@@ -1,11 +1,20 @@
-import React from 'react';
+import React,{useState} from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
+import I18n, { setLanguage } from '../utils/localization';
 
 const HomeScreen = ({ navigation }) => {
+  const [currentLang, setCurrentLang] = useState(I18n.locale);
+  const toggleLanguage = () => {
+    const newLang = currentLang === 'en' ? 'ar' : 'en';
+    setLanguage(newLang);
+    setCurrentLang(newLang);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Welcome to Deliverme!</Text>
-      <Button title="Go to Signup" onPress={() => navigation.navigate('Signup')} />
+      <Text style={styles.text}>{I18n.t('welcome')}</Text>
+      <Button title={I18n.t('signup')} onPress={() => navigation.navigate('Signup')} />
+      <Button title={I18n.t('changeLanguage')} onPress={toggleLanguage} />
     </View>
   );
 };

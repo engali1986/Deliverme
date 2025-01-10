@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import I18n, { setLanguage } from '../utils/localization';
 
 const SignupScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Signup Screen</Text>
+      <Text style={styles.text}>{I18n.t('SignUpScreen')}</Text>
     </View>
   );
 };
