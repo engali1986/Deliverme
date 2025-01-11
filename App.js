@@ -2,6 +2,7 @@ import React from 'react';
 import AppNavigator from './src/navigation/AppNavigator';
 import { View, Text } from 'react-native';
 import useFonts from './src/hooks/usefonts.js';
+import './src/i18n/i18n.js';
 
 export default function App() {
   const fontsLoaded = useFonts();

@@ -1,20 +1,20 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
-import SignupScreen from '../screens/SignupScreen';
+import ClientSignupScreen from '../screens/ClientSignupScreen';
+import DriverSignupScreen from '../screens/DriverSignupScreen';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
-const AppNavigator = () => {
+export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="ClientSignup" component={ClientSignupScreen} />
+        <Stack.Screen name="DriverSignup" component={DriverSignupScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-};
-
-export default AppNavigator;
+}

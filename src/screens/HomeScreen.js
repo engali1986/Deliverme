@@ -1,34 +1,29 @@
-import React,{useState} from 'react';
+import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import I18n, { setLanguage } from '../utils/localization';
+import i18n from '../i18n/i18n.js';
+import LanguageToggle from '../components/LanguageToggle.js';
 
-const HomeScreen = ({ navigation }) => {
-  const [currentLang, setCurrentLang] = useState(I18n.locale);
-  const toggleLanguage = () => {
-    const newLang = currentLang === 'en' ? 'ar' : 'en';
-    setLanguage(newLang);
-    setCurrentLang(newLang);
-  };
-
+export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{I18n.t('welcome')}</Text>
-      <Button title={I18n.t('signup')} onPress={() => navigation.navigate('Signup')} />
-      <Button title={I18n.t('changeLanguage')} onPress={toggleLanguage} />
+      <Text style={styles.title}>{i18n.t('home_title')}</Text>
+      <LanguageToggle />
+      <Button title={i18n.t('client_signup')} onPress={() => navigation.navigate('ClientSignup')} />
+      <Button title={i18n.t('driver_signup')} onPress={() => navigation.navigate('DriverSignup')} />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 16,
   },
-  text: {
+  title: {
     fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 20,
   },
 });
-
-export default HomeScreen;

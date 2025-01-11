@@ -1,0 +1,41 @@
+{
+    "en": {
+      "home_title": "Welcome to Deliverme",
+      "client_signup": "Client Signup",
+      "driver_signup": "Driver Signup",
+      "all_fields_required": "All fields are mandatory.",
+      "password_instructions": "Password must be at least 8 characters long, containing 1 uppercase, 1 lowercase, and 1 special character.",
+      "email": "Email",
+      "name": "Name",
+      "password": "Password",
+      "mobile_number": "Mobile Number",
+      "driver_license_photo": "Driver’s License Photo",
+      "car_registration_photo": "Car Registration Photo",
+      "criminal_record_photo": "Criminal Record Photo",
+      "personal_photo": "Personal Photo",
+      "upload_photo": "Upload Photo",
+      "change_photo": "Change Photo",
+      "sign_up": "Sign Up",
+      "language": "العربيه"
+    },
+    "ar": {
+      "home_title": "مرحبًا بك في Deliverme",
+      "client_signup": "تسجيل العميل",
+      "driver_signup": "تسجيل السائق",
+      "all_fields_required": "جميع الحقول مطلوبة.",
+      "password_instructions": "يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل وتحتوي على حرف كبير وحرف صغير ورمز خاص.",
+      "email": "البريد الإلكتروني",
+      "name": "الاسم",
+      "password": "كلمة المرور",
+      "mobile_number": "رقم الهاتف",
+      "driver_license_photo": "صورة رخصة القيادة",
+      "car_registration_photo": "صورة تسجيل السيارة",
+      "criminal_record_photo": "صورة السجل الجنائي",
+      "personal_photo": "الصورة الشخصية",
+      "upload_photo": "تحميل الصورة",
+      "change_photo": "تغيير الصورة",
+      "sign_up": "تسجيل",
+      "language": "English"
+    }
+  }
+  
