@@ -1,9 +1,11 @@
-import React from 'react';
+import React,{useContext} from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import i18n from '../i18n/i18n.js';
 import LanguageToggle from '../components/LanguageToggle.js';
+import { LanguageContext } from '../context/LanguageContext.js';
 
 export default function HomeScreen({ navigation }) {
+  const { language } = useContext(LanguageContext); // Use context to trigger re-render
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{i18n.t('home_title')}</Text>
