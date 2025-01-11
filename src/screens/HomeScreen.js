@@ -10,8 +10,14 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>{i18n.t('home_title')}</Text>
       <LanguageToggle />
-      <Button title={i18n.t('client_signup')} onPress={() => navigation.navigate('ClientSignup')} />
-      <Button title={i18n.t('driver_signup')} onPress={() => navigation.navigate('DriverSignup')} />
+      <Button
+        title={i18n.t('clientSignIn')}
+        onPress={() => navigation.navigate('ClientSignin')}
+      />
+      <Button
+        title={i18n.t('driverSignIn')}
+        onPress={() => navigation.navigate('DriverSignin')}
+      />
     </View>
   );
 }

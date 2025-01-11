@@ -2,7 +2,11 @@
     "en": {
       "home_title": "Welcome to Deliverme",
       "client_signup": "Client Signup",
+      "clientSignIn": "Client Sigin",
       "driver_signup": "Driver Signup",
+      "driverSignIn": "Driver Signin",
+      "signUp":"Signup",
+      "signIn":"Signin",
       "all_fields_required": "All fields are mandatory.",
       "password_instructions": "Password must be at least 8 characters long, containing 1 uppercase, 1 lowercase, and 1 special character.",
       "email": "Email",
@@ -21,7 +25,11 @@
     "ar": {
       "home_title": "مرحبًا بك في Deliverme",
       "client_signup": "تسجيل العميل",
+      "clientSignIn": "تسجيل دخول عميل",
       "driver_signup": "تسجيل السائق",
+      "driverSignIn": "تسجيل دخول سائق",
+      "signUp":"تسجيل جديد",
+      "signIn":"تسجيل الدخول",
       "all_fields_required": "جميع الحقول مطلوبة.",
       "password_instructions": "يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل وتحتوي على حرف كبير وحرف صغير ورمز خاص.",
       "email": "البريد الإلكتروني",
