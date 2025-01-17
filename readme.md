@@ -2,7 +2,7 @@
 
 Deliverme is a mobile application designed to function as a ride-hailing platform, with features for both **Clients** and **Drivers**. The project consists of a **React Native frontend** and a **Node.js backend** using the **native MongoDB driver**.
 
----
+------
 
 ## **Features Implemented So Far**
 
