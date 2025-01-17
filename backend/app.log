@@ -9,3 +9,30 @@
 2025-01-17 08:22:04 [INFO]: Connecting to MongoDB...
 2025-01-17 08:22:06 [INFO]: MongoDB connection established successfully
 2025-01-17 08:22:06 [INFO]: Database connected and ready to use
+2025-01-17 09:16:03 [[32MINFO[39M]: [32mConnecting to MongoDB...[39m
+2025-01-17 09:16:04 [[32MINFO[39M]: [32mMongoDB connection established successfully[39m
+2025-01-17 09:16:04 [[32MINFO[39M]: [32mDatabase connected and ready to use[39m
+2025-01-17 09:16:34 [INFO]: Connecting to MongoDB...
+2025-01-17 09:16:36 [INFO]: MongoDB connection established successfully
+2025-01-17 09:16:36 [INFO]: Database connected and ready to use
+2025-01-17 09:19:41 [INFO]: Connecting to MongoDB...
+2025-01-17 09:19:43 [INFO]: MongoDB connection established successfully
+2025-01-17 09:19:43 [INFO]: Database connected and ready to use
+undefined
+undefined
+undefined
+2025-01-17 09:21:41 [[32MINFO[39M]: [32mConnecting to MongoDB...[39m
+2025-01-17 09:21:43 [[32MINFO[39M]: [32mMongoDB connection established successfully[39m
+2025-01-17 09:21:43 [[32MINFO[39M]: [32mDatabase connected and ready to use[39m
+2025-01-17 09:23:48 [INFO]: Connecting to MongoDB...
+2025-01-17 09:23:49 [INFO]: MongoDB connection established successfully
+2025-01-17 09:23:49 [INFO]: Database connected and ready to use
+2025-01-17 09:26:26 [[32MINFO[39M]: [32mConnecting to MongoDB...[39m
+2025-01-17 09:26:28 [[32MINFO[39M]: [32mMongoDB connection established successfully[39m
+2025-01-17 09:26:28 [[32MINFO[39M]: [32mDatabase connected and ready to use[39m
+[32m2025-01-17 09:34:16 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-17 09:34:17 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-17 09:34:17 [INFO]: Database connected and ready to use[39m
+[32m2025-01-17 09:35:35 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-17 09:35:37 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-17 09:35:37 [INFO]: Database connected and ready to use[39m

@@ -1,5 +1,7 @@
 import { createLogger, format, transports } from 'winston';
 
+
+
 // Define log format with timestamp
 const logFormat = format.printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level.toUpperCase()}]: ${message}`;
@@ -12,8 +14,10 @@ const logger = createLogger({
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }),
     format.splat(),
-    logFormat
+    logFormat,
+    format.colorize({all:true})
   ),
+  
   transports: [
     new transports.Console(),                // Log to console
     new transports.File({ filename: 'app.log' }) // Log to a file
