@@ -9,6 +9,9 @@ export default function ClientSignupScreen() {
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
 
+  // Additional state to track loading status
+  const [isLoading, setIsLoading] = useState(false);
+
   const validateInputs = () => {
     // Check if all fields are filled
     if (!email || !name || !password || !mobile) {
@@ -43,10 +46,14 @@ export default function ClientSignupScreen() {
   };
 
   const handleSignup = async () => {
-    if (!validateFields()){
+    if (!validateInputs()){
+      console.log("Please fill all data")
       Alert.alert('Error', i18n.t("missing_fields"));
       return;
     }
+
+     // Disable the button
+     setIsLoading(true);
 
     try {
       const data = { email, mobile, name, password };
@@ -54,6 +61,9 @@ export default function ClientSignupScreen() {
       Alert.alert("Success", response.message || "Client signed up successfully");
     } catch (error) {
       Alert.alert("Error", error.message);
+    }finally{
+      // Re-enable the button
+      setIsLoading(false);
     }
   };
 
@@ -92,7 +102,7 @@ export default function ClientSignupScreen() {
         value={mobile}
         onChangeText={setMobile}
       />
-      <Button title="Sign Up" onPress={handleSignup} />
+      <Button title="Sign Up" onPress={handleSignup} disabled={isLoading} />
     </View>
   );
 }
