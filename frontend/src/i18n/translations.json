@@ -20,7 +20,8 @@
       "upload_photo": "Upload Photo",
       "change_photo": "Change Photo",
       "sign_up": "Sign Up",
-      "language": "العربيه"
+      "language": "العربيه",
+      "missing_fields":"Please fill all fields"
     },
     "ar": {
       "home_title": "مرحبًا بك في Deliverme",
@@ -43,7 +44,8 @@
       "upload_photo": "تحميل الصورة",
       "change_photo": "تغيير الصورة",
       "sign_up": "تسجيل",
-      "language": "English"
+      "language": "English",
+      "missing_fields":"برجاء ملا كافه الحقول"
     }
   }
   

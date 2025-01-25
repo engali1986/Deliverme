@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import i18n from '../i18n/i18n.js';
+import {clientSignup} from "../services/api.js"
 
 export default function ClientSignupScreen() {
   const [email, setEmail] = useState('');
@@ -41,11 +42,18 @@ export default function ClientSignupScreen() {
     return true;
   };
 
-  const handleSignup = () => {
-    if (validateInputs()) {
-      // TODO: Integrate with backend API
-      console.log('Client signup successful:', { email, name, password, mobile });
-      Alert.alert('Success', 'You have signed up successfully!');
+  const handleSignup = async () => {
+    if (!validateFields()){
+      Alert.alert('Error', i18n.t("missing_fields"));
+      return;
+    }
+
+    try {
+      const data = { email, mobile, name, password };
+      const response = await clientSignup(data);
+      Alert.alert("Success", response.message || "Client signed up successfully");
+    } catch (error) {
+      Alert.alert("Error", error.message);
     }
   };
 
