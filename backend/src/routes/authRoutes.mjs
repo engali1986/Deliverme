@@ -5,7 +5,10 @@ dotenv.config()
 const router = express.Router();
 
 // Client Routes
-router.post('/client/signup', clientSignUp);
+router.post('/client/signup', async (req, res) => {
+    const db = req.app.locals.db;  // Access the db instance from app.locals
+    await clientSignUp(req, res, db);
+  });
 router.post('/client/signin', clientSignIn);
 
 // Driver Routes

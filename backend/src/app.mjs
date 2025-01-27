@@ -12,12 +12,14 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Connect to database
-connectDB().then((db) => {
-  app.locals.db = db;
+connectDB().then((client) => {
+  const db = client.db('deliverme'); // Access the database from the client
+  app.locals.db = db; // Store the db in app.locals
   logger.info('Database connected and ready to use');
   console.log('Database connected and ready to use');
+}).catch(error => {
+  logger.error('Error while connecting to database: %s', error.message);
 });
-
 // Routes
 app.use('/api/auth', authRoutes);
 // Global Error Handler

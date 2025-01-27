@@ -47,3 +47,54 @@ undefined
 [33m2025-01-25 17:24:24 [WARN]: Client already exists: engali1986ac@mail.com[39m
 [32m2025-01-25 17:35:43 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
 [32m2025-01-25 17:35:44 [INFO]: Client successfully registered: engali1986ac@mail.com[39m
+[32m2025-01-27 19:31:37 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-27 19:31:39 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-27 19:31:39 [INFO]: Database connected and ready to use[39m
+[32m2025-01-27 19:48:30 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-27 19:48:32 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-27 19:48:32 [INFO]: Database connected and ready to use[39m
+[32m2025-01-27 19:50:06 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-27 19:50:07 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-27 19:50:07 [INFO]: Database connected and ready to use[39m
+[32m2025-01-27 19:50:10 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-27 20:00:54 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-27 20:00:56 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-27 20:00:56 [INFO]: Database connected and ready to use[39m
+[32m2025-01-27 20:02:56 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-27 20:02:58 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-27 20:02:58 [INFO]: Database connected and ready to use[39m
+[32m2025-01-27 20:03:00 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-27 20:11:12 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-27 20:11:14 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-27 20:11:14 [INFO]: Database connected and ready to use[39m
+[32m2025-01-27 20:11:19 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-27 20:11:19 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-27 20:11:20 [ERROR]: Error during Client Sign-Up: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c2a1c4295sm11989456f8f.91 - gsmtp[39m
+[32m2025-01-27 20:16:48 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-27 20:16:50 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-27 20:16:50 [INFO]: Database connected and ready to use[39m
+[32m2025-01-27 20:16:55 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-27 20:16:55 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-27 20:16:56 [ERROR]: Error during Client Sign-Up: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c2a18859asm11634418f8f.42 - gsmtp[39m
+[32m2025-01-27 20:17:58 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-27 20:17:58 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-27 20:17:59 [ERROR]: Error during Client Sign-Up: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-438bd4d3dbcsm142883075e9.40 - gsmtp[39m
+[32m2025-01-27 20:39:46 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-27 20:39:46 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-27 20:39:47 [ERROR]: Error during Client Sign-Up: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-438bd507c59sm140732825e9.17 - gsmtp[39m
+[32m2025-01-27 20:55:03 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-27 20:55:03 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-27 20:55:04 [ERROR]: Error during Client Sign-Up: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c2a1c4161sm11594008f8f.88 - gsmtp[39m
+[32m2025-01-27 20:56:19 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-27 20:56:19 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-27 20:56:19 [ERROR]: Error during Client Sign-Up: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c2a1c3fedsm11579032f8f.85 - gsmtp[39m
+[32m2025-01-27 20:58:30 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-27 20:58:30 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-27 20:58:31 [ERROR]: Error during Client Sign-Up: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c2a188915sm11740539f8f.41 - gsmtp[39m

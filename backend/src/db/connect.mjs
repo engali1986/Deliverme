@@ -1,32 +1,31 @@
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
-import logger from '../utils/logger.mjs'; // Import the logger
+import logger from '../utils/logger.mjs';
 
 dotenv.config();
 
 const uri = process.env.MONGO_URI;
-let dbInstance = null;
+let clientInstance = null;
 
 const options = {
   maxPoolSize: 50,
   minPoolSize: 5,
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 };
 
 export async function connectDB() {
-  if (dbInstance) {
+  if (clientInstance) {
     logger.info('Reusing existing MongoDB connection');
-    return dbInstance;
+    return clientInstance;
   }
 
   try {
     logger.info('Connecting to MongoDB...');
-    const client = new MongoClient(uri, options);
-    await client.connect();
-    dbInstance = client.db('deliverme');
+    clientInstance = new MongoClient(uri, options);
+    await clientInstance.connect();
     logger.info('MongoDB connection established successfully');
-    return dbInstance;
+    return clientInstance;
   } catch (error) {
     logger.error('Failed to connect to MongoDB: %s', error.message);
     process.exit(1);
