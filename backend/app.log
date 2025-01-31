@@ -167,3 +167,9 @@ undefined
 [32m2025-01-31 09:21:28 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
 [32m2025-01-31 09:21:28 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
 [31m2025-01-31 09:21:28 [ERROR]: Error during Client Sign-Up: unauthorized_client[39m
+[32m2025-01-31 17:26:15 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-31 17:26:24 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-31 17:26:24 [INFO]: Database connected and ready to use[39m
+[32m2025-01-31 17:27:18 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-31 17:27:18 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-01-31 17:27:23 [INFO]: Verification email sent to: engali1986ac@mail.com[39m

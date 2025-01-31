@@ -11,7 +11,7 @@ dotenv.config();
 const oauth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID, // Google client ID
   process.env.CLIENT_SECRET, // Google client secret
-  'http://localhost' // Redirect URI
+  'https://developers.google.com/oauthplayground' // Redirect URI
 );
 
 // Set the refresh token for the client
