@@ -3,18 +3,55 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import nodemailer from "nodemailer"
 import logger from '../utils/logger.mjs';
+import { google } from 'googleapis';
 
 dotenv.config();
-let Transporter=await nodemailer.createTransport({
-  service:"gmail",
-  port: 587, 
-  secure:true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-  })
 
+// Set up OAuth2 client
+const oauth2Client = new google.auth.OAuth2(
+  process.env.CLIENT_ID, // Google client ID
+  process.env.CLIENT_SECRET, // Google client secret
+  'http://localhost' // Redirect URI
+);
+
+// Set the refresh token for the client
+oauth2Client.setCredentials({
+  refresh_token: process.env.REFRESH_TOKEN,
+});
+
+// Create the nodemailer transporter
+const createTransporter = async () => {
+  const accessToken = await oauth2Client.getAccessToken();
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      type: 'OAuth2',
+      user: process.env.EMAIL_USER,
+      clientId: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      refreshToken: process.env.REFRESH_TOKEN,
+      accessToken: accessToken.token,
+    },
+  });
+};
+// Send verification email using OAuth2
+async function sendClientVerificationEmail(email, verificationCode) {
+  const transporter = await createTransporter();
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Verify Your Deliverme Account',
+    text: `Your verification code is: ${verificationCode}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    logger.info('Verification email sent to: %s', email);
+  } catch (error) {
+    logger.error('Error sending email: %s', error.message);
+    throw new Error('Failed to send email');
+  }
+}
 // Client Sign-Up
 export async function clientSignUp(req, res,db) {
   const { email, mobile, name, password } = req.body;
@@ -59,17 +96,7 @@ export async function clientSignUp(req, res,db) {
     }
 
     // Send verification email
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Verify Your Deliverme Account",
-      text: `Your verification code is: ${verificationCode}`,
-    };
-
-    await Transporter.sendMail(mailOptions);
-
-    logger.info("Verification email sent to: %s", email);
-
+    await sendClientVerificationEmail(email, verificationCode);
     // Commit the transaction if everything goes fine
     await session.commitTransaction();
 

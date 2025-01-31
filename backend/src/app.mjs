@@ -4,8 +4,18 @@ import bodyParser from 'body-parser';
 import { connectDB } from './db/connect.mjs';
 import authRoutes from './routes/authRoutes.mjs';
 import logger from './utils/logger.mjs';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
+// Set rate limit (100 requests per 15 minutes)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+  message: 'Too many requests, please try again later.',
+});
+
+// Apply rate limiting to all routes
+app.use(limiter);
 
 // Middleware
 app.use(cors());

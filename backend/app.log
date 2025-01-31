@@ -104,3 +104,66 @@ undefined
 [32m2025-01-28 20:23:26 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
 [32m2025-01-28 20:23:26 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
 [32m2025-01-28 20:23:27 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-01-31 08:39:31 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-31 08:39:35 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-31 08:39:35 [INFO]: Database connected and ready to use[39m
+[32m2025-01-31 08:40:59 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-31 08:40:59 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-31 08:41:01 [ERROR]: Error sending email, attempt 1: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c5c11b851sm3799690f8f.43 - gsmtp[39m
+[31m2025-01-31 08:41:02 [ERROR]: Error sending email, attempt 2: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-438dcc13139sm80380975e9.3 - gsmtp[39m
+[31m2025-01-31 08:41:03 [ERROR]: Error sending email, attempt 3: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c5c122539sm3864184f8f.46 - gsmtp[39m
+[31m2025-01-31 08:41:03 [ERROR]: Error during Client Sign-Up: Failed to send email after multiple attempts[39m
+[32m2025-01-31 08:41:46 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-31 08:41:46 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-31 08:41:48 [ERROR]: Error sending email, attempt 1: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-438dcc2ef08sm81755945e9.22 - gsmtp[39m
+[31m2025-01-31 08:41:48 [ERROR]: Error sending email, attempt 2: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-438dcc13146sm80137485e9.4 - gsmtp[39m
+[31m2025-01-31 08:41:49 [ERROR]: Error sending email, attempt 3: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c5c11b58esm3765402f8f.42 - gsmtp[39m
+[31m2025-01-31 08:41:49 [ERROR]: Error during Client Sign-Up: Failed to send email after multiple attempts[39m
+[32m2025-01-31 08:43:02 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-31 08:43:04 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-31 08:43:04 [INFO]: Database connected and ready to use[39m
+[32m2025-01-31 08:43:12 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-31 08:43:12 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-31 08:43:13 [ERROR]: Error sending email, attempt 1: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c5c0ec315sm3815038f8f.4 - gsmtp[39m
+[31m2025-01-31 08:43:15 [ERROR]: Error sending email, attempt 2: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-438dcc263f0sm80614245e9.9 - gsmtp[39m
+[31m2025-01-31 08:43:16 [ERROR]: Error sending email, attempt 3: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c5c1e8f53sm3764257f8f.100 - gsmtp[39m
+[31m2025-01-31 08:43:16 [ERROR]: Error during Client Sign-Up: Failed to send email after multiple attempts[39m
+[32m2025-01-31 08:44:04 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-31 08:44:07 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-31 08:44:07 [INFO]: Database connected and ready to use[39m
+[32m2025-01-31 08:44:11 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-31 08:44:11 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-31 08:44:14 [ERROR]: Error sending email, attempt 1: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-438dcc12f88sm80923665e9.2 - gsmtp[39m
+[31m2025-01-31 08:44:15 [ERROR]: Error sending email, attempt 2: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-38c5c12191dsm3918898f8f.51 - gsmtp[39m
+[31m2025-01-31 08:44:16 [ERROR]: Error sending email, attempt 3: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-438e245f14esm44553705e9.34 - gsmtp[39m
+[31m2025-01-31 08:44:17 [ERROR]: Error during Client Sign-Up: Failed to send email after multiple attempts[39m
+[32m2025-01-31 09:14:41 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-31 09:14:42 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-31 09:14:42 [INFO]: Database connected and ready to use[39m
+[32m2025-01-31 09:14:46 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-31 09:14:46 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-31 09:14:47 [ERROR]: Error during Client Sign-Up: unauthorized_client[39m
+[32m2025-01-31 09:16:42 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-31 09:16:46 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-31 09:16:46 [INFO]: Database connected and ready to use[39m
+[32m2025-01-31 09:16:47 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-31 09:16:47 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-31 09:16:47 [ERROR]: Error during Client Sign-Up: unauthorized_client[39m
+[32m2025-01-31 09:21:20 [INFO]: Connecting to MongoDB...[39m
+[32m2025-01-31 09:21:22 [INFO]: MongoDB connection established successfully[39m
+[32m2025-01-31 09:21:22 [INFO]: Database connected and ready to use[39m
+[32m2025-01-31 09:21:28 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-01-31 09:21:28 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-01-31 09:21:28 [ERROR]: Error during Client Sign-Up: unauthorized_client[39m
