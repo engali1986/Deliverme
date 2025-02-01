@@ -34,8 +34,27 @@ const createTransporter = async () => {
     },
   });
 };
-// Send verification email using OAuth2
+// Send verification email to Client using OAuth2
 async function sendClientVerificationEmail(email, verificationCode) {
+  const transporter = await createTransporter();
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Verify Your Deliverme Account',
+    text: `Your verification code is: ${verificationCode}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    logger.info('Verification email sent to: %s', email);
+  } catch (error) {
+    logger.error('Error sending email: %s', error.message);
+    throw new Error('Failed to send email');
+  }
+}
+
+// Send verification email to Client using OAuth2
+async function sendDriverVerificationEmail(email, verificationCode) {
   const transporter = await createTransporter();
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -143,30 +162,71 @@ export async function clientSignIn(req, res) {
 }
 
 // Driver Sign-Up
-export async function driverSignUp(req, res) {
-  const { email, mobile, name, password, driverLicensePhoto, carRegistrationPhoto, criminalRecordPhoto, personalPhoto } = req.body;
-  const db = req.app.locals.db;
+export async function DriverSignUp(req, res,db) {
+  const { email, mobile, name, password } = req.body;
+  logger.info("Driver Sign-Up db %s", db);
+  const client = db.client; // MongoClient instance
+  const session = client.startSession(); // Start session on MongoClient
 
+  
   try {
-    const existingDriver = await db.collection('drivers').findOne({ email });
-    if (existingDriver) return res.status(400).json({ message: 'Driver already exists' });
+    session.startTransaction();  // Begin transaction
 
+    logger.info("Driver Sign-Up request received for email: %s", email);
+
+    // Check if the Driver already exists
+    const existingClient = await db.collection("drivers").findOne({ email }, { session });
+    if (existingClient) {
+      logger.warn("Driver already exists: %s", email);
+      return res.status(400).json({ message: "Driver already exists" });
+    }
+
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db.collection('drivers').insertOne({
-      email,
-      mobile,
-      name,
-      password: hashedPassword,
-      driverLicensePhoto,
-      carRegistrationPhoto,
-      criminalRecordPhoto,
-      personalPhoto
-    });
 
-    res.status(201).json({ message: 'Driver registered successfully' });
+    // Generate a random 6-digit verification number
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
+
+    // Insert client with clientVerified as false and save verification code
+    const result = await db.collection("drivers").insertOne(
+      {
+        email,
+        mobile,
+        name,
+        password: hashedPassword,
+        clientVerified: false,
+        verificationCode,
+      },
+      { session }
+    );
+
+    if (!result.acknowledged) {
+      throw new Error("Failed to insert driver into the database");
+    }
+
+    // Send verification email
+    await sendDriverVerificationEmail(email, verificationCode);
+    // Commit the transaction if everything goes fine
+    await session.commitTransaction();
+
+    res.status(201).json({
+      message: "Driver registered successfully. Please verify your email.",
+    });
   } catch (error) {
-    logger.error('Error in Driver Sign-Up: %s', error.message);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    // If any error happens, rollback the transaction and delete the Driver
+    await session.abortTransaction();
+    logger.error("Error during Driver Sign-Up: %s", error.message);
+
+    // Optionally, you can delete the client if email sending fails
+    await db.collection("drivers").deleteOne({ email });
+
+    res.status(500).json({
+      message: "Server error occurred during sign-up. Please try again later.",
+      error: error.message,
+    });
+  } finally {
+    // End the session and transaction
+    session.endSession();
   }
 }
 
