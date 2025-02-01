@@ -12,7 +12,10 @@ router.post('/client/signup', async (req, res) => {
 router.post('/client/signin', clientSignIn);
 
 // Driver Routes
-router.post('/driver/signup', driverSignUp);
+router.post('/driver/signup', async (req, res) => {
+  const db = req.app.locals.db;  // Access the db instance from app.locals
+  await driverSignUp(req, res, db);
+});
 router.post('/driver/signin', driverSignIn);
 router.get("/",(req,res)=>{
     console.log(process.env.JWT_SECRET)

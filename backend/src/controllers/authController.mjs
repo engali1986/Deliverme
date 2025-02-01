@@ -53,7 +53,7 @@ async function sendClientVerificationEmail(email, verificationCode) {
   }
 }
 
-// Send verification email to Client using OAuth2
+// Send verification email to Driver using OAuth2
 async function sendDriverVerificationEmail(email, verificationCode) {
   const transporter = await createTransporter();
   const mailOptions = {
@@ -162,7 +162,7 @@ export async function clientSignIn(req, res) {
 }
 
 // Driver Sign-Up
-export async function DriverSignUp(req, res,db) {
+export async function driverSignUp(req, res,db) {
   const { email, mobile, name, password } = req.body;
   logger.info("Driver Sign-Up db %s", db);
   const client = db.client; // MongoClient instance
