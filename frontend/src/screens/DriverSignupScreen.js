@@ -11,6 +11,8 @@ export default function DriverSignupScreen() {
   const [registrationPhoto, setRegistrationPhoto] = useState(null);
   const [criminalRecordPhoto, setCriminalRecordPhoto] = useState(null);
   const [personalPhoto, setPersonalPhoto] = useState(null);
+  // Additional state to track loading status
+    const [isLoading, setIsLoading] = useState(false);
 
   const validateInputs = () => {
     if (!email || !name || !password || !mobile || !licensePhoto || !registrationPhoto || !criminalRecordPhoto || !personalPhoto) {
@@ -132,7 +134,7 @@ export default function DriverSignupScreen() {
         <Text style={styles.uploadButtonText}>{personalPhoto ? 'Change Photo' : 'Upload Photo'}</Text>
       </TouchableOpacity>
 
-      <Button title="Sign Up" onPress={handleSignup} />
+      <Button disabled={isLoading} title="Sign Up" onPress={handleSignup} />
     </View>
   );
 }

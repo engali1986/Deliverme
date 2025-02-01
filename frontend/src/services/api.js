@@ -49,3 +49,28 @@ export async function clientSignin(data) {
     throw new Error(error.message || "Network error");
   }
 }
+
+/**
+ * Handles user signup for drivers.
+ * @param {Object} data - The driver signup details (email, mobile, name, password).
+ */
+export async function driverSignup(data) {
+  try {
+    const response = await fetch(`${BASE_URL}/driver/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to sign up");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.log(error)
+    throw new Error(error.message || "Network error");
+  }
+}
