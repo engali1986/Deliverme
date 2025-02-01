@@ -142,22 +142,49 @@ export async function clientSignUp(req, res,db) {
 
 // Client Sign-In
 export async function clientSignIn(req, res) {
-  const { email, password } = req.body;
+  const { email, password, verificationCode } = req.body;
   const db = req.app.locals.db;
 
   try {
-    const client = await db.collection('clients').findOne({ email });
-    logger.info('Client Sign-In request received for email: %s', email);
-    if (!client) return res.status(404).json({ message: 'Client not found' });
+    const client = await db.collection("clients").findOne({ email });
+    if (!client) {
+      logger.warn("Client not found: %s", email);
+      return res.status(404).json({ message: "Client not found" });
+    }
 
     const isPasswordValid = await bcrypt.compare(password, client.password);
-    if (!isPasswordValid) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isPasswordValid) {
+      logger.warn("Invalid credentials for email: %s", email);
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
 
-    const token = jwt.sign({ id: client._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({ message: 'Client logged in successfully', token });
+    // Check if the client is verified
+    if (!client.clientVerified) {
+      if (!verificationCode || verificationCode !== client.verificationCode) {
+        return res.status(400).json({
+          message:
+            "Account not verified. Please provide the correct verification code.",
+        });
+      }
+
+      // Verify the client
+      await db.collection("clients").updateOne(
+        { email },
+        { $set: { clientVerified: true }, $unset: { verificationCode: "" } }
+      );
+
+      logger.info("Client verified successfully: %s", email);
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ id: client._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.status(200).json({ message: "Client signed in successfully", token });
   } catch (error) {
-    logger.error('Error in Client Sign-In: %s', error.message);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    logger.error("Error in Client Sign-In: %s", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 }
 
@@ -194,7 +221,7 @@ export async function driverSignUp(req, res,db) {
         mobile,
         name,
         password: hashedPassword,
-        clientVerified: false,
+        driverVerified: false,
         verificationCode,
       },
       { session }
