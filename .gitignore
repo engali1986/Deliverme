@@ -34,6 +34,8 @@ yarn-error.*
 ./backend/.env
 /backend/.env
 *.env
+/backend/DriveServiceAccount.json
+./backend/DriveServiceAccount.json
 
 # typescript
 *.tsbuildinfo
