@@ -24,6 +24,61 @@ oauth2Client.setCredentials({
   refresh_token: process.env.REFRESH_TOKEN,
 });
 
+// Google Drive API with OAuth2
+const drive = google.drive({ version: "v3", auth: oauth2Client });
+
+/**
+ * Creates a Google Drive folder for the driver.
+ */
+async function createDriverFolder(mobile) {
+  try {
+    const response = await drive.files.create({
+      requestBody: {
+        name: mobile,
+        mimeType: "application/vnd.google-apps.folder",
+        parents: [process.env.DRIVE_PARENT_FOLDER_ID],
+      },
+      fields: "id",
+    });
+
+    logger.info(`Google Drive folder created for driver ${mobile}, ID: ${response.data.id}`);
+    return response.data.id;
+  } catch (error) {
+    logger.error("Error creating Google Drive folder: %s", error.message);
+    throw new Error("Failed to create Google Drive folder");
+  }
+}
+
+/**
+ * Uploads a file to Google Drive inside the driver’s folder.
+ */
+async function uploadFileToDrive(filePath, fileName, folderId) {
+  try {
+    const fileMetadata = {
+      name: fileName,
+      parents: [folderId],
+    };
+
+    const media = {
+      mimeType: "image/jpeg",
+      body: fs.createReadStream(filePath),
+    };
+
+    const response = await drive.files.create({
+      requestBody: fileMetadata,
+      media: media,
+      fields: "id",
+    });
+
+    logger.info(`Uploaded ${fileName} to Google Drive Folder ID: ${folderId}, File ID: ${response.data.id}`);
+    return response.data.id;
+  } catch (error) {
+    logger.error("Google Drive upload failed: %s", error.message);
+    throw new Error("Document upload failed");
+  }
+}
+
+
 // Create the nodemailer transporter
 const createTransporter = async () => {
   const accessToken = await oauth2Client.getAccessToken();
@@ -198,6 +253,9 @@ export async function driverSignUp(req, res,db) {
   const { email, mobile, name, password } = req.body;
   logger.info("Driver Sign-Up db %s", db);
   const client = db.client; // MongoClient instance
+  const files = req.files;
+  let folderId;
+  let uploadedFiles = {};
   const session = client.startSession(); // Start session on MongoClient
 
   
@@ -219,7 +277,17 @@ export async function driverSignUp(req, res,db) {
     // Generate a random 6-digit verification number
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
-    // Insert client with clientVerified as false and save verification code
+    // Step 1: Create Google Drive folder for driver
+    folderId = await createDriverFolder(mobile);
+
+    // Step 2: Upload documents to this folder
+    const requiredDocs = ["license", "registration", "criminal", "personal"];
+    for (const doc of requiredDocs) {
+      if (!files[doc]) throw new Error(`Missing required file: ${doc}`);
+      uploadedFiles[doc] = await uploadFileToDrive(files[doc][0].path, files[doc][0].originalname, folderId);
+    }
+
+    // Step 3: Store driver data in MongoDB
     const result = await db.collection("drivers").insertOne(
       {
         email,
@@ -228,6 +296,10 @@ export async function driverSignUp(req, res,db) {
         password: hashedPassword,
         driverVerified: false,
         verificationCode,
+        driverPhotos: {
+          folderId,
+          ...uploadedFiles,
+        }
       },
       { session }
     );
@@ -248,6 +320,16 @@ export async function driverSignUp(req, res,db) {
     // If any error happens, rollback the transaction and delete the Driver
     await session.abortTransaction();
     logger.error("Error during Driver Sign-Up: %s", error.message);
+
+    if (folderId) {
+      try {
+        await drive.files.delete({ fileId: folderId });
+        logger.info(`Rolled back Google Drive folder for driver ${mobile}`);
+      } catch (deleteError) {
+        logger.error("Failed to rollback Google Drive folder: %s", deleteError.message);
+      }
+    }
+
 
     // Optionally, you can delete the client if email sending fails
     await db.collection("drivers").deleteOne({ email });
