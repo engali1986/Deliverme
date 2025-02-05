@@ -1,0 +1,11 @@
+{
+  "name": "deliverme",
+  "version": "1.0.0",
+  "description": "Deliverme is a mobile application designed to function as a ride-hailing platform, with features for both **Clients** and **Drivers**. The project consists of a **React Native frontend** and a **Node.js backend** using the **native MongoDB driver**.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
