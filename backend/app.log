@@ -203,3 +203,9 @@ undefined
 [32m2025-02-01 07:17:50 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
 [32m2025-02-01 07:17:50 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
 [33m2025-02-01 07:17:50 [WARN]: Client already exists: engali1986ac@mail.com[39m
+[32m2025-02-05 06:25:03 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-05 06:25:05 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-05 06:25:05 [INFO]: Database connected and ready to use[39m
+[32m2025-02-05 06:26:38 [INFO]: Client Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-05 06:26:38 [INFO]: Client Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-05 06:26:41 [INFO]: Verification email sent to: engali1986ac@mail.com[39m

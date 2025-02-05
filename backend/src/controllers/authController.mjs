@@ -11,13 +11,6 @@ import logger from '../utils/logger.mjs';
 
 
 dotenv.config();
-// Google Drive API Setup
-const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
-const auth = new google.auth.GoogleAuth({
-  keyFile: process.env.GOOGLE_CREDENTIALS_PATH,
-  scopes: SCOPES,
-});
-const drive = google.drive({ version: "v3", auth });
 
 // Set up OAuth2 client
 const oauth2Client = new google.auth.OAuth2(
