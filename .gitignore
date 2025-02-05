@@ -33,7 +33,7 @@ yarn-error.*
 .env*.local
 ./backend/.env
 /backend/.env
-.env
+*.env
 /backend/DriveServiceAccount.json
 ./backend/DriveServiceAccount.json
 
