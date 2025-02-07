@@ -1,168 +1,129 @@
-# Deliverme - Ride Sharing App
+# DeliverMe - Ride Sharing App
 
-## 📌 Project Overview
-Deliverme is a **ride-sharing** application, developed using **React Native (Frontend)** and **Node.js with MongoDB (Backend)**. It allows **clients** to request rides and **drivers** to accept ride requests, including **document uploads** and **Google Drive integration**.
+DeliverMe is a ride-sharing mobile application, built using **React Native** (frontend) and **Node.js with Express and MongoDB** (backend). The app supports **driver and client accounts**, allows users to **sign up, verify their email, request rides**, and integrates **Google Drive API for storing driver documents**.
+
+---
+
+## 🚀 Features
+### **1. Client Features:**
+✅ Sign Up & Login (Email Verification Required)
+✅ Request a Ride
+✅ View Nearby Drivers
+✅ Multi-language Support (English & Arabic)
+
+### **2. Driver Features:**
+✅ Sign Up with Required Documents
+✅ Email Verification via Code
+✅ Upload License, Car Registration, and Personal Documents
+✅ Accept Ride Requests
+
+### **3. Admin Features:**
+✅ View & Manage Clients & Drivers
+✅ Monitor Ride Requests
+✅ Manage Google Drive Uploads
+
+### **4. Technologies Used:**
+- **Frontend:** React Native, Expo, React Navigation
+- **Backend:** Node.js, Express, MongoDB (Native Driver)
+- **Storage:** Google Drive API (for driver documents)
+- **Email:** Nodemailer with OAuth2
+- **Authentication:** JWT-based authentication
+- **Logging:** Winston Logger
 
 ---
 
 ## 📂 Project Folder Structure
 ```
-Deliverme/
-├── deliverme-frontend/                    # React Native mobile app
-│   ├── src/
-│   │   ├── components/                    # Reusable UI components
-│   │   ├── navigation/                    # Navigation setup
-│   │   ├── screens/                       # All screens (Client/Driver Sign Up & Sign In)
-│   │   │   ├── HomeScreen.js
-│   │   │   ├── ClientSignupScreen.js
-│   │   │   ├── ClientSigninScreen.js
-│   │   │   ├── DriverSignupScreen.js
-│   │   │   ├── DriverSigninScreen.js
-│   │   ├── services/                      # API service functions
-│   │   ├── context/                       # Context API for language toggle
-│   ├── package.json                       # Frontend dependencies
-│   └── README.md                          # Frontend-specific readme
+DeliverMe/
+│── backend/                   # Node.js & Express Backend
+│   │── controllers/           # API Controllers
+│   │   ├── authController.mjs # Handles authentication (Signup, Login, Verification)
+│   │── middlewares/           # Express Middlewares
+│   │   ├── uploadMiddleware.mjs  # Multer for file uploads
+│   │── routes/                # API Routes
+│   │   ├── authRoutes.mjs     # Authentication Routes
+│   │── services/              # Utility & External Services
+│   │   ├── googleDrive.mjs    # Google Drive Integration
+│   │── utils/                 # Logger, Configs
+│   │── server.mjs             # Express Server Entry Point
+│   │── config.mjs             # Environment Variables
 │
-├── deliverme-backend/                     # Node.js backend
-│   ├── src/
-│   │   ├── controllers/                   # Business logic (auth, ride requests)
-│   │   │   ├── authController.mjs         # Authentication logic (OAuth2, Sign-In/Sign-Up)
-│   │   ├── db/                            # MongoDB connection logic
-│   │   │   └── connect.mjs                # Database connection with pooling
-│   │   ├── middlewares/                   # Middleware for authentication, errors, uploads
-│   │   │   ├── authMiddleware.mjs         # JWT authentication middleware
-│   │   │   ├── uploadMiddleware.mjs       # Multer file upload middleware
-│   │   ├── routes/                        # API routes
-│   │   │   ├── authRoutes.mjs             # Auth-related routes (signup, signin)
-│   │   │   ├── rideRoutes.mjs             # Ride booking & tracking routes
-│   │   ├── utils/                         # Utility modules (e.g., logger)
-│   │   │   ├── logger.mjs                 # Winston logger setup
-│   │   ├── config/                        # Configuration files
-│   │   │   ├── googleDriveConfig.mjs      # Google Drive OAuth2 setup
-│   │   │   ├── emailConfig.mjs            # Nodemailer OAuth2 setup
-│   │   ├── app.mjs                        # Express app setup
-│   ├── logs/                              # Logs directory
-│   ├── uploads/                           # Temporary storage for uploaded files
-│   ├── .env                               # Environment variables (MongoDB, Google, Email, JWT)
-│   ├── server.mjs                         # Backend entry point
-│   ├── package.json                       # Backend dependencies
-│   └── README.md                          # Backend-specific readme
+│── frontend/                  # React Native App
+│   │── src/
+│   │   ├── screens/
+│   │   │   ├── HomeScreen.js         # Main Home Screen
+│   │   │   ├── ClientSigninScreen.js # Client Login
+│   │   │   ├── ClientSignupScreen.js # Client Signup
+│   │   │   ├── DriverSigninScreen.js # Driver Login
+│   │   │   ├── DriverSignupScreen.js # Driver Signup with Verification Code
+│   │   │   ├── DriverHomeScreen.js   # Driver Dashboard
+│   │   │   ├── VerifyDriverScreen.js # Verification Code Entry
+│   │   ├── navigation/
+│   │   │   ├── AppNavigator.js       # Navigation Setup
+│   │   ├── services/
+│   │   │   ├── api.js                # API Calls (Signup, Login, Verification)
+│   │   ├── assets/
+│   │   ├── App.js
+│   │   ├── i18n.js                    # Language Setup
+│   │   ├── styles/
+│   │   │   ├── theme.js               # App Theme (Shades of Blue)
 │
-└── README.md                              # Main project readme
+│── README.md                   # Project Documentation
+│── .env                         # Environment Variables
+│── package.json                 # Dependencies & Scripts
 ```
 
 ---
 
-## 🚀 Features
-### **Frontend (React Native)**
-✅ **Client & Driver Authentication** (Sign-Up, Sign-In).  
-✅ **Google Drive API Integration** for **driver document uploads**.  
-✅ **Instant Language Toggle** (English/Arabic).  
-✅ **Navigation using React Navigation**.  
+## 🛠️ Installation & Setup
 
-### **Backend (Node.js + Express + MongoDB)**
-✅ **OAuth2 Authentication** for **Google Drive API & Nodemailer**.  
-✅ **Google Drive API Integration** for **secure document storage**.  
-✅ **Multer Middleware** for **handling file uploads**.  
-✅ **Nodemailer OAuth2** for **secure email verification**.  
-✅ **Error Handling & Logging** using **Winston**.  
-✅ **JWT Authentication** for secure API access.  
-
----
-
-## 🔧 Setup & Installation
-### **1️⃣ Clone the Repository**
+### **Backend Setup**
 ```sh
-git clone https://github.com/your-repo/deliverme.git
-cd deliverme
-```
-
-### **2️⃣ Install Dependencies**
-```sh
-# Install backend dependencies
-cd deliverme-backend
+cd backend
 npm install
-
-# Install frontend dependencies
-cd ../deliverme-frontend
-npm install
-```
-
-### **3️⃣ Configure Environment Variables**
-Create a `.env` file inside `deliverme-backend/` and add:
-```plaintext
-# MongoDB
-MONGO_URI=your_mongo_connection_string
-JWT_SECRET=your_jwt_secret_key
-
-# OAuth2 Credentials (Google Drive & Nodemailer)
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_REFRESH_TOKEN=your_google_refresh_token
-GOOGLE_REDIRECT_URI=https://developers.google.com/oauthplayground
-
-# Email Configuration (Gmail API)
-EMAIL_USER=your_email@gmail.com
-EMAIL_SERVICE=Gmail
-
-# Google Drive Folder
-DRIVE_PARENT_FOLDER_ID=your_google_drive_parent_folder_id
-```
-
-### **4️⃣ Start the Backend Server**
-```sh
-cd deliverme-backend
 npm start
 ```
 
-### **5️⃣ Start the React Native App**
-For Android:
+### **Frontend Setup**
 ```sh
-cd deliverme-frontend
-npx react-native run-android
-```
-For iOS:
-```sh
-cd deliverme-frontend
-npx react-native run-ios
+cd frontend
+npm install
+npx expo start
 ```
 
 ---
 
-## ✅ API Endpoints
-### **Authentication**
-| Method | Endpoint | Description |
-|--------|-------------------------|--------------------------------|
-| POST   | `/api/auth/client/signup`  | Client sign-up |
-| POST   | `/api/auth/client/signin`  | Client sign-in |
-| POST   | `/api/auth/driver/signup`  | Driver sign-up (with file uploads) |
-| POST   | `/api/auth/driver/signin`  | Driver sign-in |
+## 🔑 Environment Variables (`.env`)
+```env
+# Backend
+MONGO_URI=mongodb+srv://your_mongo_url
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REFRESH_TOKEN=your_google_refresh_token
+GMAIL_USER=your_gmail
+GMAIL_PASS=your_gmail_password
+JWT_SECRET=your_jwt_secret
+DRIVE_PARENT_FOLDER_ID=your_drive_folder_id
 
----
-
-## 🌍 Deployment Guide
-### **Frontend Deployment**
-- Android: **Build APK** → `npx react-native run-android --variant=release`
-- iOS: **Build iOS App** → `npx react-native run-ios --configuration Release`
-
-### **Backend Deployment**
-- Deploy on **Heroku / AWS / DigitalOcean**.
-- Use **PM2** to keep the backend running:
-```sh
-npm install -g pm2
-pm start
-pm2 start server.mjs --name deliverme-backend
+# Frontend
+API_BASE_URL=http://your_backend_ip:5000/api
 ```
 
 ---
 
-## 🚀 Next Steps
-✅ **Implement Real-time Ride Tracking (Socket.IO)**  
-✅ **Deploy Backend to Cloud Server (Heroku, AWS, DigitalOcean)**  
-✅ **Deploy Frontend (APK & iOS)**  
-✅ **Integrate Google Maps API for Ride Requests**  
+## 🎯 How It Works
+1️⃣ **User Signs Up** → Enters details & gets a verification email.
+2️⃣ **Driver Uploads Documents** → License, Registration, Personal Photo.
+3️⃣ **Email Verification** → User enters the code to activate account.
+4️⃣ **Client Requests a Ride** → Nearby drivers get notified.
+5️⃣ **Driver Accepts Ride** → Ride starts, tracking enabled.
 
 ---
 
-💡 **Need Help?** Reach out for support or feature requests! 🚀
+## ✅ Next Steps & Future Improvements
+- **Real-time Ride Tracking** (Socket.io)
+- **In-App Payments Integration** (Stripe)
+- **Push Notifications** for Ride Requests
+
+🚀 **DeliverMe is now ready to deploy!** 🎉
 
