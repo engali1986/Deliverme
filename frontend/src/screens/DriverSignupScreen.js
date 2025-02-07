@@ -116,7 +116,8 @@ const DriverSignupScreen = ({ navigation }) => {
      try {
   const response = await driverSignup(form); // Call the API function
   Alert.alert("Signup successful! Please check your email to verify your account.");
-  navigation.navigate("DriverSignin");
+  setShowVerification(true)
+  // navigation.navigate("DriverSignin");
      } catch (error) {
   Alert.alert("Signup failed. Please try again.");
   console.error(error);
@@ -148,9 +149,9 @@ const DriverSignupScreen = ({ navigation }) => {
       {/* Submit button with loading indicator */}
       {loading ? <ActivityIndicator size="large" /> : <Button title={i18n.t("sign_up")} onPress={handleSignup} />}
         </>):(<>
-          <Text style={styles.title}>{t("Enter Verification Code")}</Text>
-      <TextInput style={styles.input} placeholder={t("Verification Code")} keyboardType="numeric" value={verificationCode} onChangeText={setVerificationCode} />
-      <Button title={t("Verify")} color="#0073e6" onPress={handleVerify} />
+          <Text style={styles.title}>Enter Verification Code</Text>
+      <TextInput style={styles.input} placeholder={i18n.t("verification_code")} keyboardType="numeric" value={verificationCode} onChangeText={setVerificationCode} />
+      <Button title={i18n.t("verify")} color="#0073e6"  />
         </>)}
 
       

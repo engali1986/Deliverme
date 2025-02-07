@@ -296,3 +296,36 @@ undefined
 [32m2025-02-07 14:45:20 [INFO]: Uploaded ComfyUI_00002_.png to Google Drive Folder ID: 1fxYQ8vr04jyStgezZ0pFqsTOJAunJPx7, File ID: 15DgoeQRUcgxX1D_TyMvpf9riQkzmIzWs[39m
 [32m2025-02-07 14:45:25 [INFO]: Uploaded ComfyUI_00004_.png to Google Drive Folder ID: 1fxYQ8vr04jyStgezZ0pFqsTOJAunJPx7, File ID: 1v002wI6qKXlSapdOtrzZsHyYXG4mCnXo[39m
 [32m2025-02-07 14:45:27 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-02-07 19:51:39 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-07 19:51:41 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-07 19:51:41 [INFO]: Database connected and ready to use[39m
+[32m2025-02-07 19:52:43 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-07 19:52:44 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-07 19:52:44 [INFO]: Database connected and ready to use[39m
+[32m2025-02-07 20:01:50 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-07 20:01:50 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-07 20:01:50 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-07 20:01:52 [INFO]: Google Drive folder created for driver 01101806523, ID: 1GkoKXYmyADH8M7tEiaacg1McnKz5meDy[39m
+[32m2025-02-07 20:01:54 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 1GkoKXYmyADH8M7tEiaacg1McnKz5meDy, File ID: 1Oxx-3gXI8VekAJiXCkoU226nOgIp-Dh_[39m
+[32m2025-02-07 20:01:56 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 1GkoKXYmyADH8M7tEiaacg1McnKz5meDy, File ID: 1EQyHqNwJ9bN5vcvcyMH2pGN9P6bUMmbv[39m
+[32m2025-02-07 20:01:58 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 1GkoKXYmyADH8M7tEiaacg1McnKz5meDy, File ID: 1sakEXFhlCchdCb3gA2J8_jpPLLioaOjl[39m
+[32m2025-02-07 20:02:00 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 1GkoKXYmyADH8M7tEiaacg1McnKz5meDy, File ID: 1Jbbb6LDNbH3Jicwrmx_CVzc1TvHildaT[39m
+[32m2025-02-07 20:02:02 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-02-07 20:05:38 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-07 20:05:38 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-07 20:05:38 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-07 20:05:39 [INFO]: Google Drive folder created for driver 01101806523, ID: 1f7i03DU5q6TVJXxbbBkS-GgMOXrDZlcw[39m
+[32m2025-02-07 20:05:41 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 1f7i03DU5q6TVJXxbbBkS-GgMOXrDZlcw, File ID: 1aGGpV_jvHr081cRFO1vU5XNxcP25OxOr[39m
+[32m2025-02-07 20:05:43 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 1f7i03DU5q6TVJXxbbBkS-GgMOXrDZlcw, File ID: 1Vpv_00pm0qBFu6AsjBnvGctEIIjjvvIQ[39m
+[32m2025-02-07 20:05:45 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 1f7i03DU5q6TVJXxbbBkS-GgMOXrDZlcw, File ID: 1SsjcB8NCIPwtq3qjyEFm_SGip5amnGhQ[39m
+[32m2025-02-07 20:05:47 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 1f7i03DU5q6TVJXxbbBkS-GgMOXrDZlcw, File ID: 1Oy1BwEF7ZhF-10wsK-3ylTXrvNMbePWX[39m
+[32m2025-02-07 20:05:48 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-02-07 20:07:48 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-07 20:07:48 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-07 20:07:48 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-07 20:07:49 [INFO]: Google Drive folder created for driver 01101806523, ID: 12guR2p0xX5Cl7Zu0-TWggvtFMD93pBQm[39m
+[32m2025-02-07 20:07:51 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 12guR2p0xX5Cl7Zu0-TWggvtFMD93pBQm, File ID: 1GOxsHUpbdMAbs-jl1a0HqaL00ST5VivZ[39m
+[32m2025-02-07 20:07:53 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 12guR2p0xX5Cl7Zu0-TWggvtFMD93pBQm, File ID: 1XHnJe5vPd4KnU6gvddYZAMumdPkszFSH[39m
+[32m2025-02-07 20:07:55 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 12guR2p0xX5Cl7Zu0-TWggvtFMD93pBQm, File ID: 1l3IY5cRCB_zfgWgrU8tcPaejytVszUq9[39m
+[32m2025-02-07 20:07:57 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 12guR2p0xX5Cl7Zu0-TWggvtFMD93pBQm, File ID: 1yS0J0HD7LW6bDAWuHOjj8gNRdFgiS9io[39m
+[32m2025-02-07 20:07:59 [INFO]: Verification email sent to: engali1986ac@mail.com[39m

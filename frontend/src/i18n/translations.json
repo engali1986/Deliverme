@@ -21,7 +21,9 @@
       "change_photo": "Change Photo",
       "sign_up": "Sign Up",
       "language": "العربيه",
-      "missing_fields":"Please fill all fields"
+      "missing_fields":"Please fill all fields",
+      "verify":"Varify",
+      "verification_code":"Varification Code"
     },
     "ar": {
       "home_title": "مرحبًا بك في Deliverme",
@@ -45,7 +47,9 @@
       "change_photo": "تغيير الصورة",
       "sign_up": "تسجيل",
       "language": "English",
-      "missing_fields":"برجاء ملا كافه الحقول"
+      "missing_fields":"برجاء ملا كافه الحقول",
+      "verify":"تحقق",
+      "verification_code":"رمز التحقق"
     }
   }
   
