@@ -56,21 +56,40 @@ export async function clientSignin(data) {
  */
 export async function driverSignup(data) {
   try {
-    const response = await fetch(`${BASE_URL}/driver/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to sign up");
-    }
-
-    return await response.json();
+  const formData = new FormData();
+  
+  // Append all form fields to FormData
+  Object.keys(data).forEach((key) => {
+  if (["license", "registration", "criminal", "personal"].includes(key)) {
+  formData.append(key, {
+  uri: data[key],
+  type: "image/jpeg",
+  name: `${key}.jpg`,
+  });
+  } else {
+  formData.append(key, data[key]);
+  }
+  });
+  
+  // Send request to backend
+  const response = await fetch(`${BASE_URL}/driver/signup`, {
+  method: "POST",
+  body: formData,
+  headers: {
+  "Accept": "application/json",
+  },
+  });
+  
+  if (!response.ok) {
+  const errorData = await response.json();
+  throw new Error(errorData.message || "Failed to sign up");
+  }
+  
+  return await response.json();
   } catch (error) {
-    console.log(error)
-    throw new Error(error.message || "Network error");
+  console.log(error);
+  throw new Error(error.message || "Network error");
   }
 }
+  
+  
