@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator, Image, Alert, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator, Image, Alert, StyleSheet, ScrollView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import i18n from '../i18n/i18n.js';
+import {driverSignup} from "../services/api.js"
 
 const DriverSignupScreen = ({ navigation }) => {
   
@@ -95,7 +96,7 @@ const DriverSignupScreen = ({ navigation }) => {
 
   // Function to handle signup request
   const handleSignup = async () => {
-    console.log(form)
+    console.log("form",form)
     // Check if all required fields are filled
     if (!validateInputs()){
           console.log("Please fill all data")
@@ -124,6 +125,9 @@ const DriverSignupScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <ScrollView>
+
+      
       <Text style={styles.title}>{i18n.t("sign_up")}</Text>
       
       {/* Input fields for email, mobile, name, and password */}
@@ -142,6 +146,7 @@ const DriverSignupScreen = ({ navigation }) => {
 
       {/* Submit button with loading indicator */}
       {loading ? <ActivityIndicator size="large" /> : <Button title={i18n.t("sign_up")} onPress={handleSignup} />}
+      </ScrollView>
     </View>
   );
 };

@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000/api/auth"; // Replace with your backend's deployed URL if applicable
+const BASE_URL = "http://192.168.1.6:5000/api/auth"; // Replace with your backend's deployed URL if applicable
 
 /**
  * Handles user signup for clients.
@@ -55,6 +55,7 @@ export async function clientSignin(data) {
  * @param {Object} data - The driver signup details (email, mobile, name, password).
  */
 export async function driverSignup(data) {
+  console.log("api.js driverignup data",data)
   try {
   const formData = new FormData();
   
@@ -87,6 +88,7 @@ export async function driverSignup(data) {
   
   return await response.json();
   } catch (error) {
+    console.log("api.js driverSignup error",error)
   console.log(error);
   throw new Error(error.message || "Network error");
   }
