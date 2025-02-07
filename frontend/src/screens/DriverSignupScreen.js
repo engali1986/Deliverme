@@ -6,6 +6,8 @@ import i18n from '../i18n/i18n.js';
 import {driverSignup} from "../services/api.js"
 
 const DriverSignupScreen = ({ navigation }) => {
+  const [showVerification, setShowVerification] = useState(false)
+  const [verificationCode, setVerificationCode] = useState("");
   
   // State to store form input values
   const [form, setForm] = useState({
@@ -126,9 +128,8 @@ const DriverSignupScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ScrollView>
-
-      
-      <Text style={styles.title}>{i18n.t("sign_up")}</Text>
+        {!showVerification?(<>
+          <Text style={styles.title}>{i18n.t("sign_up")}</Text>
       
       {/* Input fields for email, mobile, name, and password */}
       <TextInput style={styles.input} placeholder={i18n.t("email")} value={form.email} onChangeText={(text)=>{setForm({...form,email:text})}} />
@@ -146,6 +147,14 @@ const DriverSignupScreen = ({ navigation }) => {
 
       {/* Submit button with loading indicator */}
       {loading ? <ActivityIndicator size="large" /> : <Button title={i18n.t("sign_up")} onPress={handleSignup} />}
+        </>):(<>
+          <Text style={styles.title}>{t("Enter Verification Code")}</Text>
+      <TextInput style={styles.input} placeholder={t("Verification Code")} keyboardType="numeric" value={verificationCode} onChangeText={setVerificationCode} />
+      <Button title={t("Verify")} color="#0073e6" onPress={handleVerify} />
+        </>)}
+
+      
+      
       </ScrollView>
     </View>
   );
