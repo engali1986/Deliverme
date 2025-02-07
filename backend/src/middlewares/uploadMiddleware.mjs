@@ -50,6 +50,12 @@ export const processFileUpload = async (req, res, next) => {
             logger.error("File upload error: %s", err.message);
             return res.status(400).json({ message: err.message });
         }
+         // ✅ Parse non-file fields manually
+    Object.keys(req.body).forEach((key) => {
+        req.body[key] = req.body[key]?.trim();
+      });
+  
+      logger.info("Files uploaded and form data processed successfully.");
         next();
     });
 };

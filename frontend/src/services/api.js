@@ -61,15 +61,15 @@ export async function driverSignup(data) {
   
   // Append all form fields to FormData
   Object.keys(data).forEach((key) => {
-  if (["license", "registration", "criminal", "personal"].includes(key)) {
-  formData.append(key, {
-  uri: data[key],
-  type: "image/jpeg",
-  name: `${key}.jpg`,
-  });
-  } else {
-  formData.append(key, data[key]);
-  }
+    if (["license", "registration", "criminal", "personal"].includes(key)) {
+      formData.append(key, {
+        uri: data[key],
+        type: "image/jpeg",
+        name: `${key}.jpg`,
+      });
+    } else {
+      formData.append(key, data[key]); // ✅ Ensure text fields are sent correctly
+    }
   });
   
   // Send request to backend
@@ -77,7 +77,7 @@ export async function driverSignup(data) {
   method: "POST",
   body: formData,
   headers: {
-  "Accept": "application/json",
+    "Accept": "application/json", // ✅ No "Content-Type" needed; FormData sets it automatically
   },
   });
   

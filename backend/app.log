@@ -255,3 +255,44 @@ undefined
 [32m2025-02-07 10:36:25 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
 [32m2025-02-07 10:36:25 [INFO]: Driver Sign-Up request received for email: undefined[39m
 [31m2025-02-07 10:36:26 [ERROR]: Error during Driver Sign-Up: Illegal arguments: undefined, number[39m
+[32m2025-02-07 14:32:10 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-07 14:32:12 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-07 14:32:12 [INFO]: Database connected and ready to use[39m
+[32m2025-02-07 14:32:59 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-07 14:32:59 [INFO]: Driver Sign-Up request received for email: undefined[39m
+[33m2025-02-07 14:32:59 [WARN]: Missing required fields.[39m
+[32m2025-02-07 14:34:45 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-07 14:34:47 [INFO]: Driver Sign-Up db undefined[39m
+[32m2025-02-07 14:35:27 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-07 14:35:28 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-07 14:35:28 [INFO]: Database connected and ready to use[39m
+[32m2025-02-07 14:35:32 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-07 14:35:32 [INFO]: Driver Sign-Up request received for email: undefined[39m
+[33m2025-02-07 14:35:32 [WARN]: Missing required fields.[39m
+[32m2025-02-07 14:35:56 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-07 14:35:58 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-07 14:35:58 [INFO]: Database connected and ready to use[39m
+[32m2025-02-07 14:36:01 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-07 14:36:01 [INFO]: Driver Sign-Up request received for email: undefined[39m
+[33m2025-02-07 14:36:01 [WARN]: Missing required fields.[39m
+[32m2025-02-07 14:38:35 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-07 14:38:39 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-07 14:38:39 [INFO]: Database connected and ready to use[39m
+[32m2025-02-07 14:38:41 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-07 14:38:41 [INFO]: Driver Sign-Up request received for email: undefined[39m
+[33m2025-02-07 14:38:41 [WARN]: Missing required fields.[39m
+[32m2025-02-07 14:42:02 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-07 14:42:02 [INFO]: Driver Sign-Up request received for email: undefined[39m
+[33m2025-02-07 14:42:02 [WARN]: Missing required fields.[39m
+[32m2025-02-07 14:44:55 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-07 14:44:59 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-07 14:44:59 [INFO]: Database connected and ready to use[39m
+[32m2025-02-07 14:45:01 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-07 14:45:01 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-07 14:45:01 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-07 14:45:03 [INFO]: Google Drive folder created for driver 01101806523, ID: 1fxYQ8vr04jyStgezZ0pFqsTOJAunJPx7[39m
+[32m2025-02-07 14:45:08 [INFO]: Uploaded ComfyUI_00001_.png to Google Drive Folder ID: 1fxYQ8vr04jyStgezZ0pFqsTOJAunJPx7, File ID: 16d8M_3if68AF4iEZU8ka13Mcx0BuxAyt[39m
+[32m2025-02-07 14:45:14 [INFO]: Uploaded ComfyUI_00003_.png to Google Drive Folder ID: 1fxYQ8vr04jyStgezZ0pFqsTOJAunJPx7, File ID: 1BkHzLuhh3p2kVbwFWe3Rs0D0aefMBoXD[39m
+[32m2025-02-07 14:45:20 [INFO]: Uploaded ComfyUI_00002_.png to Google Drive Folder ID: 1fxYQ8vr04jyStgezZ0pFqsTOJAunJPx7, File ID: 15DgoeQRUcgxX1D_TyMvpf9riQkzmIzWs[39m
+[32m2025-02-07 14:45:25 [INFO]: Uploaded ComfyUI_00004_.png to Google Drive Folder ID: 1fxYQ8vr04jyStgezZ0pFqsTOJAunJPx7, File ID: 1v002wI6qKXlSapdOtrzZsHyYXG4mCnXo[39m
+[32m2025-02-07 14:45:27 [INFO]: Verification email sent to: engali1986ac@mail.com[39m

@@ -18,8 +18,11 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Middleware
+app.use(express.json()); // ✅ Handles JSON requests
+app.use(express.urlencoded({ extended: true })); // ✅ Handles URL-encoded requests
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // ✅ Parses form-urlencoded bodie
 
 // Connect to database
 connectDB().then((client) => {

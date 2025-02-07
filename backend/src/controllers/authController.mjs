@@ -252,9 +252,9 @@ export async function clientSignIn(req, res) {
 export async function driverSignUp(req, res,db) {
   const { email, mobile, name, password } = req.body;
   logger.info("Driver Sign-Up db %s", db);
+  console.log(req.body)
   const client = db.client; // MongoClient instance
   const files = req.files;
-  let folderId;
   let uploadedFiles = {};
   const session = client.startSession(); // Start session on MongoClient
 
@@ -263,6 +263,12 @@ export async function driverSignUp(req, res,db) {
     session.startTransaction();  // Begin transaction
 
     logger.info("Driver Sign-Up request received for email: %s", email);
+    
+    if (!email || !mobile || !name || !password) {
+      logger.warn("Missing required fields.");
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
 
     // Check if the Driver already exists
     const existingClient = await db.collection("drivers").findOne({ email }, { session });
@@ -278,7 +284,10 @@ export async function driverSignUp(req, res,db) {
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
     // Step 1: Create Google Drive folder for driver
-    folderId = await createDriverFolder(mobile);
+    const folderId = await createDriverFolder(mobile);
+    if (!folderId) {
+      throw new Error("Failed to create Google Drive folder");
+    }
 
     // Step 2: Upload documents to this folder
     const requiredDocs = ["license", "registration", "criminal", "personal"];
