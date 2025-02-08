@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator, Image, Alert, StyleSheet, ScrollView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+// import DocumentPicker from "react-native-document-picker";
+import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import i18n from '../i18n/i18n.js';
-import {driverSignup} from "../services/api.js"
+import {driverSignup, verifyDriver} from "../services/api.js"
 
 const DriverSignupScreen = ({ navigation }) => {
   const [showVerification, setShowVerification] = useState(false)
   const [verificationCode, setVerificationCode] = useState("");
+
   
   // State to store form input values
   const [form, setForm] = useState({
@@ -60,24 +63,100 @@ const DriverSignupScreen = ({ navigation }) => {
  
 
   // Function to handle image selection
-  const pickImage = async (field) => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  // const pickImage = async (field) => {
+  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   console.log("image status:", status)
+  //   if (status !== "granted") {
+  //     Alert.alert("Permission Denied", "You need to grant gallery access.");
+  //     return;
+  //   }
+  
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: 'images',
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //     });
+  
+  //   // If gallery fails, try opening the camera
+  //   if (result.canceled || result.assets.length === 0) {
+  //     let result = await ImagePicker.launchImageLibraryAsync({
+  //       mediaTypes: ['images', 'videos'],
+  //       allowsEditing: true,
+  //       aspect: [4, 3],
+  //       quality: 1,
+  //       });
+  
+  //     if (!cameraResult.canceled && cameraResult.assets.length > 0) {
+  //       result = cameraResult;
+  //     }
+  //   }
+  
+  //   if (!result.canceled && result.assets.length > 0) {
+  //     const imageUri = result.assets[0].uri;
+  //     const fileInfo = await FileSystem.getInfoAsync(imageUri);
+  //     if (fileInfo.size > 1024 * 1024) {
+  //       Alert.alert("File too large", "File size must be under 1MB");
+  //       return;
+  //     }
+  
+  //     setForm((prev) => ({ ...prev, [field]: imageUri }));
+  //   }
+  // };
 
-    if (!result.canceled) {
-      // Validate file size (max 1MB)
-      const fileInfo = await FileSystem.getInfoAsync(result.assets[0].uri);
-      if (fileInfo.size > 1024 * 1024) {
-        Alert.alert("File size must be under 1MB");
-        return;
+  const pickImage = async (field) => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "image/*",
+      });
+
+      if (!result.canceled && result.assets.length > 0) {
+        const imageUri = result.assets[0].uri;
+        const fileInfo = await FileSystem.getInfoAsync(imageUri);
+        if (fileInfo.size > 1024 * 1024) {
+          Alert.alert("File too large", "File size must be under 1MB");
+          return;
+        }
+    
+        setForm((prev) => ({ ...prev, [field]: imageUri }));
       }
-      setForm({ ...form, [field]: result.assets[0].uri });
+
+
+    } catch (error) {
+      Alert.alert("File upload error", error);
+      
     }
+    // const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    // console.log("image status:", status)
+    // if (status !== "granted") {
+    //   Alert.alert("Permission Denied", "You need to grant gallery access.");
+    //   return;
+    // }
+  
+    // let result = await ImagePicker.launchImageLibraryAsync({
+    //   mediaTypes: 'images',
+    //   allowsEditing: true,
+    //   aspect: [4, 3],
+    //   quality: 1,
+    //   });
+  
+    // // If gallery fails, try opening the camera
+    // if (result.canceled || result.assets.length === 0) {
+    //   let result = await ImagePicker.launchImageLibraryAsync({
+    //     mediaTypes: ['images', 'videos'],
+    //     allowsEditing: true,
+    //     aspect: [4, 3],
+    //     quality: 1,
+    //     });
+  
+    //   if (!cameraResult.canceled && cameraResult.assets.length > 0) {
+    //     result = cameraResult;
+    //   }
+    // }
+  
+    
   };
+  
 
   // Function to handle input validation and form state update
   const handleInputChange = (field, value) => {
@@ -95,6 +174,8 @@ const DriverSignupScreen = ({ navigation }) => {
     }
     setForm({ ...form, [field]: value });
   };
+
+
 
   // Function to handle signup request
   const handleSignup = async () => {
@@ -126,6 +207,23 @@ const DriverSignupScreen = ({ navigation }) => {
      }
   };
 
+  // Function to handle verification
+const handleVerify = async () => {
+  if (!verificationCode) {
+  Alert.alert("Please enter the verification code");
+  return;
+  }
+  
+  try {
+    await verifyDriver({ email: form.email, verificationCode });
+    Alert.alert("Verification successful!");
+    // navigation.navigate("DriverHome"); // Redirect to Driver Home after verification
+  } catch (error) {
+    Alert.alert("Invalid code. Please try again.");
+  }
+  
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -151,7 +249,7 @@ const DriverSignupScreen = ({ navigation }) => {
         </>):(<>
           <Text style={styles.title}>Enter Verification Code</Text>
       <TextInput style={styles.input} placeholder={i18n.t("verification_code")} keyboardType="numeric" value={verificationCode} onChangeText={setVerificationCode} />
-      <Button title={i18n.t("verify")} color="#0073e6"  />
+      <Button title={i18n.t("verify")} color="#acc6f5" onPress={handleVerify}  />
         </>)}
 
       

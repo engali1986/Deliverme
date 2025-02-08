@@ -329,3 +329,52 @@ undefined
 [32m2025-02-07 20:07:55 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 12guR2p0xX5Cl7Zu0-TWggvtFMD93pBQm, File ID: 1l3IY5cRCB_zfgWgrU8tcPaejytVszUq9[39m
 [32m2025-02-07 20:07:57 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 12guR2p0xX5Cl7Zu0-TWggvtFMD93pBQm, File ID: 1yS0J0HD7LW6bDAWuHOjj8gNRdFgiS9io[39m
 [32m2025-02-07 20:07:59 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-02-08 09:21:48 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-08 09:21:50 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-08 09:21:50 [INFO]: Database connected and ready to use[39m
+[32m2025-02-08 10:17:40 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-08 10:17:40 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-08 10:17:40 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-08 10:17:41 [INFO]: Google Drive folder created for driver 01101806523, ID: 1BRYCFM8nB11ybH219w0n-swd3axBMXnN[39m
+[32m2025-02-08 10:17:44 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 1BRYCFM8nB11ybH219w0n-swd3axBMXnN, File ID: 1TKIE50zbG3oQEmZ1IQTkSwCPKZehNOmP[39m
+[32m2025-02-08 10:17:46 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 1BRYCFM8nB11ybH219w0n-swd3axBMXnN, File ID: 1sGd1OMAk7q-q__6rLw040jG5yIkYny3n[39m
+[32m2025-02-08 10:17:48 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 1BRYCFM8nB11ybH219w0n-swd3axBMXnN, File ID: 1ZFVQ4kp_g6IeG9IT9_R9yaAOJ7n5wUGX[39m
+[32m2025-02-08 10:17:50 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 1BRYCFM8nB11ybH219w0n-swd3axBMXnN, File ID: 1kguj5p5cMWS6n1OI-tjlotEbJQ4Ivhnf[39m
+[32m2025-02-08 10:17:53 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-02-08 10:18:35 [INFO]: Driver Sign-Up deriver verification received for email: engali1986ac@mail.com[39m
+[32m2025-02-08 10:20:22 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-08 10:20:25 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-08 10:20:25 [INFO]: Database connected and ready to use[39m
+[32m2025-02-08 10:21:49 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-08 10:21:49 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-08 10:21:49 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-08 10:21:50 [INFO]: Google Drive folder created for driver 01101806523, ID: 16vg8FnSkHCP9c8I2wQPWrFKOvozhwm8r[39m
+[32m2025-02-08 10:21:52 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 16vg8FnSkHCP9c8I2wQPWrFKOvozhwm8r, File ID: 1xpD0Qz5kuQFK7gkULBMHEM_z6XdsBiWZ[39m
+[32m2025-02-08 10:21:54 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 16vg8FnSkHCP9c8I2wQPWrFKOvozhwm8r, File ID: 1kiKfAwuieVFQL9wMemzpY4-LJg-NRU2D[39m
+[32m2025-02-08 10:21:56 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 16vg8FnSkHCP9c8I2wQPWrFKOvozhwm8r, File ID: 112OaezLqyO0BRCXgftf-l8DtYdOBsnOq[39m
+[32m2025-02-08 10:21:59 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 16vg8FnSkHCP9c8I2wQPWrFKOvozhwm8r, File ID: 1wmekhmR4pfD6X1fL-Ak30-e3cHbSNz7g[39m
+[32m2025-02-08 10:22:00 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-02-08 10:22:31 [INFO]: Driver Sign-Up deriver verification received for email: engali1986ac@mail.com[39m
+[31m2025-02-08 10:22:31 [ERROR]: Driver Invalid verification code email: engali1986ac@mail.com[39m
+[32m2025-02-08 10:23:05 [INFO]: Driver Sign-Up deriver verification received for email: engali1986ac@mail.com[39m
+[31m2025-02-08 10:23:05 [ERROR]: Driver Invalid verification code email: engali1986ac@mail.com[39m
+[32m2025-02-08 10:24:33 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-08 10:24:35 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-08 10:24:35 [INFO]: Database connected and ready to use[39m
+[32m2025-02-08 10:29:41 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-08 10:29:41 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-08 10:29:41 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-08 10:29:43 [INFO]: Google Drive folder created for driver 01101806523, ID: 17vdI4QkVi_us_4ZSy7S7BBHlY-gtO_eR[39m
+[32m2025-02-08 10:29:45 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 17vdI4QkVi_us_4ZSy7S7BBHlY-gtO_eR, File ID: 1rcn-r4vyazPKqzCQGKqn2c2NSgiZuEjE[39m
+[32m2025-02-08 10:29:47 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 17vdI4QkVi_us_4ZSy7S7BBHlY-gtO_eR, File ID: 1pfq3Mg7kUwWhEEbrOjLrtdbaBRPWLI3T[39m
+[32m2025-02-08 10:29:49 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 17vdI4QkVi_us_4ZSy7S7BBHlY-gtO_eR, File ID: 18ze0vIloxLvkBjTqCHygklkLHRUicLUk[39m
+[32m2025-02-08 10:29:51 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 17vdI4QkVi_us_4ZSy7S7BBHlY-gtO_eR, File ID: 13_gEIp4MTgkboMt-Jt4tTSQv9lXEAxdM[39m
+[32m2025-02-08 10:29:52 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-02-08 10:30:30 [INFO]: Driver Sign-Up deriver verification received for email: engali1986ac@mail.com[39m
+[32m2025-02-08 10:30:30 [INFO]: Driver Verification result: {[39m
+[32m  acknowledged: true,[39m
+[32m  modifiedCount: 1,[39m
+[32m  upsertedId: null,[39m
+[32m  upsertedCount: 0,[39m
+[32m  matchedCount: 1[39m
+[32m}[39m

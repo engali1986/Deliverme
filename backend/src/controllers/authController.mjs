@@ -281,7 +281,7 @@ export async function driverSignUp(req, res,db) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Generate a random 6-digit verification number
-    const verificationCode = Math.floor(100000 + Math.random() * 900000);
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Step 1: Create Google Drive folder for driver
     const folderId = await createDriverFolder(mobile);
@@ -352,6 +352,40 @@ export async function driverSignUp(req, res,db) {
     session.endSession();
   }
 }
+
+// Driver Sign-Up verification
+export async function verifyDriver(req, res, db) {
+  const { email, verificationCode } = req.body;
+  logger.info("Driver Sign-Up deriver verification received for email: %s", email);
+  try {
+    const driver = await db.collection("drivers").findOne({ email });
+
+    if (!driver) {
+      logger.error("Driver not found for email: %s", email);
+      return res.status(400).json({ message: "Driver not found" });
+    }
+
+    if (driver.verificationCode !== verificationCode) {
+      logger.error("Driver Invalid verification code email: %s", email);
+      return res.status(400).json({ message: "Invalid verification code" });
+    }
+
+    const Verification=await db.collection("drivers").updateOne(
+      { email },
+      { $set: { driverVerified: true } }
+    );
+
+    logger.info("Driver Verification result: %s", Verification);
+    if (Verification.modifiedCount>0) {
+      res.status(200).json({ message: "Driver verified successfully" }); 
+    }else{
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
+
 
 // Driver Sign-In
 export async function driverSignIn(req, res) {

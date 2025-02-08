@@ -93,5 +93,27 @@ export async function driverSignup(data) {
   throw new Error(error.message || "Network error");
   }
 }
+
+export async function verifyDriver(data) {
+  console.log("api.js verifyDriver data", data)
+  try {
+    const response = await fetch(`${BASE_URL}/driver/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Verification failed");
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw new Error(error.message || "Network error");
+  }
+}
   
   
