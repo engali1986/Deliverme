@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator, Image, Alert, StyleSheet, ScrollView } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-// import DocumentPicker from "react-native-document-picker";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import i18n from '../i18n/i18n.js';
@@ -126,35 +124,6 @@ const DriverSignupScreen = ({ navigation }) => {
       Alert.alert("File upload error", error);
       
     }
-    // const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    // console.log("image status:", status)
-    // if (status !== "granted") {
-    //   Alert.alert("Permission Denied", "You need to grant gallery access.");
-    //   return;
-    // }
-  
-    // let result = await ImagePicker.launchImageLibraryAsync({
-    //   mediaTypes: 'images',
-    //   allowsEditing: true,
-    //   aspect: [4, 3],
-    //   quality: 1,
-    //   });
-  
-    // // If gallery fails, try opening the camera
-    // if (result.canceled || result.assets.length === 0) {
-    //   let result = await ImagePicker.launchImageLibraryAsync({
-    //     mediaTypes: ['images', 'videos'],
-    //     allowsEditing: true,
-    //     aspect: [4, 3],
-    //     quality: 1,
-    //     });
-  
-    //   if (!cameraResult.canceled && cameraResult.assets.length > 0) {
-    //     result = cameraResult;
-    //   }
-    // }
-  
-    
   };
   
 
