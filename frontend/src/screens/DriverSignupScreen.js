@@ -164,7 +164,11 @@ const DriverSignupScreen = ({ navigation }) => {
 
    
      try {
-  const response = await driverSignup(form); // Call the API function
+  const response = await driverSignup(form).then(res=>{
+    console.log("Driver signup response",res)
+    return res
+  }); // Call the API function
+  console.log("Driver signup response", response)
   Alert.alert("Signup successful! Please check your email to verify your account.");
   setShowVerification(true)
   // navigation.navigate("DriverSignin");

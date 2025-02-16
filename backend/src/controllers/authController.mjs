@@ -32,6 +32,7 @@ const drive = google.drive({ version: "v3", auth: oauth2Client });
  */
 async function createDriverFolder(mobile) {
   try {
+   
     const response = await drive.files.create({
       requestBody: {
         name: mobile,
@@ -44,6 +45,7 @@ async function createDriverFolder(mobile) {
     logger.info(`Google Drive folder created for driver ${mobile}, ID: ${response.data.id}`);
     return response.data.id;
   } catch (error) {
+    logger.error("Error creating Google Drive folder: %s", error);
     logger.error("Error creating Google Drive folder: %s", error.message);
     throw new Error("Failed to create Google Drive folder");
   }
@@ -81,7 +83,7 @@ async function uploadFileToDrive(filePath, fileName, folderId) {
 
 // Create the nodemailer transporter
 const createTransporter = async () => {
-  const accessToken = await oauth2Client.getAccessToken();
+  // const accessToken = await oauth2Client.getAccessToken();
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -90,7 +92,7 @@ const createTransporter = async () => {
       clientId: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       refreshToken: process.env.REFRESH_TOKEN,
-      accessToken: accessToken.token,
+      // accessToken: accessToken.token,
     },
   });
 };

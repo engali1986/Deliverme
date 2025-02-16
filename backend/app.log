@@ -378,3 +378,170 @@ undefined
 [32m  upsertedCount: 0,[39m
 [32m  matchedCount: 1[39m
 [32m}[39m
+[32m2025-02-16 18:57:54 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 18:57:56 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 18:57:56 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 18:58:33 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 18:58:35 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 18:58:35 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 19:02:46 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 19:02:46 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 19:02:46 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-02-16 19:02:47 [ERROR]: Error creating Google Drive folder: invalid_grant[39m
+[31m2025-02-16 19:02:47 [ERROR]: Error during Driver Sign-Up: Failed to create Google Drive folder[39m
+[32m2025-02-16 19:05:57 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 19:06:02 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 19:06:02 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 19:06:12 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 19:06:12 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 19:06:12 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-02-16 19:06:12 [ERROR]: Error creating Google Drive folder: invalid_grant[39m
+[31m2025-02-16 19:06:12 [ERROR]: Error during Driver Sign-Up: Failed to create Google Drive folder[39m
+[32m2025-02-16 19:07:00 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 19:07:04 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 19:07:04 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 19:07:29 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 19:07:29 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 19:07:29 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-02-16 19:07:29 [ERROR]: Error creating Google Drive folder: invalid_grant[39m
+[31m2025-02-16 19:07:29 [ERROR]: Error during Driver Sign-Up: Failed to create Google Drive folder[39m
+[32m2025-02-16 19:11:12 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 19:11:14 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 19:11:14 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 19:11:21 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 19:11:21 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 19:11:21 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-02-16 19:11:21 [ERROR]: Error creating Google Drive folder: GaxiosError: invalid_grant[39m
+[31m    at Gaxios._request (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\gaxios\build\src\gaxios.js:142:23)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+[31m    at async OAuth2Client.refreshTokenNoCache (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:212:19)[39m
+[31m    at async OAuth2Client.getRequestMetadataAsync (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:333:17)[39m
+[31m    at async OAuth2Client.requestAsync (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:418:23)[39m
+[31m    at async createDriverFolder (file:///C:/Users/Engal/Desktop/Deliverme/backend/src/controllers/authController.mjs:35:22)[39m
+[31m    at async driverSignUp (file:///C:/Users/Engal/Desktop/Deliverme/backend/src/controllers/authController.mjs:288:22)[39m
+[31m    at async file:///C:/Users/Engal/Desktop/Deliverme/backend/src/routes/authRoutes.mjs:19:3 {[39m
+[31m  config: [Object],[39m
+[31m  response: [Object],[39m
+[31m  error: undefined,[39m
+[31m  status: 400,[39m
+[31m  [Symbol(gaxios-gaxios-error)]: '6.7.1'[39m
+[31m}[39m
+[31m2025-02-16 19:11:21 [ERROR]: Error creating Google Drive folder: invalid_grant[39m
+[31m2025-02-16 19:11:22 [ERROR]: Error during Driver Sign-Up: Failed to create Google Drive folder[39m
+[32m2025-02-16 19:39:50 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 19:39:53 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 19:39:53 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 19:39:57 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 19:39:57 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 19:39:57 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-02-16 19:39:58 [ERROR]: Error creating Google Drive folder: GaxiosError: invalid_grant[39m
+[31m    at Gaxios._request (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\gaxios\build\src\gaxios.js:142:23)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+[31m    at async OAuth2Client.refreshTokenNoCache (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:212:19)[39m
+[31m    at async OAuth2Client.getRequestMetadataAsync (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:333:17)[39m
+[31m    at async OAuth2Client.requestAsync (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:418:23)[39m
+[31m    at async createDriverFolder (file:///C:/Users/Engal/Desktop/Deliverme/backend/src/controllers/authController.mjs:36:22)[39m
+[31m    at async driverSignUp (file:///C:/Users/Engal/Desktop/Deliverme/backend/src/controllers/authController.mjs:289:22)[39m
+[31m    at async file:///C:/Users/Engal/Desktop/Deliverme/backend/src/routes/authRoutes.mjs:19:3 {[39m
+[31m  config: [Object],[39m
+[31m  response: [Object],[39m
+[31m  error: undefined,[39m
+[31m  status: 400,[39m
+[31m  [Symbol(gaxios-gaxios-error)]: '6.7.1'[39m
+[31m}[39m
+[31m2025-02-16 19:39:58 [ERROR]: Error creating Google Drive folder: invalid_grant[39m
+[31m2025-02-16 19:39:58 [ERROR]: Error during Driver Sign-Up: Failed to create Google Drive folder[39m
+[32m2025-02-16 19:47:13 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 19:47:15 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 19:47:15 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 19:47:23 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 19:47:23 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 19:47:23 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-02-16 19:47:24 [ERROR]: Error creating Google Drive folder: GaxiosError: invalid_grant[39m
+[31m    at Gaxios._request (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\gaxios\build\src\gaxios.js:142:23)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+[31m    at async OAuth2Client.refreshTokenNoCache (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:212:19)[39m
+[31m    at async OAuth2Client.getRequestMetadataAsync (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:333:17)[39m
+[31m    at async OAuth2Client.requestAsync (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:418:23)[39m
+[31m    at async createDriverFolder (file:///C:/Users/Engal/Desktop/Deliverme/backend/src/controllers/authController.mjs:36:22)[39m
+[31m    at async driverSignUp (file:///C:/Users/Engal/Desktop/Deliverme/backend/src/controllers/authController.mjs:289:22)[39m
+[31m    at async file:///C:/Users/Engal/Desktop/Deliverme/backend/src/routes/authRoutes.mjs:19:3 {[39m
+[31m  config: [Object],[39m
+[31m  response: [Object],[39m
+[31m  error: undefined,[39m
+[31m  status: 400,[39m
+[31m  [Symbol(gaxios-gaxios-error)]: '6.7.1'[39m
+[31m}[39m
+[31m2025-02-16 19:47:24 [ERROR]: Error creating Google Drive folder: invalid_grant[39m
+[31m2025-02-16 19:47:24 [ERROR]: Error during Driver Sign-Up: Failed to create Google Drive folder[39m
+[32m2025-02-16 19:54:30 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 19:54:32 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 19:54:32 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 19:56:42 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 19:56:44 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 19:56:44 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 19:56:51 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 19:56:51 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 19:56:51 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[31m2025-02-16 19:56:52 [ERROR]: Error creating Google Drive folder: GaxiosError: invalid_grant[39m
+[31m    at Gaxios._request (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\gaxios\build\src\gaxios.js:142:23)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+[31m    at async OAuth2Client.refreshTokenNoCache (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:212:19)[39m
+[31m    at async OAuth2Client.getRequestMetadataAsync (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:333:17)[39m
+[31m    at async OAuth2Client.requestAsync (C:\Users\Engal\Desktop\Deliverme\backend\node_modules\google-auth-library\build\src\auth\oauth2client.js:418:23)[39m
+[31m    at async createDriverFolder (file:///C:/Users/Engal/Desktop/Deliverme/backend/src/controllers/authController.mjs:36:22)[39m
+[31m    at async driverSignUp (file:///C:/Users/Engal/Desktop/Deliverme/backend/src/controllers/authController.mjs:289:22)[39m
+[31m    at async file:///C:/Users/Engal/Desktop/Deliverme/backend/src/routes/authRoutes.mjs:19:3 {[39m
+[31m  config: [Object],[39m
+[31m  response: [Object],[39m
+[31m  error: undefined,[39m
+[31m  status: 400,[39m
+[31m  [Symbol(gaxios-gaxios-error)]: '6.7.1'[39m
+[31m}[39m
+[31m2025-02-16 19:56:52 [ERROR]: Error creating Google Drive folder: invalid_grant[39m
+[31m2025-02-16 19:56:52 [ERROR]: Error during Driver Sign-Up: Failed to create Google Drive folder[39m
+[32m2025-02-16 20:01:41 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 20:01:44 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 20:01:44 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 20:01:56 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 20:01:56 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 20:01:56 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-16 20:01:57 [INFO]: Google Drive folder created for driver 01101806523, ID: 1zma_L2X7rW746r2_bs0Smm-pxny0iDeX[39m
+[32m2025-02-16 20:01:59 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 1zma_L2X7rW746r2_bs0Smm-pxny0iDeX, File ID: 1BwWlums_91nr-foZpwb8hgRnGlcpetNX[39m
+[32m2025-02-16 20:02:02 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 1zma_L2X7rW746r2_bs0Smm-pxny0iDeX, File ID: 1y5iBXeV9RgPI2oS5EPNVFf4eTKBRAkAv[39m
+[32m2025-02-16 20:02:04 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 1zma_L2X7rW746r2_bs0Smm-pxny0iDeX, File ID: 1-NIKQnEvWy65b9MqVi5t33tkbyhg-fzb[39m
+[32m2025-02-16 20:02:07 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 1zma_L2X7rW746r2_bs0Smm-pxny0iDeX, File ID: 181srHZDlj_GPZRIi5QorUL1wPSuf-lYP[39m
+[32m2025-02-16 20:02:08 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-02-16 20:05:10 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 20:05:12 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 20:05:12 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 20:06:20 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 20:06:20 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 20:06:20 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.come[39m
+[32m2025-02-16 20:06:22 [INFO]: Google Drive folder created for driver 01101806522, ID: 1bpzHZo583LVvg23jcoKRpGDqCzm91tXz[39m
+[32m2025-02-16 20:06:24 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 1bpzHZo583LVvg23jcoKRpGDqCzm91tXz, File ID: 18WD8gWQ9pevUtT2XoVX2QalmJTBaelJC[39m
+[32m2025-02-16 20:06:26 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 1bpzHZo583LVvg23jcoKRpGDqCzm91tXz, File ID: 1B9gfh1bEvxILPTIMBp0si3EF5zQ1Xdrn[39m
+[32m2025-02-16 20:06:28 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 1bpzHZo583LVvg23jcoKRpGDqCzm91tXz, File ID: 1hjiutDDJxesq4Pj48fKJwYJaUtuENh5F[39m
+[32m2025-02-16 20:06:30 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 1bpzHZo583LVvg23jcoKRpGDqCzm91tXz, File ID: 184YjiwQV8PpnIITup1ojVlIhpcqYsGLl[39m
+[32m2025-02-16 20:06:32 [INFO]: Verification email sent to: engali1986ac@mail.come[39m
+[32m2025-02-16 20:07:23 [INFO]: Connecting to MongoDB...[39m
+[32m2025-02-16 20:07:25 [INFO]: MongoDB connection established successfully[39m
+[32m2025-02-16 20:07:25 [INFO]: Database connected and ready to use[39m
+[32m2025-02-16 20:08:50 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 20:08:50 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 20:08:50 [INFO]: Driver Sign-Up request received for email: engali1986ac@mail.com[39m
+[32m2025-02-16 20:08:51 [INFO]: Google Drive folder created for driver 01101806233, ID: 1zHvjXby9QyS32TQwLiJTpOXu5m4qiA0t[39m
+[32m2025-02-16 20:08:53 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 1zHvjXby9QyS32TQwLiJTpOXu5m4qiA0t, File ID: 1H3ilYjjRaon0w3xOsLD1UrkN203d5OYM[39m
+[32m2025-02-16 20:08:55 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 1zHvjXby9QyS32TQwLiJTpOXu5m4qiA0t, File ID: 1XyhcVelJyzaP0RtEoP6sqpv-PBxzfUvW[39m
+[32m2025-02-16 20:08:58 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 1zHvjXby9QyS32TQwLiJTpOXu5m4qiA0t, File ID: 1mJu8ec-Oym_VPRbe7EtboiS6nJNKg8Pf[39m
+[32m2025-02-16 20:09:00 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 1zHvjXby9QyS32TQwLiJTpOXu5m4qiA0t, File ID: 1J9a29G37m6kZ1WGT_xcOnKgOts3roQzE[39m
+[32m2025-02-16 20:09:01 [INFO]: Verification email sent to: engali1986ac@mail.com[39m
+[32m2025-02-16 20:12:19 [INFO]: Files uploaded and form data processed successfully.[39m
+[32m2025-02-16 20:12:19 [INFO]: Driver Sign-Up db Db { s: [Object], client: [MongoClient] }[39m
+[32m2025-02-16 20:12:19 [INFO]: Driver Sign-Up request received for email: Engali1986ac@mail.com[39m
+[32m2025-02-16 20:12:20 [INFO]: Google Drive folder created for driver 01101806554, ID: 1cegPtoc-yicVeJxcySh1H7v_NDIhMbv_[39m
+[32m2025-02-16 20:12:22 [INFO]: Uploaded license.jpg to Google Drive Folder ID: 1cegPtoc-yicVeJxcySh1H7v_NDIhMbv_, File ID: 1OhwhoV6N02v6hsT-b-mCXYb6Asemfjzy[39m
+[32m2025-02-16 20:12:24 [INFO]: Uploaded registration.jpg to Google Drive Folder ID: 1cegPtoc-yicVeJxcySh1H7v_NDIhMbv_, File ID: 1zi-dLx0RNSkG5Ub5_D3Gwni2MCfA1trN[39m
+[32m2025-02-16 20:12:26 [INFO]: Uploaded criminal.jpg to Google Drive Folder ID: 1cegPtoc-yicVeJxcySh1H7v_NDIhMbv_, File ID: 1yS86YzN5pQ9AqjN2cd_S22BXdB7xwtmH[39m
+[32m2025-02-16 20:12:28 [INFO]: Uploaded personal.jpg to Google Drive Folder ID: 1cegPtoc-yicVeJxcySh1H7v_NDIhMbv_, File ID: 1ydHMcoroiJGw0GoxtY0k78ctHqGPEsH2[39m
+[32m2025-02-16 20:12:30 [INFO]: Verification email sent to: Engali1986ac@mail.com[39m
