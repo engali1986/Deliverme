@@ -83,7 +83,7 @@ async function uploadFileToDrive(filePath, fileName, folderId) {
 
 // Create the nodemailer transporter
 const createTransporter = async () => {
-  // const accessToken = await oauth2Client.getAccessToken();
+  const accessToken = await oauth2Client.getAccessToken();
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -92,7 +92,7 @@ const createTransporter = async () => {
       clientId: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       refreshToken: process.env.REFRESH_TOKEN,
-      // accessToken: accessToken.token,
+      accessToken: accessToken.token,
     },
   });
 };
@@ -257,6 +257,7 @@ export async function driverSignUp(req, res,db) {
   console.log(req.body)
   const client = db.client; // MongoClient instance
   const files = req.files;
+  let folderId
   let uploadedFiles = {};
   const session = client.startSession(); // Start session on MongoClient
 
@@ -286,7 +287,7 @@ export async function driverSignUp(req, res,db) {
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Step 1: Create Google Drive folder for driver
-    const folderId = await createDriverFolder(mobile);
+    folderId = await createDriverFolder(mobile);
     if (!folderId) {
       throw new Error("Failed to create Google Drive folder");
     }
