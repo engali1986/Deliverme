@@ -73,6 +73,14 @@ async function uploadFileToDrive(filePath, fileName, folderId) {
     });
 
     logger.info(`Uploaded ${fileName} to Google Drive Folder ID: ${folderId}, File ID: ${response.data.id}`);
+    // ✅ Delete the local file from uploads folder after successful upload
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        logger.error(`Failed to delete file ${filePath} after upload: ${err.message}`);
+      } else {
+        logger.info(`Deleted file ${filePath} from uploads folder after upload.`);
+      }
+    });
     return response.data.id;
   } catch (error) {
     logger.error("Google Drive upload failed: %s", error.message);
