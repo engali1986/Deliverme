@@ -52,28 +52,35 @@ async function createDriverFolder(mobile) {
 }
 
 /**
- * Uploads a file directly to Google Drive from memory (buffer).
+ * Uploads a file to Google Drive inside the driver’s folder.
  */
-async function uploadFileToDrive(fileBuffer, fileName, folderId, mimeType) {
+async function uploadFileToDrive(filePath, fileName, folderId) {
   try {
-    logger.info(`File buffer of ${fileName} : ${fileBuffer}`);
     const fileMetadata = {
       name: fileName,
       parents: [folderId],
     };
 
     const media = {
-      mimeType: mimeType,
-      body: fileBuffer, // Directly use buffer instead of a file path
+      mimeType: "image/jpeg",
+      body: fs.createReadStream(filePath),
     };
 
-    const response = await google.drive({ version: "v3" }).files.create({
+    const response = await drive.files.create({
       requestBody: fileMetadata,
       media: media,
       fields: "id",
     });
 
     logger.info(`Uploaded ${fileName} to Google Drive Folder ID: ${folderId}, File ID: ${response.data.id}`);
+    // ✅ Delete the local file from uploads folder after successful upload
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        logger.error(`Failed to delete file ${filePath} after upload: ${err.message}`);
+      } else {
+        logger.info(`Deleted file ${filePath} from uploads folder after upload.`);
+      }
+    });
     return response.data.id;
   } catch (error) {
     logger.error("Google Drive upload failed: %s", error.message);
@@ -294,15 +301,11 @@ export async function driverSignUp(req, res,db) {
     }
 
     // Step 2: Upload documents to this folder
-    const uploadedFiles = {};
-
-for (const [key, fileArray] of Object.entries(req.files)) {
-  const fileBuffer = fileArray[0].buffer; // Get file buffer from multer
-  const fileName = fileArray[0].originalname;
-  const mimeType = fileArray[0].mimetype;
-  
-  uploadedFiles[key] = await uploadFileToDrive(fileBuffer, fileName, folderId, mimeType);
-}
+    const requiredDocs = ["license", "registration", "criminal", "personal"];
+    for (const doc of requiredDocs) {
+      if (!files[doc]) throw new Error(`Missing required file: ${doc}`);
+      uploadedFiles[doc] = await uploadFileToDrive(files[doc][0].path, files[doc][0].originalname, folderId);
+    }
 
     // Step 3: Store driver data in MongoDB
     const result = await db.collection("drivers").insertOne(
