@@ -4,6 +4,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import i18n from '../i18n/i18n.js';
 import {driverSignup, verifyDriver} from "../services/api.js"
+import Toast from 'react-native-toast-message';
 
 const DriverSignupScreen = ({ navigation }) => {
   const [showVerification, setShowVerification] = useState(false)
@@ -28,30 +29,55 @@ const DriverSignupScreen = ({ navigation }) => {
   const validateInputs = () => {
       // Check if all fields are filled
       if (!form.email || !form.mobile || !form.name || !form.password || !form.license || !form.registration || !form.criminal || !form.personal) {
-        Alert.alert('Error', 'All fields are mandatory!');
+        // Alert.alert('Error', 'All fields are mandatory!');
+        Toast.show({
+          type: 'error', // or 'error'
+          text1: ('Error.'),
+          text2:('All fields are mandatory!'),
+          props: { showIcon: true }, // Custom Prop for Icon
+        });
         return false;
       }
   
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(form.email)) {
-        Alert.alert('Error', 'Please enter a valid email address!');
+        // Alert.alert('Error', 'Please enter a valid email address!');
+        Toast.show({
+          type: 'error', // or 'error'
+          text1: ('Error.'),
+          text2:('Please enter a valid email address!'),
+          props: { showIcon: true }, // Custom Prop for Icon
+        });
         return false;
       }
   
       // Validate password (at least 8 characters, 1 uppercase, 1 lowercase, 1 special character)
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
       if (!passwordRegex.test(form.password)) {
-        Alert.alert(
-          'Error',
-          'Password must be at least 8 characters long, with at least 1 uppercase letter, 1 lowercase letter, and 1 special character!'
-        );
+        // Alert.alert(
+        //   'Error',
+        //   'Password must be at least 8 characters long, with at least 1 uppercase letter, 1 lowercase letter, and 1 special character!'
+        // );
+        Toast.show({
+          type: 'error', // or 'error'
+          text1: ('Error.'),
+          text2:('Password must be at least 8 characters long, with at least 1 uppercase letter, 1 lowercase letter, and 1 special character!'),
+          props: { showIcon: true }, // Custom Prop for Icon
+        });
         return false;
       }
   
       // Validate mobile number (numeric and 11 digits for Egypt)
       if (!/^\d{11}$/.test(form.mobile)) {
-        Alert.alert('Error', 'Mobile number must be 11 digits!');
+        // Alert.alert('Error', 'Mobile number must be 11 digits!');
+        Toast.show({
+          type: 'error', // or 'error'
+          text1: ('Error.'),
+          text2:('Mobile number must be 11 digits!'),
+          props: { showIcon: true }, // Custom Prop for Icon
+        });
+        
         return false;
       }
   
@@ -112,7 +138,13 @@ const DriverSignupScreen = ({ navigation }) => {
         const imageUri = result.assets[0].uri;
         const fileInfo = await FileSystem.getInfoAsync(imageUri);
         if (fileInfo.size > 1024 * 1024) {
-          Alert.alert("File too large", "File size must be under 1MB");
+          // Alert.alert("File too large", "File size must be under 1MB");
+          Toast.show({
+            type: 'error', // or 'error'
+            text1: ('File too large.'),
+            text2:('File size must be under 1MB'),
+            props: { showIcon: true }, // Custom Prop for Icon
+          });
           return;
         }
     
@@ -121,7 +153,13 @@ const DriverSignupScreen = ({ navigation }) => {
 
 
     } catch (error) {
-      Alert.alert("File upload error", error);
+      // Alert.alert("File upload error", error);
+      Toast.show({
+        type: 'error', // or 'error'
+        text1: ('File upload error'),
+        text2:error,
+        props: { showIcon: true }, // Custom Prop for Icon
+      });
       
     }
   };

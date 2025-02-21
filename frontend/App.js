@@ -4,6 +4,8 @@ import AppNavigator from './src/navigation/AppNavigator.js';
 import { initializeLanguage } from './src/i18n/i18n.js';
 import { LanguageProvider } from './src/context/LanguageContext.js';
 import './src/i18n/i18n.js';
+import Toast from "react-native-toast-message";
+import { toastConfig } from './src/components/toastConfig.js';
 
 export default function App() {
   const [loading, setLoading] = useState(true); // Always call useState at the top
@@ -26,9 +28,13 @@ export default function App() {
   }
 
   return (
+    <>
     <LanguageProvider>
       <AppNavigator />
     </LanguageProvider>
+    <Toast config={toastConfig} position="top" topOffset={50} />
+    </>
+    
   );
 }
 
