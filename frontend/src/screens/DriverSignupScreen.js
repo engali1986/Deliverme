@@ -168,15 +168,33 @@ const DriverSignupScreen = ({ navigation }) => {
   // Function to handle input validation and form state update
   const handleInputChange = (field, value) => {
     if (field === "email" && !validateEmail(value)) {
-      Alert.alert("Invalid email format. Please use English characters only.");
+      // Alert.alert("Invalid email format. Please use English characters only.");
+      Toast.show({
+        type: 'error', // or 'error'
+        text1: ('Error.'),
+        text2:('Invalid email format. Please use English characters only.'),
+        props: { showIcon: true }, // Custom Prop for Icon
+      });
       return;
     }
     if (field === "password" && !validatePassword(value)) {
-      Alert.alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character.");
+      // Alert.alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character.");
+      Toast.show({
+        type: 'error', // or 'error'
+        text1: ('Error.'),
+        text2:('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character.'),
+        props: { showIcon: true }, // Custom Prop for Icon
+      });
       return;
     }
     if ((field === "name" || field === "mobile") && !validateEnglishText(value)) {
-      Alert.alert("Name and Mobile must contain only English letters and numbers.");
+      // Alert.alert("Name and Mobile must contain only English letters and numbers.");
+      Toast.show({
+        type: 'error', // or 'error'
+        text1: ('Error.'),
+        text2:('Name and Mobile must contain only English letters and numbers.'),
+        props: { showIcon: true }, // Custom Prop for Icon
+      });
       return;
     }
     setForm({ ...form, [field]: value });
@@ -190,7 +208,13 @@ const DriverSignupScreen = ({ navigation }) => {
     // Check if all required fields are filled
     if (!validateInputs()){
           console.log("Please fill all data")
-          Alert.alert('Error', i18n.t("missing_fields"));
+          // Alert.alert('Error', i18n.t("missing_fields"));
+          Toast.show({
+            type: 'error', // or 'error'
+            text1: ('Error.'),
+            text2:i18n.t("missing_fields"),
+            props: { showIcon: true }, // Custom Prop for Icon
+          });
           return;
         }
 
@@ -207,11 +231,23 @@ const DriverSignupScreen = ({ navigation }) => {
     return res
   }); // Call the API function
   console.log("Driver signup response", response)
-  Alert.alert("Signup successful! Please check your email to verify your account.");
+  // Alert.alert("Signup successful! Please check your email to verify your account.");
+  Toast.show({
+    type: 'success', // or 'error'
+    text1: ('Success.'),
+    text2:('Signup successful! Please check your email to verify your account.'),
+    props: { showIcon: true }, // Custom Prop for Icon
+  });
   setShowVerification(true)
   // navigation.navigate("DriverSignin");
      } catch (error) {
-  Alert.alert("Signup failed. Please try again.");
+  // Alert.alert("Signup failed. Please try again.");
+  Toast.show({
+    type: 'error', // or 'error'
+    text1: ('Error.'),
+    text2:("Signup failed. Please try again."),
+    props: { showIcon: true }, // Custom Prop for Icon
+  });
   console.error(error);
      } finally {
   setLoading(false);
@@ -222,15 +258,33 @@ const DriverSignupScreen = ({ navigation }) => {
 const handleVerify = async () => {
   if (!verificationCode) {
   Alert.alert("Please enter the verification code");
+  Toast.show({
+    type: 'success', // or 'error'
+    text1: ('Success.'),
+    text2:("Please enter the verification code"),
+    props: { showIcon: true }, // Custom Prop for Icon
+  });
   return;
   }
   
   try {
     await verifyDriver({ email: form.email, verificationCode });
-    Alert.alert("Verification successful!");
+    // Alert.alert("Verification successful!");
+    Toast.show({
+      type: 'success', // or 'error'
+      text1: ('Success.'),
+      text2:("Verification successful!"),
+      props: { showIcon: true }, // Custom Prop for Icon
+    });
     // navigation.navigate("DriverHome"); // Redirect to Driver Home after verification
   } catch (error) {
-    Alert.alert("Invalid code. Please try again.");
+    // Alert.alert("Invalid code. Please try again.");
+    Toast.show({
+      type: 'error', // or 'error'
+      text1: ('Error.'),
+      text2:("Invalid code. Please try again."),
+      props: { showIcon: true }, // Custom Prop for Icon
+    });
   }
   
   };
