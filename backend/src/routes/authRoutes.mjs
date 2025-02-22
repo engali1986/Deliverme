@@ -1,6 +1,6 @@
 import express from 'express';
 import { clientSignUp, clientSignIn, driverSignUp, driverSignIn, verifyDriver } from '../controllers/authController.mjs';
-import {processFileUpload} from "../middlewares/uploadMiddleware.mjs"
+import upload from "../middlewares/uploadMiddleware.mjs"
 import dotenv from "dotenv"
 dotenv.config()
 const router = express.Router();
@@ -13,7 +13,7 @@ router.post('/client/signup', async (req, res) => {
 router.post('/client/signin', clientSignIn);
 
 // Driver Routes
-router.post('/driver/signup',processFileUpload, async (req, res) => {
+router.post('/driver/signup',upload, async (req, res) => {
   console.log("post driver signup", req.body)
   const db = req.app.locals.db;  // Access the db instance from app.locals
   await driverSignUp(req, res, db);

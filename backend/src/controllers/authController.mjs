@@ -5,6 +5,7 @@ import nodemailer from "nodemailer"
 import { google } from 'googleapis';
 import fs from "fs"
 import logger from '../utils/logger.mjs';
+import {PassThrough} from "stream"
 
 
 
@@ -52,6 +53,15 @@ async function createDriverFolder(mobile) {
 }
 
 /**
+ * Converts a buffer into a readable stream.
+ */
+function bufferToStream(buffer) {
+  const stream = new PassThrough();
+  stream.end(buffer);
+  return stream;
+}
+
+/**
  * Uploads a file directly to Google Drive from memory (buffer).
  */
 async function uploadFileToDrive(fileBuffer, fileName, folderId, mimeType) {
@@ -64,7 +74,7 @@ async function uploadFileToDrive(fileBuffer, fileName, folderId, mimeType) {
 
     const media = {
       mimeType: mimeType,
-      body: fileBuffer, // Directly use buffer instead of a file path
+      body: bufferToStream(fileBuffer), // Convert Buffer to Readable Stream
     };
 
     const response = await google.drive({ version: "v3" }).files.create({
