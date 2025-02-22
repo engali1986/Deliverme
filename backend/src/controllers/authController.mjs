@@ -6,12 +6,29 @@ import { google } from 'googleapis';
 import fs from "fs"
 import logger from '../utils/logger.mjs';
 import {PassThrough} from "stream"
+import {fileURLToPath} from "url"
+import path from 'path';
+
 
 
 
 
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const keyfilepath=path.join(__dirname,"../../DriveServiceAccount.json")
+    console.log(path.join(__dirname,"../../DriveServiceAccount.json"))
+
+// Load the service account key JSON file
+const auth = new google.auth.GoogleAuth({
+  keyFile: keyfilepath, // Path to your service account key file
+  scopes: ["https://www.googleapis.com/auth/drive.file"],
+});
+
+// Google Drive API with OAuth2
+const drive = google.drive({ version: "v3", auth });
 
 // Set up OAuth2 client
 const oauth2Client = new google.auth.OAuth2(
@@ -25,8 +42,7 @@ oauth2Client.setCredentials({
   refresh_token: process.env.REFRESH_TOKEN,
 });
 
-// Google Drive API with OAuth2
-const drive = google.drive({ version: "v3", auth: oauth2Client });
+
 
 /**
  * Creates a Google Drive folder for the driver.
@@ -66,7 +82,7 @@ function bufferToStream(buffer) {
  */
 async function uploadFileToDrive(fileBuffer, fileName, folderId, mimeType) {
   try {
-    logger.info(`File buffer of ${fileName} : ${fileBuffer}`);
+    
     const fileMetadata = {
       name: fileName,
       parents: [folderId],
@@ -77,7 +93,7 @@ async function uploadFileToDrive(fileBuffer, fileName, folderId, mimeType) {
       body: bufferToStream(fileBuffer), // Convert Buffer to Readable Stream
     };
 
-    const response = await google.drive({ version: "v3" }).files.create({
+    const response = await drive.files.create({
       requestBody: fileMetadata,
       media: media,
       fields: "id",
@@ -87,6 +103,8 @@ async function uploadFileToDrive(fileBuffer, fileName, folderId, mimeType) {
     return response.data.id;
   } catch (error) {
     logger.error("Google Drive upload failed: %s", error.message);
+    logger.error("Google Drive upload failed: %s", error);
+
     throw new Error("Document upload failed");
   }
 }
@@ -277,6 +295,8 @@ export async function driverSignUp(req, res,db) {
     session.startTransaction();  // Begin transaction
 
     logger.info("Driver Sign-Up request received for email: %s", email);
+    
+
     
     if (!email || !mobile || !name || !password) {
       logger.warn("Missing required fields.");
