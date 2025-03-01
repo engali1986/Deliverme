@@ -23,7 +23,11 @@ router.post("/driver/verify",async (req,res)=>{
   const db = req.app.locals.db;  // Access the db instance from app.locals
   await verifyDriver(req,res,db)
 })
-router.post('/driver/signin', driverSignIn);
+router.post('/driver/signin', async(req,res)=>{
+  console.log("post driver signin", req.body)
+  const db = req.app.locals.db;  // Access the db instance from app.locals
+  await driverSignIn(req,res,db)
+});
 router.get("/",(req,res)=>{
     console.log(process.env.JWT_SECRET)
     res.send("Server working")

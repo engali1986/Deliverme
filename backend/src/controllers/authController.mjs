@@ -426,12 +426,11 @@ export async function verifyDriver(req, res, db) {
 
 
 // Driver Sign-In
-export async function driverSignIn(req, res) {
-  const { email, password } = req.body;
-  const db = req.app.locals.db;
+export async function driverSignIn(req, res, db) {
+  const { mobile, password } = req.body;
 
   try {
-    const driver = await db.collection('drivers').findOne({ email });
+    const driver = await db.collection('drivers').findOne({ mobile });
     if (!driver) return res.status(404).json({ message: 'Driver not found' });
 
     const isPasswordValid = await bcrypt.compare(password, driver.password);
