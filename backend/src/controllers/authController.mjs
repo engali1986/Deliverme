@@ -394,7 +394,7 @@ for (const [key, fileArray] of Object.entries(req.files)) {
 // Driver Sign-Up verification
 export async function verifyDriver(req, res, db) {
   const { email, verificationCode } = req.body;
-  logger.info("Driver Sign-Up deriver verification received for email: %s", email);
+  logger.info("Driver Sign-Up deriver verification received for email: %s", req.body);
   try {
     const driver = await db.collection("drivers").findOne({ email });
 
@@ -427,6 +427,16 @@ export async function verifyDriver(req, res, db) {
 
 // Driver Sign-In
 /**
+ * Generates a JWT token for authentication.
+ */
+function generateToken(driver) {
+  return jwt.sign(
+    { id: driver._id, mobile: driver.mobile, name: driver.name },
+    process.env.JWT_SECRET,
+    { expiresIn: "30d" } // Token expires in 7 days
+  );
+}
+/**
  * Handles driver sign-in.
  */
 export async function driverSignIn(req, res,db) {
@@ -437,6 +447,7 @@ export async function driverSignIn(req, res,db) {
 
     // Check if driver exists
     const driver = await db.collection("drivers").findOne({ mobile });
+    logger.info("Driver Sign-In driver is: %s", driver);
     if (!driver) {
       logger.warn("Driver not found: %s", mobile);
       return res.status(404).json({ message: "Driver not found" });
@@ -449,17 +460,23 @@ export async function driverSignIn(req, res,db) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    
+
     // Check verification status
     if (!driver.driverVerified) {
       logger.info("Driver not verified: %s", mobile);
       return res.status(200).json({ message: "Verification required", driverVerified: false });
     }
 
+    // Generate JWT token
+    const token = generateToken(driver);
+
     // Successful login
     logger.info("Driver successfully signed in: %s", mobile);
     res.status(200).json({
       message: "Sign-in successful",
       driverVerified: true,
+      token,
       driver: {
         name: driver.name,
         mobile: driver.mobile,

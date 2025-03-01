@@ -93,6 +93,40 @@ export async function driverSignup(data) {
   throw new Error(error.message || "Network error");
   }
 }
+/**
+ * Handles driver sign-in request and stores JWT token.
+ * @param {Object} data - The driver login details (mobile, password).
+ */
+
+export async function driverSignin(data) {
+  try {
+    const response = await fetch(`${BASE_URL}/driver/signin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to sign in");
+    }
+
+    const result = await response.json();
+    if (result.token) {
+      // Store the token securely
+      await AsyncStorage.setItem("driverToken", result.token);
+      await AsyncStorage.setItem("driverData", JSON.stringify(result.driver));
+    }
+
+    return result; // Returns driver details and JWT token
+  } catch (error) {
+    console.log("Driver Sign-In Error:", error);
+    throw new Error(error.message || "Network error");
+  }
+}
+
 
 export async function verifyDriver(data) {
   console.log("api.js verifyDriver data", data)

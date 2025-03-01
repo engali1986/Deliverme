@@ -23,7 +23,8 @@
       "language": "العربيه",
       "missing_fields":"Please fill all fields",
       "verify":"Varify",
-      "verification_code":"Varification Code"
+      "verification_code":"Varification Code",
+      "verify_account":"Verify your account"
     },
     "ar": {
       "home_title": "مرحبًا بك في Deliverme",
@@ -49,7 +50,8 @@
       "language": "English",
       "missing_fields":"برجاء ملا كافه الحقول",
       "verify":"تحقق",
-      "verification_code":"رمز التحقق"
+      "verification_code":"رمز التحقق",
+      "verify_account":" تحقق من الحساب"
     }
   }
   
