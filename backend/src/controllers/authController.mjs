@@ -305,7 +305,7 @@ export async function driverSignUp(req, res,db) {
 
 
     // Check if the Driver already exists
-    const existingClient = await db.collection("drivers").findOne({ email }, { session });
+    const existingClient = await db.collection("drivers").findOne({ mobile }, { session });
     if (existingClient) {
       logger.warn("Driver already exists: %s", email);
       return res.status(400).json({ message: "Driver already exists" });
@@ -426,20 +426,49 @@ export async function verifyDriver(req, res, db) {
 
 
 // Driver Sign-In
-export async function driverSignIn(req, res, db) {
+/**
+ * Handles driver sign-in.
+ */
+export async function driverSignIn(req, res,db) {
   const { mobile, password } = req.body;
 
   try {
-    const driver = await db.collection('drivers').findOne({ mobile });
-    if (!driver) return res.status(404).json({ message: 'Driver not found' });
+    logger.info("Driver Sign-In request received for mobile: %s", mobile);
 
+    // Check if driver exists
+    const driver = await db.collection("drivers").findOne({ mobile });
+    if (!driver) {
+      logger.warn("Driver not found: %s", mobile);
+      return res.status(404).json({ message: "Driver not found" });
+    }
+
+    // Verify password
     const isPasswordValid = await bcrypt.compare(password, driver.password);
-    if (!isPasswordValid) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isPasswordValid) {
+      logger.warn("Invalid password attempt for driver: %s", mobile);
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-    const token = jwt.sign({ id: driver._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({ message: 'Driver logged in successfully', token });
+    // Check verification status
+    if (!driver.driverVerified) {
+      logger.info("Driver not verified: %s", mobile);
+      return res.status(200).json({ message: "Verification required", driverVerified: false });
+    }
+
+    // Successful login
+    logger.info("Driver successfully signed in: %s", mobile);
+    res.status(200).json({
+      message: "Sign-in successful",
+      driverVerified: true,
+      driver: {
+        name: driver.name,
+        mobile: driver.mobile,
+      },
+    });
   } catch (error) {
-    logger.error('Error in Driver Sign-In: %s', error.message);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    logger.error("Error in Driver Sign-In: %s", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 }
+
+
