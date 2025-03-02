@@ -241,7 +241,7 @@ const DriverSignupScreen = ({ navigation }) => {
   setShowVerification(true)
   // navigation.navigate("DriverSignin");
      } catch (error) {
-  // Alert.alert("Signup failed. Please try again.");
+  setLoading(false);
   Toast.show({
     type: 'error', // or 'error'
     text1: ('Error.'),
@@ -256,11 +256,12 @@ const DriverSignupScreen = ({ navigation }) => {
 
   // Function to handle verification
 const handleVerify = async () => {
+  setLoading(true);
   if (!verificationCode) {
-  Alert.alert("Please enter the verification code");
+    setLoading(false);
   Toast.show({
-    type: 'success', // or 'error'
-    text1: ('Success.'),
+    type: 'error', // or 'error'
+    text1: ('Error.'),
     text2:("Please enter the verification code"),
     props: { showIcon: true }, // Custom Prop for Icon
   });
@@ -268,14 +269,27 @@ const handleVerify = async () => {
   }
   
   try {
-    await verifyDriver({ email: form.email, verificationCode });
+    const responce=await verifyDriver({ email: form.email, verificationCode });
     // Alert.alert("Verification successful!");
-    Toast.show({
-      type: 'success', // or 'error'
-      text1: ('Success.'),
-      text2:("Verification successful!"),
-      props: { showIcon: true }, // Custom Prop for Icon
-    });
+    if (responce.message && responce.message==="Wrong verification code, please check your email") {
+      Toast.show({
+        type: 'error', // or 'error'
+        text1: ('Error.'),
+        text2:("Wrong verification code, please check your email"),
+        props: { showIcon: true }, // Custom Prop for Icon
+      });
+      setLoading(false);
+    }else{
+      Toast.show({
+        type: 'success', // or 'error'
+        text1: ('Success.'),
+        text2:("Verification successful!",responce),
+        props: { showIcon: true }, // Custom Prop for Icon
+      });
+      setLoading(false);
+
+    }
+   
     // navigation.navigate("DriverHome"); // Redirect to Driver Home after verification
   } catch (error) {
     // Alert.alert("Invalid code. Please try again.");
@@ -285,6 +299,7 @@ const handleVerify = async () => {
       text2:("Invalid code. Please try again."),
       props: { showIcon: true }, // Custom Prop for Icon
     });
+    setLoading(false);
   }
   
   };
@@ -314,7 +329,7 @@ const handleVerify = async () => {
         </>):(<>
           <Text style={styles.title}>Enter Verification Code</Text>
       <TextInput style={styles.input} placeholder={i18n.t("verification_code")} keyboardType="numeric" value={verificationCode} onChangeText={setVerificationCode} />
-      <Button title={i18n.t("verify")} color="#acc6f5" onPress={handleVerify}  />
+      {loading ? <ActivityIndicator size="large" /> :<Button title={i18n.t("verify")} color="#acc6f5" onPress={handleVerify}  />}
         </>)}
 
       

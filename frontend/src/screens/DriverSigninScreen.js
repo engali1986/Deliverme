@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import i18n from '../i18n/i18n';
+import {driverSignin, verifyDriver} from "../services/api.js"
 const DriverSigninScreen = () => {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
@@ -11,6 +12,7 @@ const DriverSigninScreen = () => {
   
   const handleSignIn = async () => {
     try {
+      console.log("DriverSigninScreen.js mobile, password:", mobile, password)
       const response = await driverSignin({ mobile, password });
 
       if (response.driverVerified) {
@@ -37,7 +39,7 @@ const DriverSigninScreen = () => {
   
     return (
     <View style={styles.container}>
-       {isVerifying?(
+       {!isVerifying?(
         <>
         <Text style={styles.title}>{i18n.t('driverSignIn')}</Text>
         <TextInput

@@ -405,7 +405,8 @@ export async function verifyDriver(req, res, db) {
 
     if (driver.verificationCode !== verificationCode) {
       logger.error("Driver Invalid verification code email: %s", email);
-      return res.status(400).json({ message: "Invalid verification code" });
+      await sendDriverVerificationEmail(email, driver.verificationCode);
+      return res.status(200).json({ message: "Wrong verification code, please check your email" });
     }
 
     const Verification=await db.collection("drivers").updateOne(
