@@ -269,7 +269,7 @@ const handleVerify = async () => {
   }
   
   try {
-    const responce=await verifyDriver({ email: form.email, verificationCode });
+    const responce=await verifyDriver({ mobile:null,email: form.email, verificationCode });
     // Alert.alert("Verification successful!");
     if (responce.message && responce.message==="Wrong verification code, please check your email") {
       Toast.show({

@@ -393,24 +393,35 @@ for (const [key, fileArray] of Object.entries(req.files)) {
 
 // Driver Sign-Up verification
 export async function verifyDriver(req, res, db) {
-  const { email, verificationCode } = req.body;
-  logger.info("Driver Sign-Up deriver verification received for email: %s", req.body);
+  const { mobile,email, verificationCode } = req.body;
+  logger.info("Driver verification received for email: %s", req.body);
   try {
-    const driver = await db.collection("drivers").findOne({ email });
+    let driver
+    if (!mobile) {
+      driver = await db.collection("drivers").findOne({ email });
+    }else{
+      driver = await db.collection("drivers").findOne({ mobile });
+    }
+    
 
     if (!driver) {
       logger.error("Driver not found for email: %s", email);
       return res.status(400).json({ message: "Driver not found" });
     }
 
+    console.log("authController.mjs verifyDriver driver:",driver)
+
     if (driver.verificationCode !== verificationCode) {
       logger.error("Driver Invalid verification code email: %s", email);
       await sendDriverVerificationEmail(email, driver.verificationCode);
       return res.status(200).json({ message: "Wrong verification code, please check your email" });
     }
+    let query=driver.email
+    console.log("authController.mjs verifyDriver driver query:",query)
+  
 
     const Verification=await db.collection("drivers").updateOne(
-      { email },
+      {email:query} ,
       { $set: { driverVerified: true } }
     );
 
@@ -466,7 +477,7 @@ export async function driverSignIn(req, res,db) {
     // Check verification status
     if (!driver.driverVerified) {
       logger.info("Driver not verified: %s", mobile);
-      return res.status(200).json({ message: "Verification required", driverVerified: false });
+      return res.status(200).json({ message: "Verification required", driverVerified: false, email:driver.email });
     }
 
     // Generate JWT token

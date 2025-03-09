@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:5000/api/auth"; // Replace with your backend's deployed URL if applicable
+import AsyncStorage from "@react-native-async-storage/async-storage";
+const BASE_URL = "http://192.168.1.9:5000/api/auth"; // Replace with your backend's deployed URL if applicable
 
 /**
  * Handles user signup for clients.
@@ -120,9 +121,12 @@ export async function driverSignin(data) {
       // Store the token securely
       await AsyncStorage.setItem("driverToken", result.token);
       await AsyncStorage.setItem("driverData", JSON.stringify(result.driver));
+      return result; // Returns driver details and JWT token
     }
 
-    return result; // Returns driver details and JWT token
+    return result // Returns driver data if no Token
+
+    
   } catch (error) {
     console.log("Driver Sign-In Error:", error);
     throw new Error(error.message || "Network error");
@@ -146,7 +150,7 @@ export async function verifyDriver(data) {
       throw new Error(errorData.message || "Verification failed");
     }
 
-    return await response.json();
+    return response.json();
   } catch (error) {
     throw new Error(error.message || "Network error");
   }
