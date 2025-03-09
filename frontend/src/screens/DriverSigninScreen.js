@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import i18n from '../i18n/i18n';
 import {driverSignin, verifyDriver} from "../services/api.js"
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from 'react-native-toast-message';
 
 const DriverSigninScreen = () => {
   const [mobile, setMobile] = useState("");
@@ -11,22 +13,34 @@ const DriverSigninScreen = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const navigation = useNavigation();
+  // Loading state to indicate form submission progress
+  const [loading, setLoading] = useState(false);
   
   const handleSignIn = async () => {
+    setLoading(true)
+    if (mobile.length===0 || password.length===0) {
+      Toast.show({ type: "error", text1: "Error",text2:i18n.t("missing_fields"),props: { showIcon: true } });
+      setLoading(false)
+      return
+    }
     try {
       console.log("DriverSigninScreen.js mobile, password:", mobile, password)
       const response = await driverSignin({ mobile, password });
-
       if (response.driverVerified) {
         Toast.show({ type: "success", text1: "Sign-In Successful", text2: "Welcome back!",props: { showIcon: true } });
+        await AsyncStorage.setItem("driverToken", response.token);
+        await AsyncStorage.setItem("driverData", JSON.stringify(response.driver));
+        setLoading(false)
         navigation.navigate("DriverHome"); // Redirect to home
-      } else {
-        setEmail(response.email)
-        setIsVerifying(true);
+      }
+      if (!response.driverVerified) {
+        setIsVerifying(false);
         Toast.show({ type: "info", text1: "Verification Required", text2: "Please verify your account first.", props: { showIcon: true }  });
+        setLoading(false)
       }
     } catch (error) {
       Toast.show({ type: "error", text1: "Sign-In Failed", text2: error.message, props: { showIcon: true }  });
+      setLoading(false)
     }
   };
 
@@ -60,7 +74,7 @@ const DriverSigninScreen = () => {
           onChangeText={setPassword}
           secureTextEntry
         />
-        <Button title={i18n.t('signIn')} onPress={handleSignIn} />
+        {loading ? <ActivityIndicator size="large" />:<Button title={i18n.t('signIn')} onPress={handleSignIn} />}
         <Button
           title={i18n.t('signUp')}
           onPress={() => navigation.navigate('DriverSignup')}
@@ -75,7 +89,8 @@ const DriverSigninScreen = () => {
             onChangeText={setVerificationCode}
             keyboardType="number-pad"
           />
-          <Button title={i18n.t('verify')} onPress={handleVerify} />
+          {loading ? <ActivityIndicator size="large" />:<Button title={i18n.t('verify')} onPress={handleVerify} />}
+          
       </>)}
 
     </View>

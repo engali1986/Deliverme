@@ -29,11 +29,11 @@ const DriverSignupScreen = ({ navigation }) => {
   const validateInputs = () => {
       // Check if all fields are filled
       if (!form.email || !form.mobile || !form.name || !form.password || !form.license || !form.registration || !form.criminal || !form.personal) {
-        // Alert.alert('Error', 'All fields are mandatory!');
+        // Alert.alert'Error', 'All fields are mandatory!';
         Toast.show({
           type: 'error', // or 'error'
-          text1: ('Error.'),
-          text2:('All fields are mandatory!'),
+          text1: 'Error',
+          text2:'All fields are mandatory!',
           props: { showIcon: true }, // Custom Prop for Icon
         });
         return false;
@@ -42,11 +42,11 @@ const DriverSignupScreen = ({ navigation }) => {
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(form.email)) {
-        // Alert.alert('Error', 'Please enter a valid email address!');
+        // Alert.alert'Error', 'Please enter a valid email address!';
         Toast.show({
           type: 'error', // or 'error'
-          text1: ('Error.'),
-          text2:('Please enter a valid email address!'),
+          text1: 'Error',
+          text2:'Please enter a valid email address!',
           props: { showIcon: true }, // Custom Prop for Icon
         });
         return false;
@@ -61,8 +61,8 @@ const DriverSignupScreen = ({ navigation }) => {
         // );
         Toast.show({
           type: 'error', // or 'error'
-          text1: ('Error.'),
-          text2:('Password must be at least 8 characters long, with at least 1 uppercase letter, 1 lowercase letter, and 1 special character!'),
+          text1: 'Error',
+          text2:'Password must be at least 8 characters long, with at least 1 uppercase letter, 1 lowercase letter, and 1 special character!',
           props: { showIcon: true }, // Custom Prop for Icon
         });
         return false;
@@ -70,11 +70,11 @@ const DriverSignupScreen = ({ navigation }) => {
   
       // Validate mobile number (numeric and 11 digits for Egypt)
       if (!/^\d{11}$/.test(form.mobile)) {
-        // Alert.alert('Error', 'Mobile number must be 11 digits!');
+        // Alert.alert'Error', 'Mobile number must be 11 digits!';
         Toast.show({
           type: 'error', // or 'error'
-          text1: ('Error.'),
-          text2:('Mobile number must be 11 digits!'),
+          text1: 'Error',
+          text2:'Mobile number must be 11 digits!',
           props: { showIcon: true }, // Custom Prop for Icon
         });
         
@@ -141,8 +141,8 @@ const DriverSignupScreen = ({ navigation }) => {
           // Alert.alert("File too large", "File size must be under 1MB");
           Toast.show({
             type: 'error', // or 'error'
-            text1: ('File too large.'),
-            text2:('File size must be under 1MB'),
+            text1: 'File too large.',
+            text2:'File size must be under 1MB',
             props: { showIcon: true }, // Custom Prop for Icon
           });
           return;
@@ -156,7 +156,7 @@ const DriverSignupScreen = ({ navigation }) => {
       // Alert.alert("File upload error", error);
       Toast.show({
         type: 'error', // or 'error'
-        text1: ('File upload error'),
+        text1: 'File upload error',
         text2:error,
         props: { showIcon: true }, // Custom Prop for Icon
       });
@@ -171,8 +171,8 @@ const DriverSignupScreen = ({ navigation }) => {
       // Alert.alert("Invalid email format. Please use English characters only.");
       Toast.show({
         type: 'error', // or 'error'
-        text1: ('Error.'),
-        text2:('Invalid email format. Please use English characters only.'),
+        text1: 'Error',
+        text2:'Invalid email format. Please use English characters only.',
         props: { showIcon: true }, // Custom Prop for Icon
       });
       return;
@@ -181,8 +181,8 @@ const DriverSignupScreen = ({ navigation }) => {
       // Alert.alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character.");
       Toast.show({
         type: 'error', // or 'error'
-        text1: ('Error.'),
-        text2:('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character.'),
+        text1: 'Error',
+        text2:'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character.',
         props: { showIcon: true }, // Custom Prop for Icon
       });
       return;
@@ -191,8 +191,8 @@ const DriverSignupScreen = ({ navigation }) => {
       // Alert.alert("Name and Mobile must contain only English letters and numbers.");
       Toast.show({
         type: 'error', // or 'error'
-        text1: ('Error.'),
-        text2:('Name and Mobile must contain only English letters and numbers.'),
+        text1: 'Error',
+        text2:'Name and Mobile must contain only English letters and numbers.',
         props: { showIcon: true }, // Custom Prop for Icon
       });
       return;
@@ -208,10 +208,10 @@ const DriverSignupScreen = ({ navigation }) => {
     // Check if all required fields are filled
     if (!validateInputs()){
           console.log("Please fill all data")
-          // Alert.alert('Error', i18n.t("missing_fields"));
+          // Alert.alert'Error', i18n.t("missing_fields"));
           Toast.show({
             type: 'error', // or 'error'
-            text1: ('Error.'),
+            text1: 'Error',
             text2:i18n.t("missing_fields"),
             props: { showIcon: true }, // Custom Prop for Icon
           });
@@ -234,8 +234,8 @@ const DriverSignupScreen = ({ navigation }) => {
   // Alert.alert("Signup successful! Please check your email to verify your account.");
   Toast.show({
     type: 'success', // or 'error'
-    text1: ('Success.'),
-    text2:('Signup successful! Please check your email to verify your account.'),
+    text1: 'Success.',
+    text2:'Signup successful! Please check your email to verify your account.',
     props: { showIcon: true }, // Custom Prop for Icon
   });
   setShowVerification(true)
@@ -244,8 +244,8 @@ const DriverSignupScreen = ({ navigation }) => {
   setLoading(false);
   Toast.show({
     type: 'error', // or 'error'
-    text1: ('Error.'),
-    text2:("Signup failed. Please try again."),
+    text1: 'Error.',
+    text2:"Signup failed. Please try again.",
     props: { showIcon: true }, // Custom Prop for Icon
   });
   console.error(error);
@@ -261,29 +261,29 @@ const handleVerify = async () => {
     setLoading(false);
   Toast.show({
     type: 'error', // or 'error'
-    text1: ('Error.'),
-    text2:("Please enter the verification code"),
+    text1: 'Error.',
+    text2:"Please enter the verification code",
     props: { showIcon: true }, // Custom Prop for Icon
   });
   return;
   }
   
   try {
-    const responce=await verifyDriver({ mobile:null,email: form.email, verificationCode });
+    const responce=await verifyDriver({ mobile:form.mobile, verificationCode });
     // Alert.alert("Verification successful!");
     if (responce.message && responce.message==="Wrong verification code, please check your email") {
       Toast.show({
         type: 'error', // or 'error'
-        text1: ('Error.'),
-        text2:("Wrong verification code, please check your email"),
+        text1: 'Error',
+        text2:"Wrong verification code, please check your email",
         props: { showIcon: true }, // Custom Prop for Icon
       });
       setLoading(false);
     }else{
       Toast.show({
         type: 'success', // or 'error'
-        text1: ('Success.'),
-        text2:("Verification successful!",responce),
+        text1: 'Success.',
+        text2:"Verification successful!",
         props: { showIcon: true }, // Custom Prop for Icon
       });
       setLoading(false);
@@ -295,8 +295,8 @@ const handleVerify = async () => {
     // Alert.alert("Invalid code. Please try again.");
     Toast.show({
       type: 'error', // or 'error'
-      text1: ('Error.'),
-      text2:("Invalid code. Please try again."),
+      text1: 'Error',
+      text2:"Invalid code. Please try again.",
       props: { showIcon: true }, // Custom Prop for Icon
     });
     setLoading(false);

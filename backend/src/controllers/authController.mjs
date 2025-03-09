@@ -393,16 +393,10 @@ for (const [key, fileArray] of Object.entries(req.files)) {
 
 // Driver Sign-Up verification
 export async function verifyDriver(req, res, db) {
-  const { mobile,email, verificationCode } = req.body;
-  logger.info("Driver verification received for email: %s", req.body);
+  const { mobile, verificationCode } = req.body;
+  logger.info("Driver verification received for mobile: %s", req.body);
   try {
-    let driver
-    if (!mobile) {
-      driver = await db.collection("drivers").findOne({ email });
-    }else{
-      driver = await db.collection("drivers").findOne({ mobile });
-    }
-    
+    const driver = await db.collection("drivers").findOne({ mobile });
 
     if (!driver) {
       logger.error("Driver not found for email: %s", email);
@@ -412,16 +406,12 @@ export async function verifyDriver(req, res, db) {
     console.log("authController.mjs verifyDriver driver:",driver)
 
     if (driver.verificationCode !== verificationCode) {
-      logger.error("Driver Invalid verification code email: %s", email);
-      await sendDriverVerificationEmail(email, driver.verificationCode);
+      logger.error("Driver Invalid verification code email: %s", driver.email);
+      await sendDriverVerificationEmail(driver.email, driver.verificationCode);
       return res.status(200).json({ message: "Wrong verification code, please check your email" });
     }
-    let query=driver.email
-    console.log("authController.mjs verifyDriver driver query:",query)
-  
-
     const Verification=await db.collection("drivers").updateOne(
-      {email:query} ,
+      {mobile} ,
       { $set: { driverVerified: true } }
     );
 
@@ -432,6 +422,7 @@ export async function verifyDriver(req, res, db) {
       res.status(500).json({ message: "Server error", error: error.message });
     }
   } catch (error) {
+    logger.error("Driver verify error: %s", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 }
