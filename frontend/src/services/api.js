@@ -90,7 +90,7 @@ export async function driverSignup(data) {
   
   return await response.json();
   } catch (error) {
-    console.log("api.js driverSignup error",error)
+    console.log("api.js driverSignup error",error, error.message)
   console.log(error);
   throw new Error(error.message || "Network error");
   }

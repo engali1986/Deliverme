@@ -29,11 +29,12 @@ const DriverSignupScreen = ({ navigation }) => {
   const validateInputs = () => {
       // Check if all fields are filled
       if (!form.email || !form.mobile || !form.name || !form.password || !form.license || !form.registration || !form.criminal || !form.personal) {
+        console.log("ValidateInputs function, missing fields")
         // Alert.alert'Error', 'All fields are mandatory!';
         Toast.show({
           type: 'error', // or 'error'
           text1: 'Error',
-          text2:'All fields are mandatory!',
+          text2:i18n.t("missing_fields"),
           props: { showIcon: true }, // Custom Prop for Icon
         });
         return false;
@@ -208,13 +209,6 @@ const DriverSignupScreen = ({ navigation }) => {
     // Check if all required fields are filled
     if (!validateInputs()){
           console.log("Please fill all data")
-          // Alert.alert'Error', i18n.t("missing_fields"));
-          Toast.show({
-            type: 'error', // or 'error'
-            text1: 'Error',
-            text2:i18n.t("missing_fields"),
-            props: { showIcon: true }, // Custom Prop for Icon
-          });
           return;
         }
 
@@ -241,11 +235,12 @@ const DriverSignupScreen = ({ navigation }) => {
   setShowVerification(true)
   // navigation.navigate("DriverSignin");
      } catch (error) {
+      console.log(error)
   setLoading(false);
   Toast.show({
     type: 'error', // or 'error'
     text1: 'Error.',
-    text2:"Signup failed. Please try again.",
+    text2:error.message||"Signup failed. Please try again.",
     props: { showIcon: true }, // Custom Prop for Icon
   });
   console.error(error);
