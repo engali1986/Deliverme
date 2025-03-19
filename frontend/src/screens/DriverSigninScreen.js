@@ -10,7 +10,7 @@ const DriverSigninScreen = () => {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [email,setEmail]=useState("")
-  const [isVerifying, setIsVerifying] = useState(false);
+  const [ShowVerification, setShowVerification] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const navigation = useNavigation();
   // Loading state to indicate form submission progress
@@ -34,8 +34,8 @@ const DriverSigninScreen = () => {
         navigation.navigate("DriverHome"); // Redirect to home
       }
       if (!response.driverVerified) {
-        setIsVerifying(false);
-        Toast.show({ type: "info", text1: "Verification Required", text2: "Please verify your account first.", props: { showIcon: true }  });
+        setShowVerification(true);
+        Toast.show({ type: "success", text1: "Verification Required", text2: "Please verify your account first.", props: { showIcon: true }  });
         setLoading(false)
       }
     } catch (error) {
@@ -45,19 +45,23 @@ const DriverSigninScreen = () => {
   };
 
   const handleVerify = async () => {
+    setLoading(true)
     try {
-      const response = await verifyDriver({ mobile:mobile, email:null, verificationCode });
+      const response = await verifyDriver({ mobile:mobile, verificationCode });
       console.log("DriverSigninScreen.js handleVerify response", response)
       console.log("DriverSigninScreen.js handleVerify response", response.message)
+      
       Toast.show({ type: "success", text1: "Verification Successful", text2: "You can now sign in." });
+      setLoading(false)
     } catch (error) {
       Toast.show({ type: "error", text1: "Verification Failed", text2: error.message });
+      setLoading(false)
     }
   };
   
     return (
     <View style={styles.container}>
-       {!isVerifying?(
+       {!ShowVerification?(
         <>
         <Text style={styles.title}>{i18n.t('driverSignIn')}</Text>
         <TextInput

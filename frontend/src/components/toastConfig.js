@@ -23,7 +23,7 @@ export const toastConfig = {
 
 const styles = StyleSheet.create({
   successContainer: {
-    backgroundColor: "#d1e7ff", // Light Blue
+    backgroundColor: "#90ee90", // Light Green
     borderLeftColor: "#0073e6", // Blue Accent
     borderLeftWidth: 6,
     padding: 12,

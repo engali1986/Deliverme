@@ -25,7 +25,7 @@ const DriverSignupScreen = ({ navigation }) => {
   
   // Loading state to indicate form submission progress
   const [loading, setLoading] = useState(false);
-
+  // Function to handle input validation and form state update
   const validateInputs = () => {
       // Check if all fields are filled
       if (!form.email || !form.mobile || !form.name || !form.password || !form.license || !form.registration || !form.criminal || !form.personal) {
@@ -165,44 +165,6 @@ const DriverSignupScreen = ({ navigation }) => {
     }
   };
   
-
-  // Function to handle input validation and form state update
-  const handleInputChange = (field, value) => {
-    if (field === "email" && !validateEmail(value)) {
-      // Alert.alert("Invalid email format. Please use English characters only.");
-      Toast.show({
-        type: 'error', // or 'error'
-        text1: 'Error',
-        text2:'Invalid email format. Please use English characters only.',
-        props: { showIcon: true }, // Custom Prop for Icon
-      });
-      return;
-    }
-    if (field === "password" && !validatePassword(value)) {
-      // Alert.alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character.");
-      Toast.show({
-        type: 'error', // or 'error'
-        text1: 'Error',
-        text2:'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character.',
-        props: { showIcon: true }, // Custom Prop for Icon
-      });
-      return;
-    }
-    if ((field === "name" || field === "mobile") && !validateEnglishText(value)) {
-      // Alert.alert("Name and Mobile must contain only English letters and numbers.");
-      Toast.show({
-        type: 'error', // or 'error'
-        text1: 'Error',
-        text2:'Name and Mobile must contain only English letters and numbers.',
-        props: { showIcon: true }, // Custom Prop for Icon
-      });
-      return;
-    }
-    setForm({ ...form, [field]: value });
-  };
-
-
-
   // Function to handle signup request
   const handleSignup = async () => {
     console.log("form",form)
@@ -278,7 +240,7 @@ const handleVerify = async () => {
       Toast.show({
         type: 'success', // or 'error'
         text1: 'Success.',
-        text2:"Verification successful!",
+        text2:responce.message || "Verification successful!",
         props: { showIcon: true }, // Custom Prop for Icon
       });
       setLoading(false);

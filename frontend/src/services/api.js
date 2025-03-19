@@ -82,7 +82,7 @@ export async function driverSignup(data) {
     "Accept": "application/json", // ✅ No "Content-Type" needed; FormData sets it automatically
   },
   });
-  
+  console.log("api.js driver signup response.ok:", response.ok || "cannot find response.ok" )
   if (!response.ok) {
   const errorData = await response.json();
   throw new Error(errorData.message || "Failed to sign up");
@@ -101,7 +101,7 @@ export async function driverSignup(data) {
  */
 
 export async function driverSignin(data) {
-  console.log("api.js driversignin Data:",data)
+  console.log("api.js driversignin Data  mobile, password:",data)
   try {
     const response = await fetch(`${BASE_URL}/driver/signin`, {
       method: "POST",
@@ -110,6 +110,9 @@ export async function driverSignin(data) {
       },
       body: JSON.stringify(data),
     });
+
+    console.log("api.js driversignin response:",response)
+    console.log("api.js driversignin response.ok:",response.ok || "cannot read response.ok")
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -135,7 +138,7 @@ export async function driverSignin(data) {
 
 
 export async function verifyDriver(data) {
-  console.log("api.js verifyDriver data", data)
+  console.log("api.js verifyDriver data mobile, verificationCode", data)
   try {
     const response = await fetch(`${BASE_URL}/driver/verify`, {
       method: "POST",
@@ -144,6 +147,8 @@ export async function verifyDriver(data) {
       },
       body: JSON.stringify(data),
     });
+
+    console.log("api.js verifyDriver response", response)
 
     if (!response.ok) {
       const errorData = await response.json();
