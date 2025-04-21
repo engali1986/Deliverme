@@ -6,19 +6,26 @@ import ClientSigninScreen from '../screens/ClientSigninScreen';
 import DriverSigninScreen from '../screens/DriverSigninScreen';
 import ClientSignupScreen from '../screens/ClientSignupScreen';
 import DriverSignupScreen from '../screens/DriverSignupScreen';
+import DriverHomeScreen from '../screens/DriverHomeScreen';
+import ClientHomeScreen from '../screens/ClientHomeScreen';
 
 
 const Stack = createStackNavigator();
 
-export default function AppNavigator() {
+export default function AppNavigator({ initialRouteName }) {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home" screenOptions={{headerTitleAlign:'center', headerTintColor:"red"}}>
-        <Stack.Screen name="Home" component={HomeScreen}/>
+      <Stack.Navigator
+        initialRouteName={initialRouteName}
+        screenOptions={{ headerShown: false }} // Move here
+      >
+        <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="ClientSignin" component={ClientSigninScreen} />
         <Stack.Screen name="DriverSignin" component={DriverSigninScreen} />
         <Stack.Screen name="ClientSignup" component={ClientSignupScreen} />
         <Stack.Screen name="DriverSignup" component={DriverSignupScreen} />
+        <Stack.Screen name="DriverHome" component={DriverHomeScreen} />
+        <Stack.Screen name="ClientHome" component={ClientHomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

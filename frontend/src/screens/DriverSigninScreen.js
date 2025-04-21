@@ -58,7 +58,10 @@ const DriverSigninScreen = () => {
       }
       
       Toast.show({ type: "success", text1: "Verification Successful", text2: "You can now sign in." });
+      await AsyncStorage.setItem("driverToken", response.token);
+      await AsyncStorage.setItem("driverData", JSON.stringify(response.driver));
       setLoading(false)
+      navigation.navigate("DriverHome"); // Redirect to home
     } catch (error) {
       Toast.show({ type: "error", text1: "Verification Failed", text2: error.message });
       setLoading(false)
