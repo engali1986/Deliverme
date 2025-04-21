@@ -50,6 +50,12 @@ const DriverSigninScreen = () => {
       const response = await verifyDriver({ mobile:mobile, verificationCode });
       console.log("DriverSigninScreen.js handleVerify response", response)
       console.log("DriverSigninScreen.js handleVerify response", response.message)
+      if (response.message==="Wrong verification code, please check your email") {
+        Toast.show({ type: "error", text1: "Verification Failed", text2: response.message });
+        setLoading(false)
+        return
+        
+      }
       
       Toast.show({ type: "success", text1: "Verification Successful", text2: "You can now sign in." });
       setLoading(false)

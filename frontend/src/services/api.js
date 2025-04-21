@@ -120,12 +120,12 @@ export async function driverSignin(data) {
     }
 
     const result = await response.json();
-    if (result.token) {
-      // Store the token securely
-      await AsyncStorage.setItem("driverToken", result.token);
-      await AsyncStorage.setItem("driverData", JSON.stringify(result.driver));
-      return result; // Returns driver details and JWT token
-    }
+    // if (result.token) {
+    //   // Store the token securely
+    //   await AsyncStorage.setItem("driverToken", result.token);
+    //   await AsyncStorage.setItem("driverData", JSON.stringify(result.driver));
+    //   return result; // Returns driver details and JWT token
+    // }
 
     return result // Returns driver data if no Token
 

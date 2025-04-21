@@ -437,7 +437,7 @@ export async function verifyDriver(req, res, db) {
     const driver = await db.collection("drivers").findOne({ mobile });
 
     if (!driver) {
-      logger.error("Driver not found for email: %s", email);
+      logger.error("Driver not found for mobile: %s", mobile);
       return res.status(400).json({ message: "Driver not found" });
     }
 
