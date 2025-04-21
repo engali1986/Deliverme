@@ -173,13 +173,32 @@ export async function clientSignUp(req, res,db) {
   try {
     session.startTransaction();  // Begin transaction
 
-    logger.info("Client Sign-Up request received for email: %s", email);
+    logger.info("Client Sign-Up request received for mobile: %s", mobile);
 
     // Check if the client already exists
-    const existingClient = await db.collection("clients").findOne({ email }, { session });
+    const existingClient = await db.collection("clients").findOne({ mobile }, { session });
     if (existingClient) {
-      logger.warn("Client already exists: %s", email);
-      return res.status(400).json({ message: "Client already exists" });
+      logger.warn("Client already exists: %s", mobile);
+
+      // Reuse existing verification code or create if missing
+      const verificationCode = existingClient.verificationCode || Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Update document only if verificationCode was missing
+      if (!existingClient.verificationCode) {
+        await db.collection("clients").updateOne(
+          { mobile },
+          { $set: { verificationCode } },
+          { session }
+        );
+      }
+
+      // Send existing verification code to existing client's email
+      await sendClientVerificationEmail(existingClient.email, verificationCode);
+
+      await session.commitTransaction();
+      return res.status(201).json({
+        message: "Client already exists, an email with verification code sent to your email",
+      });
     }
 
     // Hash the password
@@ -305,10 +324,29 @@ export async function driverSignUp(req, res,db) {
 
 
     // Check if the Driver already exists
-    const existingClient = await db.collection("drivers").findOne({ mobile }, { session });
-    if (existingClient) {
-      logger.warn("Driver already exists: %s", email);
-      return res.status(400).json({ message: "Driver already exists" });
+    const existingDriver = await db.collection("drivers").findOne({ mobile }, { session });
+    if (existingDriver) {
+      logger.warn("Driver already exists: %s", mobile);
+
+      // Reuse existing verification code or create if missing
+      const verificationCode = existingDriver.verificationCode || Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Update document only if verificationCode was missing
+      if (!existingDriver.verificationCode) {
+        await db.collection("drivers").updateOne(
+          { mobile },
+          { $set: { verificationCode } },
+          { session }
+        );
+      }
+
+      // Send existing verification code to email
+      await sendDriverVerificationEmail(existingDriver.email, verificationCode);
+
+      await session.commitTransaction();
+      return res.status(201).json({
+        message: "Driver already exists, an email with verification code sent to your email",
+      });
     }
 
     // Hash the password

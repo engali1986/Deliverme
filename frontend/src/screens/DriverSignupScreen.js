@@ -87,48 +87,8 @@ const DriverSignupScreen = ({ navigation }) => {
 
  
 
-  // Function to handle image selection
-  // const pickImage = async (field) => {
-  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   console.log("image status:", status)
-  //   if (status !== "granted") {
-  //     Alert.alert("Permission Denied", "You need to grant gallery access.");
-  //     return;
-  //   }
-  
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: 'images',
-  //     allowsEditing: true,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //     });
-  
-  //   // If gallery fails, try opening the camera
-  //   if (result.canceled || result.assets.length === 0) {
-  //     let result = await ImagePicker.launchImageLibraryAsync({
-  //       mediaTypes: ['images', 'videos'],
-  //       allowsEditing: true,
-  //       aspect: [4, 3],
-  //       quality: 1,
-  //       });
-  
-  //     if (!cameraResult.canceled && cameraResult.assets.length > 0) {
-  //       result = cameraResult;
-  //     }
-  //   }
-  
-  //   if (!result.canceled && result.assets.length > 0) {
-  //     const imageUri = result.assets[0].uri;
-  //     const fileInfo = await FileSystem.getInfoAsync(imageUri);
-  //     if (fileInfo.size > 1024 * 1024) {
-  //       Alert.alert("File too large", "File size must be under 1MB");
-  //       return;
-  //     }
-  
-  //     setForm((prev) => ({ ...prev, [field]: imageUri }));
-  //   }
-  // };
-
+  // Function to handle file upload using DocumentPicker
+  // This function allows the user to select an image file from their device
   const pickImage = async (field) => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -175,10 +135,6 @@ const DriverSignupScreen = ({ navigation }) => {
         }
 
     setLoading(true);
-    // const formData = new FormData();
-    // Object.keys(form).forEach((key) => {
-    //   formData.append(key, form[key]);
-    // });
 
    
      try {
@@ -191,7 +147,7 @@ const DriverSignupScreen = ({ navigation }) => {
   Toast.show({
     type: 'success', // or 'error'
     text1: 'Success.',
-    text2:'Signup successful! Please check your email to verify your account.',
+    text2:response.message||'Signup successful! Please check your email to verify your account.',
     props: { showIcon: true }, // Custom Prop for Icon
   });
   setShowVerification(true)

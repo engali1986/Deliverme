@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const BASE_URL = "http://192.168.1.9:5000/api/auth"; // Replace with your backend's deployed URL if applicable
+const BASE_URL = "http://192.168.1.7:5000/api/auth"; // Replace with your backend's deployed URL if applicable
 
 /**
  * Handles user signup for clients.
