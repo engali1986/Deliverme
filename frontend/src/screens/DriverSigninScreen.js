@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import i18n from '../i18n/i18n';
 import {driverSignin, verifyDriver} from "../services/api.js"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from 'react-native-toast-message';
+import jwtDecode from 'jwt-decode';
+
 
 const DriverSigninScreen = () => {
   const [mobile, setMobile] = useState("");
@@ -28,8 +30,9 @@ const DriverSigninScreen = () => {
       const response = await driverSignin({ mobile, password });
       if (response.driverVerified) {
         Toast.show({ type: "success", text1: "Sign-In Successful", text2: "Welcome back!",props: { showIcon: true } });
-        await AsyncStorage.setItem("driverToken", response.token);
-        await AsyncStorage.setItem("driverData", JSON.stringify(response.driver));
+        await AsyncStorage.setItem("userToken", response.token);
+        await AsyncStorage.setItem("userType", "driver");
+        await AsyncStorage.setItem("userData", JSON.stringify(response.driver));
         setLoading(false)
         navigation.navigate("DriverHome"); // Redirect to home
       }
@@ -58,8 +61,9 @@ const DriverSigninScreen = () => {
       }
       
       Toast.show({ type: "success", text1: "Verification Successful", text2: "You can now sign in." });
-      await AsyncStorage.setItem("driverToken", response.token);
-      await AsyncStorage.setItem("driverData", JSON.stringify(response.driver));
+      await AsyncStorage.setItem("userToken", response.token);
+      await AsyncStorage.setItem("userType", "driver");
+      await AsyncStorage.setItem("userData", JSON.stringify(response.driver));
       setLoading(false)
       navigation.navigate("DriverHome"); // Redirect to home
     } catch (error) {
@@ -67,6 +71,28 @@ const DriverSigninScreen = () => {
       setLoading(false)
     }
   };
+
+  useEffect(() => {
+    const checkDriverToken = async () => {
+      const token = await AsyncStorage.getItem("userToken");
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          console.log("DriverSigninScreen.js checkDriverToken decoded", decoded)
+          const now = Date.now() / 1000;
+          if (decoded.exp > now) {
+            navigation.replace("DriverHome");
+          } else {
+            await AsyncStorage.clear(); // Clear all AsyncStorage data
+          }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          await AsyncStorage.clear(); // Clear all AsyncStorage data
+        }
+      }
+    };
+    checkDriverToken();
+  }, []);
   
     return (
     <View style={styles.container}>

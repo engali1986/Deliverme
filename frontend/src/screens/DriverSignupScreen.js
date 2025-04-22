@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, TouchableOpacity, ActivityIndicator, Image, Alert, StyleSheet, ScrollView } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
@@ -168,54 +168,52 @@ const DriverSignupScreen = ({ navigation }) => {
   };
 
   // Function to handle verification
-const handleVerify = async () => {
-  setLoading(true);
-  if (!verificationCode) {
-    setLoading(false);
-  Toast.show({
-    type: 'error', // or 'error'
-    text1: 'Error.',
-    text2:"Please enter the verification code",
-    props: { showIcon: true }, // Custom Prop for Icon
-  });
-  return;
-  }
-  
-  try {
-    const responce=await verifyDriver({ mobile:form.mobile, verificationCode });
-    // Alert.alert("Verification successful!");
-    if (responce.message && responce.message==="Wrong verification code, please check your email") {
-      Toast.show({
-        type: 'error', // or 'error'
-        text1: 'Error',
-        text2:"Wrong verification code, please check your email",
-        props: { showIcon: true }, // Custom Prop for Icon
-      });
-      setLoading(false);
-    }else{
-      Toast.show({
-        type: 'success', // or 'error'
-        text1: 'Success.',
-        text2:responce.message || "Verification successful!",
-        props: { showIcon: true }, // Custom Prop for Icon
-      });
-      setLoading(false);
-
+  const handleVerify = async () => {
+    setLoading(true)
+    try {
+      const response = await verifyDriver({ mobile:mobile, verificationCode });
+      console.log("DriverSigninScreen.js handleVerify response", response)
+      console.log("DriverSigninScreen.js handleVerify response", response.message)
+      if (response.message==="Wrong verification code, please check your email") {
+        Toast.show({ type: "error", text1: "Verification Failed", text2: response.message });
+        setLoading(false)
+        return
+        
+      }
+      
+      Toast.show({ type: "success", text1: "Verification Successful", text2: "You can now sign in." });
+      await AsyncStorage.setItem("userToken", response.token);
+      await AsyncStorage.setItem("userType", "driver");
+      await AsyncStorage.setItem("userData", JSON.stringify(response.driver));
+      setLoading(false)
+      navigation.navigate("DriverHome"); // Redirect to home
+    } catch (error) {
+      Toast.show({ type: "error", text1: "Verification Failed", text2: error.message });
+      setLoading(false)
     }
-   
-    // navigation.navigate("DriverHome"); // Redirect to Driver Home after verification
-  } catch (error) {
-    // Alert.alert("Invalid code. Please try again.");
-    Toast.show({
-      type: 'error', // or 'error'
-      text1: 'Error',
-      text2:"Invalid code. Please try again.",
-      props: { showIcon: true }, // Custom Prop for Icon
-    });
-    setLoading(false);
-  }
-  
   };
+
+  useEffect(() => {
+    const checkDriverToken = async () => {
+      const token = await AsyncStorage.getItem("userToken");
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          console.log("DriverSigninScreen.js checkDriverToken decoded", decoded)
+          const now = Date.now() / 1000;
+          if (decoded.exp > now) {
+            navigation.replace("DriverHome");
+          } else {
+            await AsyncStorage.clear(); // Clear all AsyncStorage data
+          }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          await AsyncStorage.clear(); // Clear all AsyncStorage data
+        }
+      }
+    };
+    checkDriverToken();
+  }, []);
 
   return (
     <View style={styles.container}>
