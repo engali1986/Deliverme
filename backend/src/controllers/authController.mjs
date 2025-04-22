@@ -298,6 +298,17 @@ export async function clientSignIn(req, res) {
   }
 }
 
+/**
+ * Generates a JWT token for authentication.
+ */
+function generateToken(driver) {
+  return jwt.sign(
+    { id: driver._id, mobile: driver.mobile, name: driver.name },
+    process.env.JWT_SECRET,
+    { expiresIn: "30d" } // Token expires in 30 days
+  );
+}
+
 // Driver Sign-Up
 export async function driverSignUp(req, res,db) {
   const { email, mobile, name, password } = req.body;
@@ -467,16 +478,7 @@ export async function verifyDriver(req, res, db) {
 
 
 // Driver Sign-In
-/**
- * Generates a JWT token for authentication.
- */
-function generateToken(driver) {
-  return jwt.sign(
-    { id: driver._id, mobile: driver.mobile, name: driver.name },
-    process.env.JWT_SECRET,
-    { expiresIn: "30d" } // Token expires in 7 days
-  );
-}
+
 /**
  * Handles driver sign-in.
  */
