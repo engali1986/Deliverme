@@ -7,6 +7,7 @@ import './src/i18n/i18n.js';
 import Toast from "react-native-toast-message";
 import { toastConfig } from './src/components/toastConfig.js';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 export default function App() {
   const [loading, setLoading] = useState(true); // Always call useState at the top
@@ -16,15 +17,23 @@ export default function App() {
     const initializeApp = async () => {
       try {
         await initializeLanguage(); // Load language settings
+        const demotoken= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MGEzMTg5ODgzMDA2ZDUyYWFkYzE0NyIsIm1vYmlsZSI6IjAxMTAxODA2NTIyIiwibmFtZSI6IkFsaSIsImlhdCI6MTc0NTUwMjQxNywiZXhwIjoxNzQ1NTAyNTM3fQ.7ygwr8BLmVibC286gwrn94A9UNoNWlLwmflczEuKH-0"
+      const demodecoded = jwtDecode(demotoken);
+      console.log("App.js demodecoded:", demodecoded);
 
         const token = await AsyncStorage.getItem("userToken");
         const userType = await AsyncStorage.getItem("userType");
-        console.log("App.js token, userType:", token, userType);
+        console.log("App.js token, userType,:", token, userType);
+        console.log("App.js type of token:", typeof token);
 
         if (token && userType) {
+          console.log("App.js token, userType,:", token, userType);
           try {
             const decoded = jwtDecode(token);
             const now = Date.now() / 1000; // in seconds
+            console.log("App.js decoded:", decoded);
+            console.log("App.js now:", now);
+            console.log("App.js decoded.exp:", decoded.exp);
             if (decoded.exp < now) {
               await AsyncStorage.clear();
               setInitialRoute("Home");
@@ -33,10 +42,12 @@ export default function App() {
             }
           } catch (e) {
             console.log("Invalid token");
+            console.log(e)
             await AsyncStorage.clear();
             setInitialRoute("Home");
           }
         } else {
+          console.log("No token or userType found, setting initial route to Home");
           setInitialRoute("Home");
         }
       } catch (error) {

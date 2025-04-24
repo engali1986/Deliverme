@@ -5,6 +5,8 @@ import * as FileSystem from "expo-file-system";
 import i18n from '../i18n/i18n.js';
 import {driverSignup, verifyDriver} from "../services/api.js"
 import Toast from 'react-native-toast-message';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 const DriverSignupScreen = ({ navigation }) => {
   const [showVerification, setShowVerification] = useState(false)
@@ -171,7 +173,7 @@ const DriverSignupScreen = ({ navigation }) => {
   const handleVerify = async () => {
     setLoading(true)
     try {
-      const response = await verifyDriver({ mobile:mobile, verificationCode });
+      const response = await verifyDriver({ mobile:form.mobile, verificationCode });
       console.log("DriverSigninScreen.js handleVerify response", response)
       console.log("DriverSigninScreen.js handleVerify response", response.message)
       if (response.message==="Wrong verification code, please check your email") {
@@ -199,7 +201,7 @@ const DriverSignupScreen = ({ navigation }) => {
       if (token) {
         try {
           const decoded = jwtDecode(token);
-          console.log("DriverSigninScreen.js checkDriverToken decoded", decoded)
+          console.log("DriverSignupScreen.js checkDriverToken decoded", decoded)
           const now = Date.now() / 1000;
           if (decoded.exp > now) {
             navigation.replace("DriverHome");

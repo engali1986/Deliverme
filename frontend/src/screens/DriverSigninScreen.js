@@ -5,7 +5,7 @@ import i18n from '../i18n/i18n';
 import {driverSignin, verifyDriver} from "../services/api.js"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from 'react-native-toast-message';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 
 const DriverSigninScreen = () => {

@@ -8,11 +8,16 @@ import ClientSignupScreen from '../screens/ClientSignupScreen';
 import DriverSignupScreen from '../screens/DriverSignupScreen';
 import DriverHomeScreen from '../screens/DriverHomeScreen';
 import ClientHomeScreen from '../screens/ClientHomeScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator({ initialRouteName }) {
+  console.log("AppNavigator.js initialRouteName:", initialRouteName);
+  console.log(AsyncStorage.getItem("userToken"));
+  console.log(AsyncStorage.getItem("userType"));
+  console.log(AsyncStorage.getItem("userData"));
   return (
     <NavigationContainer>
       <Stack.Navigator

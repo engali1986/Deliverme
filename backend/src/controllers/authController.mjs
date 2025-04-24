@@ -305,7 +305,7 @@ function generateToken(driver) {
   return jwt.sign(
     { id: driver._id, mobile: driver.mobile, name: driver.name },
     process.env.JWT_SECRET,
-    { expiresIn: "30d" } // Token expires in 30 days
+    { expiresIn: 60*2 } // Token expires in 2 minutes
   );
 }
 
@@ -466,7 +466,17 @@ export async function verifyDriver(req, res, db) {
 
     logger.info("Driver Verification result: %s", Verification);
     if (Verification.modifiedCount>0) {
-      res.status(200).json({ message: "Driver verified successfully" }); 
+      // Generate JWT token 
+      const token = generateToken(driver);
+      res.status(200).json({
+        message: "Driver verified successfully",
+        driverVerified: true,
+        token,
+        driver: {
+          name: driver.name,
+          mobile: driver.mobile,
+        },
+      });
     }else{
       res.status(500).json({ message: "Server error", error: error.message });
     }
