@@ -81,6 +81,7 @@ const DriverSigninScreen = () => {
           console.log("DriverSigninScreen.js checkDriverToken decoded", decoded)
           const now = Date.now() / 1000;
           if (decoded.exp > now) {
+            console.log("DriverSigninScreen.js checkDriverToken token is valid")  
             navigation.replace("DriverHome");
           } else {
             await AsyncStorage.clear(); // Clear all AsyncStorage data

@@ -17,10 +17,6 @@ export default function App() {
     const initializeApp = async () => {
       try {
         await initializeLanguage(); // Load language settings
-        const demotoken= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MGEzMTg5ODgzMDA2ZDUyYWFkYzE0NyIsIm1vYmlsZSI6IjAxMTAxODA2NTIyIiwibmFtZSI6IkFsaSIsImlhdCI6MTc0NTUwMjQxNywiZXhwIjoxNzQ1NTAyNTM3fQ.7ygwr8BLmVibC286gwrn94A9UNoNWlLwmflczEuKH-0"
-      const demodecoded = jwtDecode(demotoken);
-      console.log("App.js demodecoded:", demodecoded);
-
         const token = await AsyncStorage.getItem("userToken");
         const userType = await AsyncStorage.getItem("userType");
         console.log("App.js token, userType,:", token, userType);
