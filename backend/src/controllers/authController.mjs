@@ -125,6 +125,18 @@ const createTransporter = async () => {
     },
   });
 };
+
+/**
+ * Generates a JWT token for authentication.
+ */
+function generateToken(user) {
+  return jwt.sign(
+    { id: user._id, mobile: user.mobile, name: user.name },
+    process.env.JWT_SECRET,
+    { expiresIn: 60*2 } // Token expires in 2 minutes
+  );
+}
+
 // Send verification email to Client using OAuth2
 async function sendClientVerificationEmail(email, verificationCode) {
   const transporter = await createTransporter();
@@ -298,16 +310,7 @@ export async function clientSignIn(req, res) {
   }
 }
 
-/**
- * Generates a JWT token for authentication.
- */
-function generateToken(driver) {
-  return jwt.sign(
-    { id: driver._id, mobile: driver.mobile, name: driver.name },
-    process.env.JWT_SECRET,
-    { expiresIn: 60*2 } // Token expires in 2 minutes
-  );
-}
+
 
 // Driver Sign-Up
 export async function driverSignUp(req, res,db) {

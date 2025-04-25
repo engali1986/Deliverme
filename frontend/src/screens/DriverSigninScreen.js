@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import i18n from '../i18n/i18n';
 import {driverSignin, verifyDriver} from "../services/api.js"
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -34,7 +34,7 @@ const DriverSigninScreen = () => {
         await AsyncStorage.setItem("userType", "driver");
         await AsyncStorage.setItem("userData", JSON.stringify(response.driver));
         setLoading(false)
-        navigation.navigate("DriverHome"); // Redirect to home
+        navigation.replace("DriverHome"); // Redirect to home
       }
       if (!response.driverVerified) {
         setShowVerification(true);
@@ -65,35 +65,51 @@ const DriverSigninScreen = () => {
       await AsyncStorage.setItem("userType", "driver");
       await AsyncStorage.setItem("userData", JSON.stringify(response.driver));
       setLoading(false)
-      navigation.navigate("DriverHome"); // Redirect to home
+      navigation.replace("DriverHome"); // Redirect to home
     } catch (error) {
       Toast.show({ type: "error", text1: "Verification Failed", text2: error.message });
       setLoading(false)
     }
   };
 
-  useEffect(() => {
-    const checkDriverToken = async () => {
+  const initializeDriverSignInScreen = async () => {
+    try {
       const token = await AsyncStorage.getItem("userToken");
-      if (token) {
+      const userType = await AsyncStorage.getItem("userType");
+      console.log("Home.js token, userType,:", token, userType);
+      console.log("Home.js type of token:", typeof token);
+
+      if (token && userType) {
+        console.log("Home.js token, userType,:", token, userType);
         try {
           const decoded = jwtDecode(token);
-          console.log("DriverSigninScreen.js checkDriverToken decoded", decoded)
-          const now = Date.now() / 1000;
-          if (decoded.exp > now) {
-            console.log("DriverSigninScreen.js checkDriverToken token is valid")  
-            navigation.replace("DriverHome");
+          const now = Date.now() / 1000; // in seconds
+          console.log("Home.js decoded:", decoded);
+          console.log("Home.js now:", now);
+          console.log("Home.js decoded.exp:", decoded.exp);
+          if (decoded.exp < now) {
+            await AsyncStorage.clear();
           } else {
-            await AsyncStorage.clear(); // Clear all AsyncStorage data
+            navigation.replace(userType === "driver" ? "DriverHome" : "ClientHome");
           }
-        } catch (error) {
-          console.error("Invalid token:", error);
-          await AsyncStorage.clear(); // Clear all AsyncStorage data
+        } catch (e) {
+          console.log("Invalid token");
+          console.log(e);
+          await AsyncStorage.clear();
         }
+      } else {
+        console.log("No token or userType found, staying on Home screen");
       }
-    };
-    checkDriverToken();
-  }, []);
+    } catch (error) {
+      console.error("Error during initialization:", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      initializeDriverSignInScreen();
+    }, [])
+  );
   
     return (
     <View style={styles.container}>

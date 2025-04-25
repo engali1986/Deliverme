@@ -29,7 +29,7 @@ export default function HomeScreen() {
           if (decoded.exp < now) {
             await AsyncStorage.clear();
           } else {
-            navigation.navigate(userType === "driver" ? "DriverHome" : "ClientHome");
+            navigation.replace(userType === "driver" ? "DriverHome" : "ClientHome");
           }
         } catch (e) {
           console.log("Invalid token");
