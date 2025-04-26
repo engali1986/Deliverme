@@ -125,6 +125,31 @@ export default function ClientSignupScreen() {
     }
   };
 
+  const handleVerify = async () => {
+      setLoading(true)
+      try {
+        const response = await verifyDriver({ mobile:form.mobile, verificationCode });
+        console.log("ClientSignUpScreen.js handleVerify response", response)
+        console.log("ClientSignUpScreen.js handleVerify response", response.message)
+        if (response.message==="Wrong verification code, please check your email") {
+          Toast.show({ type: "error", text1: "Verification Failed", text2: response.message });
+          setLoading(false)
+          return
+          
+        }
+        
+        Toast.show({ type: "success", text1: "Verification Successful", text2: "You can now sign in." });
+        await AsyncStorage.setItem("userToken", response.token);
+        await AsyncStorage.setItem("userType", "client");
+        await AsyncStorage.setItem("userData", JSON.stringify(response.client));
+        setLoading(false)
+        navigation.replace("ClientHome"); // Redirect to home
+      } catch (error) {
+        Toast.show({ type: "error", text1: "Verification Failed", text2: error.message });
+        setLoading(false)
+      }
+    };
+
   return (
     <View style={styles.container}>
       {!showVerification?(<>

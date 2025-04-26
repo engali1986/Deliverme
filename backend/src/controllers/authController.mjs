@@ -262,6 +262,52 @@ export async function clientSignUp(req, res,db) {
   }
 }
 
+// Client Sign-Up verification
+export async function verifyClient(req, res, db) {
+  const { mobile, verificationCode } = req.body;
+  logger.info("Client verification received for mobile: %s", req.body);
+  try {
+    const client = await db.collection("clients").findOne({ mobile });
+
+    if (!client) {
+      logger.error("Client not found for mobile: %s", mobile);
+      return res.status(400).json({ message: "Client not found" });
+    }
+
+    console.log("authController.mjs verifyClient client:",client)
+
+    if (client.verificationCode !== verificationCode) {
+      logger.error("Client Invalid verification code email: %s", client.email);
+      await sendClientVerificationEmail(client.email, client.verificationCode);
+      return res.status(200).json({ message: "Wrong verification code, please check your email" });
+    }
+    const Verification=await db.collection("clients").updateOne(
+      {mobile} ,
+      { $set: { driverVerified: true } }
+    );
+
+    logger.info("Client Verification result: %s", Verification);
+    if (Verification.modifiedCount>0) {
+      // Generate JWT token 
+      const token = generateToken(client);
+      res.status(200).json({
+        message: "Client verified successfully",
+        clientVerified: true,
+        token,
+        client: {
+          name: client.name,
+          mobile: client.mobile,
+        },
+      });
+    }else{
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  } catch (error) {
+    logger.error("Client verify error: %s", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
+
 // Client Sign-In
 export async function clientSignIn(req, res) {
   const { email, password, verificationCode } = req.body;

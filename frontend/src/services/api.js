@@ -28,7 +28,7 @@ export async function clientSignup(data) {
 
 /**
  * Handles user login for clients.
- * @param {Object} data - The client login details (email, password).
+ * @param {Object} data - The client login details (mobile, password).
  */
 export async function clientSignin(data) {
   try {
@@ -46,6 +46,34 @@ export async function clientSignin(data) {
     }
 
     return await response.json();
+  } catch (error) {
+    throw new Error(error.message || "Network error");
+  }
+}
+
+/**
+ * Handles user Verify for clients.
+ * @param {Object} data - The client Verify details (mobile, password).
+ */
+export async function verifyClient(data) {
+  console.log("api.js verifyClient data mobile, verificationCode", data)
+  try {
+    const response = await fetch(`${BASE_URL}/driver/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    console.log("api.js verifyClient response", response)
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Verification failed");
+    }
+
+    return response.json();
   } catch (error) {
     throw new Error(error.message || "Network error");
   }

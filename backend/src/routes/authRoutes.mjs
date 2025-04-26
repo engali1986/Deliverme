@@ -1,5 +1,5 @@
 import express from 'express';
-import { clientSignUp, clientSignIn, driverSignUp, driverSignIn, verifyDriver } from '../controllers/authController.mjs';
+import { clientSignUp, clientSignIn, verifyClient, driverSignUp, driverSignIn, verifyDriver } from '../controllers/authController.mjs';
 import upload from "../middlewares/uploadMiddleware.mjs"
 import dotenv from "dotenv"
 dotenv.config()
@@ -10,6 +10,11 @@ router.post('/client/signup', async (req, res) => {
     const db = req.app.locals.db;  // Access the db instance from app.locals
     await clientSignUp(req, res, db);
   });
+  router.post("/client/verify",async (req,res)=>{
+    console.log("post client verify", req.body)
+    const db = req.app.locals.db;  // Access the db instance from app.locals
+    await verifyClient(req,res,db)
+  })
 router.post('/client/signin', clientSignIn);
 
 // Driver Routes
