@@ -14,6 +14,8 @@ export async function clientSignup(data) {
       },
       body: JSON.stringify(data),
     });
+    console.log("api.js client signup response",response)
+    console.log("api.js client signup response.ok",response.ok || "cannot find response.ok")
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to sign up");

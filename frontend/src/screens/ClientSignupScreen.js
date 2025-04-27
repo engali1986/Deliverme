@@ -92,10 +92,7 @@ export default function ClientSignupScreen() {
 
     try {
       
-      const response = await clientSignup(data).then(res=>{
-        console.log("client signup response",res)
-        return res
-      });
+      const response = await clientSignup(form)
       console.log("client signup response",response)
       if (response.status !== 201) {
         throw new Error(response.message || "Failed to sign up client");
