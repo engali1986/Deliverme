@@ -60,7 +60,7 @@ export async function clientSignin(data) {
 export async function verifyClient(data) {
   console.log("api.js verifyClient data mobile, verificationCode", data)
   try {
-    const response = await fetch(`${BASE_URL}/driver/verify`, {
+    const response = await fetch(`${BASE_URL}/client/verify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

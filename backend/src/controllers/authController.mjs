@@ -217,7 +217,7 @@ export async function clientSignUp(req, res,db) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Generate a random 6-digit verification number
-    const verificationCode = Math.floor(100000 + Math.random() * 900000);
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Insert client with clientVerified as false and save verification code
     const result = await db.collection("clients").insertOne(

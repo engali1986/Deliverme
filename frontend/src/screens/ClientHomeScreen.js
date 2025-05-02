@@ -8,7 +8,7 @@ const ClientHomeScreen = () => {
     
     return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Driver Home</Text>
+      <Text style={styles.title}>Welcome to Client Home</Text>
     </View>
     
     )

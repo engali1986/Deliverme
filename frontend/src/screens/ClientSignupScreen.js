@@ -4,7 +4,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import i18n from '../i18n/i18n.js';
-import {clientSignup} from "../services/api.js"
+import {clientSignup, verifyClient} from "../services/api.js"
 import Toast from 'react-native-toast-message';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
@@ -94,10 +94,8 @@ export default function ClientSignupScreen() {
       
       const response = await clientSignup(form)
       console.log("client signup response",response)
-      if (response.status !== 201) {
-        throw new Error(response.message || "Failed to sign up client");
-      }
-      if (response.status === 201) {
+      console.log("client signup response",response.message)
+      if(response.message==="Client already exists, an email with verification code sent to your email" || response.message==="Client registered successfully. Please verify your email.") {
         setShowVerification(true)
         Toast.show({
           type: 'success',
@@ -106,6 +104,7 @@ export default function ClientSignupScreen() {
           props: { showIcon: true }, // Custom Prop for Icon
         });
       }
+      
     } catch (error) {
       console.log(error)
         setLoading(false);
@@ -125,7 +124,7 @@ export default function ClientSignupScreen() {
   const handleVerify = async () => {
       setLoading(true)
       try {
-        const response = await verifyDriver({ mobile:form.mobile, verificationCode });
+        const response = await verifyClient({ mobile:form.mobile, verificationCode });
         console.log("ClientSignUpScreen.js handleVerify response", response)
         console.log("ClientSignUpScreen.js handleVerify response", response.message)
         if (response.message==="Wrong verification code, please check your email") {
@@ -149,7 +148,8 @@ export default function ClientSignupScreen() {
 
   return (
     <View style={styles.container}>
-      {!showVerification?(<>
+    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+    {!showVerification?(<>
         <Text style={styles.title}>Client Signup</Text>
       <Text style={styles.instructions}>
         All fields are mandatory. Password must be at least 8 characters long, containing at least 1 uppercase letter,
@@ -189,7 +189,8 @@ export default function ClientSignupScreen() {
             <TextInput style={styles.input} placeholder={i18n.t("verification_code")} keyboardType="numeric" value={verificationCode} onChangeText={setVerificationCode} />
             {loading ? <ActivityIndicator size="large" /> :<Button title={i18n.t("verify")} color="#acc6f5" onPress={handleVerify}  />}
               </>)}
-      
+
+    </ScrollView>  
     </View>
   );
 }
