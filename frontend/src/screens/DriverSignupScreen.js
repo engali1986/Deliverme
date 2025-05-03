@@ -199,6 +199,7 @@ const DriverSignupScreen = () => {
       }
       
       Toast.show({ type: "success", text1: "Verification Successful", text2: "You can now sign in." });
+      await AsyncStorage.clear()
       await AsyncStorage.setItem("userToken", response.token);
       await AsyncStorage.setItem("userType", "driver");
       await AsyncStorage.setItem("userData", JSON.stringify(response.driver));
@@ -251,7 +252,7 @@ const DriverSignupScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
         {!showVerification?(<>
           <Text style={styles.title}>{i18n.t("sign_up")}</Text>
       

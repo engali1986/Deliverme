@@ -143,6 +143,7 @@ export default function ClientSignupScreen() {
         }
         
         Toast.show({ type: "success", text1: "Verification Successful", text2: "You can now sign in." });
+        await AsyncStorage.clear()
         await AsyncStorage.setItem("userToken", response.token);
         await AsyncStorage.setItem("userType", "client");
         await AsyncStorage.setItem("userData", JSON.stringify(response.client));
