@@ -192,6 +192,18 @@ export async function clientSignUp(req, res,db) {
     if (existingClient) {
       logger.warn("Client already exists: %s", mobile);
 
+      // Check if the client is already verified
+      if (existingClient.clientVerified) {
+        logger.info("Client already verified: %s", mobile);
+        await session.commitTransaction();
+        // If the client is already verified, return a message
+        return res.status(200).json({
+          message: "Client already verified",
+        });
+      }
+      // else, send verification code to existing client
+      logger.info("Client not verified, sending verification code: %s", email);
+
       // Reuse existing verification code or create if missing
       const verificationCode = existingClient.verificationCode || Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -241,7 +253,7 @@ export async function clientSignUp(req, res,db) {
     // Commit the transaction if everything goes fine
     await session.commitTransaction();
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Client registered successfully. Please verify your email.",
     });
   } catch (error) {
@@ -388,6 +400,16 @@ export async function driverSignUp(req, res,db) {
     if (existingDriver) {
       logger.warn("Driver already exists: %s", mobile);
 
+      // Check if the Driver is already verified
+      if (existingDriver.driverVerified) {
+        logger.info("Driver already verified: %s", mobile);
+        await session.commitTransaction();
+        // If the Driver is already verified, return a message
+        return res.status(200).json({
+          message: "Driver already verified",
+        });
+      }
+
       // Reuse existing verification code or create if missing
       const verificationCode = existingDriver.verificationCode || Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -402,6 +424,8 @@ export async function driverSignUp(req, res,db) {
 
       // Send existing verification code to email
       await sendDriverVerificationEmail(existingDriver.email, verificationCode);
+
+
 
       await session.commitTransaction();
       return res.status(201).json({

@@ -147,14 +147,27 @@ const DriverSignupScreen = () => {
     return res
   }); // Call the API function
   console.log("Driver signup response", response)
-  // Alert.alert("Signup successful! Please check your email to verify your account.");
+  console.log("Driver signup response", response.message)
+  if(response.message==="Driver already exists, an email with verification code sent to your email" || response.message==="Driver registered successfully. Please verify your email.") {
+    setShowVerification(true)
   Toast.show({
-    type: 'success', // or 'error'
+    type: 'success', 
     text1: 'Success.',
     text2:response.message||'Signup successful! Please check your email to verify your account.',
     props: { showIcon: true }, // Custom Prop for Icon
   });
-  setShowVerification(true)
+  }else if(response.message==="Driver already verified"){
+    Toast.show({
+      type: 'success', // or 'error'
+      text1: 'Success.',
+      text2: 'Driver already verified, please login!',
+      props: { showIcon: true }, // Custom Prop for Icon
+    });
+
+    setLoading(false)
+    return;
+  }
+
   // navigation.replace("DriverSignin");
      } catch (error) {
       console.log(error)

@@ -5,6 +5,7 @@ import { connectDB } from './db/connect.mjs';
 import authRoutes from './routes/authRoutes.mjs';
 import logger from './utils/logger.mjs';
 import rateLimit from 'express-rate-limit';
+import { ensureIndexes } from './db/ensureIndexes.mjs'; // Import the ensureIndexes function
 
 const app = express();
 // Set rate limit (100 requests per 15 minutes)
@@ -25,11 +26,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); // ✅ Parses form-urlencoded bodie
 
 // Connect to database
-connectDB().then((client) => {
+connectDB().then(async(client) => {
   const db = client.db('deliverme'); // Access the database from the client
   app.locals.db = db; // Store the db in app.locals
   logger.info('Database connected and ready to use');
   console.log('Database connected and ready to use');
+  // ✅ Ensure indexes here
+  await ensureIndexes(db, logger)
 }).catch(error => {
   logger.error('Error while connecting to database: %s', error.message);
 });

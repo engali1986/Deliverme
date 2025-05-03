@@ -104,6 +104,14 @@ export default function ClientSignupScreen() {
           props: { showIcon: true }, // Custom Prop for Icon
         });
       }
+      if(response.message==="Client already verified"){
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Client already verified, please login!',
+          props: { showIcon: true }, // Custom Prop for Icon
+        });
+      }
       
     } catch (error) {
       console.log(error)
