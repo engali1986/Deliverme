@@ -30,6 +30,7 @@ const DriverSigninScreen = () => {
       const response = await driverSignin({ mobile, password });
       if (response.driverVerified) {
         Toast.show({ type: "success", text1: "Sign-In Successful", text2: "Welcome back!",props: { showIcon: true } });
+        AsyncStorage.clear()
         await AsyncStorage.setItem("userToken", response.token);
         await AsyncStorage.setItem("userType", "driver");
         await AsyncStorage.setItem("userData", JSON.stringify(response.driver));
