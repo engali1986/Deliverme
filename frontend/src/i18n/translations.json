@@ -24,7 +24,11 @@
       "missing_fields":"Please fill all fields",
       "verify":"Varify",
       "verification_code":"Varification Code",
-      "verify_account":"Verify your account"
+      "verify_account":"Verify your account",
+      "driver_home":"Driver Home",
+      "completed_rides":"Completed Rides",
+      "settings":"Settings",
+      "logout":"Logout"
     },
     "ar": {
       "home_title": "مرحبًا بك في Deliverme",
@@ -51,7 +55,12 @@
       "missing_fields":"برجاء ملا كافه الحقول",
       "verify":"تحقق",
       "verification_code":"رمز التحقق",
-      "verify_account":" تحقق من الحساب"
+      "verify_account":" تحقق من الحساب",
+      "driver_home":"الصفحة الرئيسية للسائق",
+      "completed_rides":"الرحلات المكتملة",
+      "settings":"الإعدادات",
+      "logout":"تسجيل الخروج"
+  
     }
   }
   
