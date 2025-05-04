@@ -490,6 +490,23 @@ for (const [key, fileArray] of Object.entries(req.files)) {
     await session.abortTransaction();
     logger.error("Error during Driver Sign-Up: %s", error.message);
 
+    // Handle duplicate key error (E11000)
+    if (error.code === 11000) {
+      logger.warn("Duplicate key error occurred: %s", error.message);
+      await db.collection("drivers").deleteOne({ email, mobile });
+      if (folderId) {
+        try {
+          await drive.files.delete({ fileId: folderId });
+          logger.info(`Rolled back Google Drive folder for driver ${mobile}`);
+        } catch (deleteError) {
+          logger.error("Failed to rollback Google Drive folder: %s", deleteError.message);
+        }
+      }
+      return res.status(400).json({
+        message: "A driver with this email already exists. Please use a different email.",
+      });
+    }
+
     if (folderId) {
       try {
         await drive.files.delete({ fileId: folderId });

@@ -291,6 +291,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
     backgroundColor: '#f5f5f5',
+    marginBottom: 50,
   },
   title: {
     fontSize: 24,
