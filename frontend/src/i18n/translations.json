@@ -28,7 +28,9 @@
       "driver_home":"Driver Home",
       "completed_rides":"Completed Rides",
       "settings":"Settings",
-      "logout":"Logout"
+      "logout":"Logout",
+      "logout_success":"Logout successfully",
+      "logout_message":"Have a nice day!"
     },
     "ar": {
       "home_title": "مرحبًا بك في Deliverme",
@@ -59,7 +61,9 @@
       "driver_home":"الصفحة الرئيسية للسائق",
       "completed_rides":"الرحلات المكتملة",
       "settings":"الإعدادات",
-      "logout":"تسجيل الخروج"
+      "logout":"تسجيل الخروج",
+      "logout_success":"تم تسجيل الخروج بنجاح",
+      "logout_message":"نتمنى لك يوماً سعيداً!"
   
     }
   }
