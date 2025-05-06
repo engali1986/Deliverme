@@ -8,6 +8,7 @@ import Toast from "react-native-toast-message";
 import { toastConfig } from './src/components/toastConfig.js';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
+import NavigationLogger from './src/components/NavigationLogger.js';
 
 export default function App() {
   const [loading, setLoading] = useState(true); // Always call useState at the top

@@ -11,6 +11,7 @@ import ClientHomeScreen from '../screens/ClientHomeScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
+
 const Stack = createStackNavigator();
 
 export default function AppNavigator({ initialRouteName }) {
@@ -20,6 +21,7 @@ export default function AppNavigator({ initialRouteName }) {
   console.log(AsyncStorage.getItem("userData"));
   return (
     <NavigationContainer>
+       
       <Stack.Navigator
         initialRouteName={initialRouteName}
         screenOptions={{ headerShown: false }} // Move here

@@ -6,6 +6,7 @@ import LanguageToggle from '../components/LanguageToggle.js';
 import { LanguageContext } from '../context/LanguageContext.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {jwtDecode} from 'jwt-decode'; // Correct import
+import NavigationLogger from '../components/NavigationLogger.js'; // Import the NavigationLogger component
 
 export default function HomeScreen() {
   const { language } = useContext(LanguageContext); // Use context to trigger re-render
@@ -52,6 +53,9 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <NavigationLogger />
+            {/* This component logs the navigation stack to the console */}
+            {/* You can remove it if you don't need this feature */}
       <Text style={styles.title}>{i18n.t('home_title')}</Text>
       <LanguageToggle />
       <Button
