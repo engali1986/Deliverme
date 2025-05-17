@@ -295,7 +295,7 @@ export async function verifyClient(req, res, db) {
     }
     const Verification=await db.collection("clients").updateOne(
       {mobile} ,
-      { $set: { driverVerified: true } }
+      { $set: { clientVerified: true } }
     );
 
     logger.info("Client Verification result: %s", Verification);
@@ -312,7 +312,7 @@ export async function verifyClient(req, res, db) {
         },
       });
     }else{
-      res.status(500).json({ message: "Server error", error: error.message });
+      res.status(500).json({ message: "Server Verify error" });
     }
   } catch (error) {
     logger.error("Client verify error: %s", error);
@@ -568,7 +568,7 @@ export async function verifyDriver(req, res, db) {
         },
       });
     }else{
-      res.status(500).json({ message: "Server error", error: error.message });
+      res.status(500).json({ message: "Server Verify error" });
     }
   } catch (error) {
     logger.error("Driver verify error: %s", error);

@@ -163,8 +163,7 @@ const DriverSignupScreen = () => {
       text2: 'Driver already verified, please login!',
       props: { showIcon: true }, // Custom Prop for Icon
     });
-
-    setLoading(false)
+    navigation.replace("DriverSignin");
     return;
   }
 

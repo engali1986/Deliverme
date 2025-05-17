@@ -77,17 +77,17 @@ const DriverSigninScreen = () => {
     try {
       const token = await AsyncStorage.getItem("userToken");
       const userType = await AsyncStorage.getItem("userType");
-      console.log("Home.js token, userType,:", token, userType);
-      console.log("Home.js type of token:", typeof token);
+      console.log("DriverSigninScreen.js token, userType,:", token, userType);
+      console.log("DriverSigninScreen.js type of token:", typeof token);
 
       if (token && userType) {
-        console.log("Home.js token, userType,:", token, userType);
+        console.log("DriverSigninScreen.js token, userType,:", token, userType);
         try {
           const decoded = jwtDecode(token);
           const now = Date.now() / 1000; // in seconds
-          console.log("Home.js decoded:", decoded);
-          console.log("Home.js now:", now);
-          console.log("Home.js decoded.exp:", decoded.exp);
+          console.log("DriverSigninScreen.js decoded:", decoded);
+          console.log("DriverSigninScreen.js now:", now);
+          console.log("DriverSigninScreen.js decoded.exp:", decoded.exp);
           if (decoded.exp < now) {
             await AsyncStorage.clear();
           } else {
@@ -99,7 +99,7 @@ const DriverSigninScreen = () => {
           await AsyncStorage.clear();
         }
       } else {
-        console.log("No token or userType found, staying on Home screen");
+        console.log("No token or userType found, staying on DriverSignin screen");
       }
     } catch (error) {
       console.error("Error during initialization:", error);

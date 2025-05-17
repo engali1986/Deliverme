@@ -111,6 +111,8 @@ export default function ClientSignupScreen() {
           text2: 'Client already verified, please login!',
           props: { showIcon: true }, // Custom Prop for Icon
         });
+        navigation.replace("ClientSignin");
+        return
       }
       
     } catch (error) {
