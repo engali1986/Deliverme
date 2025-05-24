@@ -203,7 +203,11 @@ const DriverSignupScreen = () => {
       await AsyncStorage.setItem("userType", "driver");
       await AsyncStorage.setItem("userData", JSON.stringify(response.driver));
       setLoading(false)
-      navigation.replace("DriverHome"); // Redirect to home
+      // navigation.replace("DriverHome"); // Redirect to home
+        navigation.reset({
+        index: 0,
+        routes: [{ name: "DriverHome" }],
+    });
     } catch (error) {
       Toast.show({ type: "error", text1: "Verification Failed", text2: error.message });
       setLoading(false)

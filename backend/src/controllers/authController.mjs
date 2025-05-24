@@ -321,47 +321,49 @@ export async function verifyClient(req, res, db) {
 }
 
 // Client Sign-In
-export async function clientSignIn(req, res) {
-  const { email, password, verificationCode } = req.body;
-  const db = req.app.locals.db;
+export async function clientSignIn(req, res,db) {
+  const { mobile, password } = req.body;
 
   try {
-    const client = await db.collection("clients").findOne({ email });
+    logger.info("Client Sign-In request received for mobile: %s", mobile);
+
+    // Check if client exists
+    const client = await db.collection("clients").findOne({ mobile });
+    logger.info("Client Sign-In client is: %s", client);
     if (!client) {
-      logger.warn("Client not found: %s", email);
+      logger.warn("Client not found: %s", mobile);
       return res.status(404).json({ message: "Client not found" });
     }
 
+    // Verify password
     const isPasswordValid = await bcrypt.compare(password, client.password);
     if (!isPasswordValid) {
-      logger.warn("Invalid credentials for email: %s", email);
-      return res.status(400).json({ message: "Invalid credentials" });
+      logger.warn("Invalid password attempt for client: %s", mobile);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Check if the client is verified
+    
+
+    // Check verification status
     if (!client.clientVerified) {
-      if (!verificationCode || verificationCode !== client.verificationCode) {
-        return res.status(400).json({
-          message:
-            "Account not verified. Please provide the correct verification code.",
-        });
-      }
-
-      // Verify the client
-      await db.collection("clients").updateOne(
-        { email },
-        { $set: { clientVerified: true }, $unset: { verificationCode: "" } }
-      );
-
-      logger.info("Client verified successfully: %s", email);
+      logger.info("Client not verified: %s", mobile);
+      return res.status(200).json({ message: "Verification required", clientVerified: false, email:client.email });
     }
 
-    // Generate a JWT token
-    const token = jwt.sign({ id: client._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // Generate JWT token
+    const token = generateToken(client);
 
-    res.status(200).json({ message: "Client signed in successfully", token });
+    // Successful login
+    logger.info("Client successfully signed in: %s", mobile);
+    res.status(200).json({
+      message: "Sign-in successful",
+      clientVerified: true,
+      token,
+      client: {
+        name: client.name,
+        mobile: client.mobile,
+      },
+    });
   } catch (error) {
     logger.error("Error in Client Sign-In: %s", error.message);
     res.status(500).json({ message: "Server error", error: error.message });

@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const BASE_URL = "http://192.168.1.4:5000/api/auth"; // Replace with your backend's deployed URL if applicable
+const BASE_URL = "http://192.168.1.8:5000/api/auth"; // Replace with your backend's deployed URL if applicable
 
 /**
  * Handles user signup for clients.
@@ -33,8 +33,9 @@ export async function clientSignup(data) {
  * @param {Object} data - The client login details (mobile, password).
  */
 export async function clientSignin(data) {
+  console.log("api.js clientsignin Data  mobile, password:",data)
   try {
-    const response = await fetch(`${BASE_URL}/client/signin`, {
+    const response = await fetch(`${BASE_URL}/driver/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,13 +43,20 @@ export async function clientSignin(data) {
       body: JSON.stringify(data),
     });
 
+    console.log("api.js clientsignin response:",response)
+    console.log("api.js clientsignin response.ok:",response.ok || "cannot read response.ok")
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to sign in");
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result // Returns client data if no Token
+
+    
   } catch (error) {
+    console.log("Driver Sign-In Error:", error);
     throw new Error(error.message || "Network error");
   }
 }
@@ -150,13 +158,6 @@ export async function driverSignin(data) {
     }
 
     const result = await response.json();
-    // if (result.token) {
-    //   // Store the token securely
-    //   await AsyncStorage.setItem("driverToken", result.token);
-    //   await AsyncStorage.setItem("driverData", JSON.stringify(result.driver));
-    //   return result; // Returns driver details and JWT token
-    // }
-
     return result // Returns driver data if no Token
 
     

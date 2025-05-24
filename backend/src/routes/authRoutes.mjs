@@ -15,7 +15,11 @@ router.post('/client/signup', async (req, res) => {
     const db = req.app.locals.db;  // Access the db instance from app.locals
     await verifyClient(req,res,db)
   })
-router.post('/client/signin', clientSignIn);
+router.post('/client/signin', async(req,res)=>{
+  console.log("post client signin", req.body)
+  const db = req.app.locals.db;  // Access the db instance from app.locals
+  await clientSignIn(req,res,db)
+});
 
 // Driver Routes
 router.post('/driver/signup',upload, async (req, res) => {
