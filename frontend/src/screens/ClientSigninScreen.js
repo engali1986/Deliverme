@@ -97,6 +97,10 @@ const ClientSigninScreen = () => {
           console.log("ClientSigninScreen.js decoded.exp:", decoded.exp);
           if (decoded.exp < now) {
             await AsyncStorage.clear();
+            navigation.reset({
+            index: 0,
+            routes: [{ name: "Home" }],
+           });
           } else {
             navigation.replace(userType === "driver" ? "DriverHome" : "ClientHome");
           }
@@ -104,6 +108,10 @@ const ClientSigninScreen = () => {
           console.log("Invalid token");
           console.log(e);
           await AsyncStorage.clear();
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Home" }],
+           });
         }
       } else {
         console.log("No token or userType found, staying on DriverSignin screen");

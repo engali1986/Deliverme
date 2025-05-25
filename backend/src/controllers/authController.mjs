@@ -370,8 +370,6 @@ export async function clientSignIn(req, res,db) {
   }
 }
 
-
-
 // Driver Sign-Up
 export async function driverSignUp(req, res,db) {
   const { email, mobile, name, password } = req.body;

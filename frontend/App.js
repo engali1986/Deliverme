@@ -13,6 +13,7 @@ import NavigationLogger from './src/components/NavigationLogger.js';
 export default function App() {
   const [loading, setLoading] = useState(true); // Always call useState at the top
   const [initialRoute, setInitialRoute] = useState(null); // State to hold the initial route
+  console.log("App.js App started:");
 
   useEffect(() => {
     const initializeApp = async () => {

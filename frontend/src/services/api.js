@@ -35,7 +35,7 @@ export async function clientSignup(data) {
 export async function clientSignin(data) {
   console.log("api.js clientsignin Data  mobile, password:",data)
   try {
-    const response = await fetch(`${BASE_URL}/driver/signin`, {
+    const response = await fetch(`${BASE_URL}/client/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
