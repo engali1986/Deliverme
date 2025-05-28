@@ -7,10 +7,9 @@ import {
   Animated,
   TouchableWithoutFeedback,
   TextInput,
-  ScrollView,
-  Dimensions,
+  ActivityIndicator,
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import i18n from '../i18n/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,8 +18,6 @@ import Toast from 'react-native-toast-message';
 import { LanguageContext } from '../context/LanguageContext.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
-
-const { width, height } = Dimensions.get('window');
 
 const ClientHomeScreen = () => {
   const { language } = useContext(LanguageContext);
@@ -31,20 +28,15 @@ const ClientHomeScreen = () => {
   const [destination, setDestination] = useState('');
   const [fare, setFare] = useState('');
   const [region, setRegion] = useState(null);
-  const [locationPermission, setLocationPermission] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Toast.show({
-          type: 'error',
-          text1: 'Permission denied',
-          text2: 'Location access is required.',
-        });
+        Toast.show({ type: 'error', text1: 'Permission denied' });
         return;
       }
-      setLocationPermission(true);
 
       let location = await Location.getCurrentPositionAsync({});
       setRegion({
@@ -53,6 +45,7 @@ const ClientHomeScreen = () => {
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
+      setPickupLocation('Current Location');
     })();
   }, []);
 
@@ -83,11 +76,7 @@ const ClientHomeScreen = () => {
       });
       navigation.replace('Home');
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: i18n.t('logout_error'),
-        text2: i18n.t('logout_failed'),
-      });
+      Toast.show({ type: 'error', text1: 'Logout Failed', text2: error.message });
     }
   };
 
@@ -121,59 +110,58 @@ const ClientHomeScreen = () => {
         throw new Error(data.message);
       }
     } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: err.message,
-      });
+      Toast.show({ type: 'error', text1: 'Error', text2: err.message });
     }
   };
 
   return (
     <View style={styles.container}>
-      {region && (
-        <MapView style={styles.map} region={region} showsUserLocation={true}>
-          <Marker coordinate={region} title="You are here" />
-        </MapView>
-      )}
+      {/* Map Area */}
+      <View style={styles.mapContainer}>
+        {!mapReady && (
+          <View style={styles.spinnerContainer}>
+            <ActivityIndicator size="large" color="#004080" />
+          </View>
+        )}
+        {region && (
+          <MapView
+            style={styles.map}
+            provider={PROVIDER_GOOGLE}
+            showsUserLocation
+            initialRegion={region}
+            onMapReady={() => setMapReady(true)}
+          >
+            <Marker coordinate={region} />
+          </MapView>
+        )}
+      </View>
 
-      <ScrollView style={styles.formContainer}>
-        <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
-          <Ionicons name="menu" size={28} color="#fff" />
-        </TouchableOpacity>
+      {/* Menu Button */}
+      <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
+        <Ionicons name="menu" size={28} color="#004080" />
+      </TouchableOpacity>
 
-        <Text style={styles.title}>{i18n.t('client_home')}</Text>
-
-        <Text style={styles.label}>{i18n.t('pickup_location')}</Text>
+      {/* Ride Request Form */}
+      <View style={styles.rideBox}>
         <TextInput
           style={styles.input}
-          placeholder={i18n.t('enter_pickup')}
-          value={pickupLocation}
-          onChangeText={setPickupLocation}
-        />
-
-        <Text style={styles.label}>{i18n.t('destination')}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={i18n.t('enter_destination')}
+          placeholder="To"
           value={destination}
           onChangeText={setDestination}
         />
-
-        <Text style={styles.label}>{i18n.t('fare_offer')}</Text>
         <TextInput
           style={styles.input}
-          placeholder="EGP"
+          placeholder="EGP Offer your fare"
           keyboardType="numeric"
           value={fare}
           onChangeText={setFare}
         />
-
-        <TouchableOpacity style={styles.requestButton} onPress={handleRequestRide}>
-          <Text style={styles.requestText}>{i18n.t('find_driver')}</Text>
+        <TouchableOpacity style={styles.findDriverBtn} onPress={handleRequestRide}>
+          <Text style={styles.findDriverText}>Find a driver</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
 
+      {/* Side Menu Overlay */}
       {menuVisible && (
         <TouchableWithoutFeedback onPress={toggleMenu}>
           <View style={styles.overlay} />
@@ -184,11 +172,9 @@ const ClientHomeScreen = () => {
         <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
           <Ionicons name="close" size={22} color="#fff" />
         </TouchableOpacity>
-
         <Text style={styles.menuItem}>{i18n.t('completed_rides')}</Text>
         <Text style={styles.menuItem}>{i18n.t('settings')}</Text>
         <LanguageToggle />
-
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>{i18n.t('logout')}</Text>
         </TouchableOpacity>
@@ -198,55 +184,55 @@ const ClientHomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    width: width,
-    height: height / 3,
-  },
-  formContainer: {
-    padding: 20,
+  container: { flex: 1, backgroundColor: '#e6f0ff' },
+  mapContainer: { flex: 1 },
+  map: { ...StyleSheet.absoluteFillObject },
+  spinnerContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#e6f0ff',
+    zIndex: 10,
   },
-  title: {
-    fontSize: 26,
-    fontWeight: '600',
-    color: '#003366',
-    textAlign: 'center',
-    marginBottom: 20,
+  menuButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: '#ffffff',
+    padding: 10,
+    borderRadius: 30,
+    zIndex: 20,
+    elevation: 3,
   },
-  label: {
-    fontSize: 16,
-    color: '#003366',
-    marginBottom: 5,
-    marginTop: 10,
+  rideBox: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: '#e6f0ff',
+    padding: 15,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    elevation: 5,
   },
   input: {
     height: 40,
     borderColor: '#004080',
     borderWidth: 1,
-    borderRadius: 6,
+    borderRadius: 8,
     paddingHorizontal: 10,
-    backgroundColor: '#ffffff',
+    marginBottom: 10,
+    backgroundColor: '#fff',
   },
-  requestButton: {
+  findDriverBtn: {
     backgroundColor: '#004080',
     paddingVertical: 14,
-    borderRadius: 6,
-    marginTop: 20,
+    borderRadius: 8,
     alignItems: 'center',
   },
-  requestText: {
+  findDriverText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  menuButton: {
-    backgroundColor: '#004080',
-    padding: 10,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
   },
   sideMenu: {
     position: 'absolute',
