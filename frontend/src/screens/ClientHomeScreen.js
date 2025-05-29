@@ -32,6 +32,7 @@ const ClientHomeScreen = () => {
   const [fare, setFare] = useState('');
   const [region, setRegion] = useState(null);
   const [mapReady, setMapReady] = useState(false);
+  const [address, setAddress] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -48,6 +49,14 @@ const ClientHomeScreen = () => {
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
+       // 🔄 Reverse Geocode
+    let [reverseGeocode] = await Location.reverseGeocodeAsync(location.coords);
+    const formatted =
+      reverseGeocode?.name && reverseGeocode?.city
+        ? `${reverseGeocode.name}, ${reverseGeocode.city}`
+        : 'Current Location';
+    setAddress(formatted);
+      // Set pickup location to current location
       setPickupLocation('Current Location');
     })();
   }, []);
@@ -135,7 +144,7 @@ const ClientHomeScreen = () => {
               initialRegion={region}
               onMapReady={() => setMapReady(true)}
             >
-              <Marker coordinate={region} />
+              <Marker coordinate={region} title={address} />
             </MapView>
           )}
         </View>
