@@ -32,8 +32,9 @@ const ClientHomeScreen = () => {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
+      let locationAcccess = await Location.requestForegroundPermissionsAsync();
+      console.log('Location permission status:', locationAcccess);
+      if (locationAcccess.status !== 'granted') {
         Toast.show({ type: 'error', text1: 'Permission denied' });
         return;
       }
