@@ -8,7 +8,6 @@ import {
   TouchableWithoutFeedback,
   TextInput,
   ActivityIndicator,
-  Dimensions,
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -19,8 +18,6 @@ import Toast from 'react-native-toast-message';
 import { LanguageContext } from '../context/LanguageContext.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
-
-const { height } = Dimensions.get('window');
 
 const ClientHomeScreen = () => {
   const { language } = useContext(LanguageContext);
@@ -36,6 +33,7 @@ const ClientHomeScreen = () => {
   useEffect(() => {
     (async () => {
       let locationAcccess = await Location.requestForegroundPermissionsAsync();
+      console.log('Location permission status:', locationAcccess);
       if (locationAcccess.status !== 'granted') {
         Toast.show({ type: 'error', text1: 'Permission denied' });
         return;
@@ -118,88 +116,76 @@ const ClientHomeScreen = () => {
   };
 
   return (
-    <View style={styles.rootWrapper}>
-      <View style={styles.container}>
-        {/* Map Area */}
-        <View style={styles.mapContainer}>
-          {!mapReady && (
-            <View style={styles.spinnerContainer}>
-              <ActivityIndicator size="large" color="#004080" />
-            </View>
-          )}
-          {region && (
-            <MapView
-              style={styles.map}
-              provider={PROVIDER_GOOGLE}
-              showsUserLocation
-              initialRegion={region}
-              onMapReady={() => setMapReady(true)}
-            >
-              <Marker coordinate={region} />
-            </MapView>
-          )}
-        </View>
-
-        {/* Menu Button */}
-        <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
-          <Ionicons name="menu" size={28} color="#004080" />
-        </TouchableOpacity>
-
-        {/* Ride Request Form */}
-        <View style={styles.rideBox}>
-          <TextInput
-            style={styles.input}
-            placeholder="To"
-            value={destination}
-            onChangeText={setDestination}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="EGP Offer your fare"
-            keyboardType="numeric"
-            value={fare}
-            onChangeText={setFare}
-          />
-          <TouchableOpacity style={styles.findDriverBtn} onPress={handleRequestRide}>
-            <Text style={styles.findDriverText}>Find a driver</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Side Menu Overlay */}
-        {menuVisible && (
-          <TouchableWithoutFeedback onPress={toggleMenu}>
-            <View style={styles.overlay} />
-          </TouchableWithoutFeedback>
+    <View style={styles.container}>
+      {/* Map Area */}
+      <View style={styles.mapContainer}>
+        {!mapReady && (
+          <View style={styles.spinnerContainer}>
+            <ActivityIndicator size="large" color="#004080" />
+          </View>
         )}
-
-        <Animated.View style={[styles.sideMenu, { transform: [{ translateX: slideAnim }] }]}>
-          <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
-            <Ionicons name="close" size={22} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.menuItem}>{i18n.t('completed_rides')}</Text>
-          <Text style={styles.menuItem}>{i18n.t('settings')}</Text>
-          <LanguageToggle />
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutText}>{i18n.t('logout')}</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        {region && (
+          <MapView
+            style={styles.map}
+            provider={PROVIDER_GOOGLE}
+            showsUserLocation
+            initialRegion={region}
+            onMapReady={() => setMapReady(true)}
+          >
+            <Marker coordinate={region} />
+          </MapView>
+        )}
       </View>
+
+      {/* Menu Button */}
+      <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
+        <Ionicons name="menu" size={28} color="#004080" />
+      </TouchableOpacity>
+
+      {/* Ride Request Form */}
+      <View style={styles.rideBox}>
+        <TextInput
+          style={styles.input}
+          placeholder="To"
+          value={destination}
+          onChangeText={setDestination}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="EGP Offer your fare"
+          keyboardType="numeric"
+          value={fare}
+          onChangeText={setFare}
+        />
+        <TouchableOpacity style={styles.findDriverBtn} onPress={handleRequestRide}>
+          <Text style={styles.findDriverText}>Find a driver</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Side Menu Overlay */}
+      {menuVisible && (
+        <TouchableWithoutFeedback onPress={toggleMenu}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
+      )}
+
+      <Animated.View style={[styles.sideMenu, { transform: [{ translateX: slideAnim }] }]}>
+        <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
+          <Ionicons name="close" size={22} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.menuItem}>{i18n.t('completed_rides')}</Text>
+        <Text style={styles.menuItem}>{i18n.t('settings')}</Text>
+        <LanguageToggle />
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>{i18n.t('logout')}</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  rootWrapper: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#e6f0ff',
-  },
-  container: {
-    height: height * 0.9,
-    width: '100%',
-    backgroundColor: '#e6f0ff',
-  },
+  container: { flex: 1, backgroundColor: '#e6f0ff' },
   mapContainer: { flex: 1 },
   map: { ...StyleSheet.absoluteFillObject },
   spinnerContainer: {
