@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import i18n from '../i18n/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -37,12 +37,14 @@ const ClientHomeScreen = () => {
   useEffect(() => {
     (async () => {
       let locationAcccess = await Location.requestForegroundPermissionsAsync();
+      console.log('ClientHomeScreen.js Location Permission Status:', locationAcccess);
       if (locationAcccess.status !== 'granted') {
         Toast.show({ type: 'error', text1: 'Permission denied' });
         return;
       }
 
       let location = await Location.getCurrentPositionAsync({});
+      console.log('ClientHomeScreen.js Current Location:', location);
       setRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -144,7 +146,32 @@ const ClientHomeScreen = () => {
               initialRegion={region}
               onMapReady={() => setMapReady(true)}
             >
-              <Marker coordinate={region} title={address} />
+           <Marker
+              coordinate={region}
+              anchor={{ x: 0.5, y: 1 }}
+              >
+              <Ionicons name="location-sharp" size={32} color="#004080" />
+              <Callout tooltip>
+                <View style={{
+                  backgroundColor: '#fff',
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  borderRadius: 6,
+                  borderColor: '#004080',
+                  borderWidth: 1,
+                  maxWidth: 250,
+                }}>
+                  <Text style={{
+                    color: '#003366',
+                    fontSize: 12,
+                    fontWeight: '600',
+                    textAlign: 'center',
+                  }}>
+                    {address}
+                  </Text>
+                </View>
+              </Callout>
+            </Marker>
             </MapView>
           )}
         </View>
