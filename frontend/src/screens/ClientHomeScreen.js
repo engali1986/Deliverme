@@ -45,6 +45,7 @@ const ClientHomeScreen = () => {
 
       let location = await Location.getCurrentPositionAsync({});
       console.log('ClientHomeScreen.js Current Location:', location);
+
       setRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -146,32 +147,12 @@ const ClientHomeScreen = () => {
               initialRegion={region}
               onMapReady={() => setMapReady(true)}
             >
-           <Marker
-              coordinate={region}
-              anchor={{ x: 0.5, y: 1 }}
-              >
-              <Ionicons name="location-sharp" size={32} color="#004080" />
-              <Callout tooltip>
-                <View style={{
-                  backgroundColor: '#fff',
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                  borderRadius: 6,
-                  borderColor: '#004080',
-                  borderWidth: 1,
-                  maxWidth: 250,
-                }}>
-                  <Text style={{
-                    color: '#003366',
-                    fontSize: 12,
-                    fontWeight: '600',
-                    textAlign: 'center',
-                  }}>
-                    {address}
-                  </Text>
-                </View>
-              </Callout>
-            </Marker>
+          <Marker coordinate={region}>
+  <View style={styles.markerContainer}>
+    <Text style={styles.markerText}>{address}</Text>
+    <View style={styles.markerDot} />
+  </View>
+</Marker>
             </MapView>
           )}
         </View>
@@ -330,6 +311,28 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     zIndex: 100,
   },
+
+  markerContainer: {
+  alignItems: 'center',
+},
+
+markerText: {
+  backgroundColor: '#004080',
+  color: 'white',
+  paddingHorizontal: 8,
+  paddingVertical: 4,
+  borderRadius: 6,
+  fontSize: 12,
+  marginBottom: 4,
+  textAlign: 'center',
+},
+
+markerDot: {
+  width: 10,
+  height: 10,
+  backgroundColor: '#004080',
+  borderRadius: 5,
+},
 });
 
 export default ClientHomeScreen;
