@@ -9,6 +9,8 @@ import {
   TextInput,
   ActivityIndicator,
   Dimensions,
+  Modal,
+  Platform,
 } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -33,6 +35,9 @@ const ClientHomeScreen = () => {
   const [region, setRegion] = useState(null);
   const [mapReady, setMapReady] = useState(false);
   const [address, setAddress] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalField, setModalField] = useState(null); // 'pickup' | 'destination' | 'fare'
+  const [modalValue, setModalValue] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -54,13 +59,16 @@ const ClientHomeScreen = () => {
       });
        // 🔄 Reverse Geocode
     let [reverseGeocode] = await Location.reverseGeocodeAsync(location.coords);
+    console.log('ClientHomeScreen.js Reverse geocode result:', reverseGeocode);
+    const street = reverseGeocode?.name || reverseGeocode?.street || '';
+    const governorate = reverseGeocode?.region || reverseGeocode?.city || '';
     const formatted =
-      reverseGeocode?.name && reverseGeocode?.city
-        ? `${reverseGeocode.name}, ${reverseGeocode.city}`
-        : 'Current Location';
+    reverseGeocode?.city
+      ? `${reverseGeocode.city}`
+      : street || governorate || 'Current Location';
     setAddress(formatted);
       // Set pickup location to current location
-      setPickupLocation('Current Location');
+      setPickupLocation(formatted || 'Current Location');
     })();
   }, []);
 
@@ -129,6 +137,21 @@ const ClientHomeScreen = () => {
     }
   };
 
+  // Helper to open modal for a specific field
+  const openModal = (field, value) => {
+    setModalField(field);
+    setModalValue(value);
+    setModalVisible(true);
+  };
+
+  // Helper to save modal value to the correct field
+  const saveModalValue = () => {
+    if (modalField === 'pickup') setPickupLocation(modalValue);
+    if (modalField === 'destination') setDestination(modalValue);
+    if (modalField === 'fare') setFare(modalValue);
+    setModalVisible(false);
+  };
+
   return (
     <View style={styles.rootWrapper}>
       <View style={styles.container}>
@@ -147,12 +170,7 @@ const ClientHomeScreen = () => {
               initialRegion={region}
               onMapReady={() => setMapReady(true)}
             >
-          <Marker coordinate={region}>
-  <View style={styles.markerContainer}>
-    <Text style={styles.markerText}>{address}</Text>
-    <View style={styles.markerDot} />
-  </View>
-</Marker>
+          <Marker coordinate={region} title={address} />
             </MapView>
           )}
         </View>
@@ -164,19 +182,34 @@ const ClientHomeScreen = () => {
 
         {/* Ride Request Form */}
         <View style={styles.rideBox}>
-          <TextInput
-            style={styles.input}
-            placeholder="To"
-            value={destination}
-            onChangeText={setDestination}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="EGP Offer your fare"
-            keyboardType="numeric"
-            value={fare}
-            onChangeText={setFare}
-          />
+          <TouchableOpacity onPress={() => openModal('pickup', pickupLocation)}>
+            <TextInput
+              style={styles.input}
+              placeholder={address || 'Current Location'}
+              value={pickupLocation}
+              editable={false}
+              pointerEvents="none"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => openModal('destination', destination)}>
+            <TextInput
+              style={styles.input}
+              placeholder="To"
+              value={destination}
+              editable={false}
+              pointerEvents="none"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => openModal('fare', fare)}>
+            <TextInput
+              style={styles.input}
+              placeholder="EGP Offer your fare"
+              keyboardType="numeric"
+              value={fare}
+              editable={false}
+              pointerEvents="none"
+            />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.findDriverBtn} onPress={handleRequestRide}>
             <Text style={styles.findDriverText}>Find a driver</Text>
           </TouchableOpacity>
@@ -201,6 +234,47 @@ const ClientHomeScreen = () => {
           </TouchableOpacity>
         </Animated.View>
       </View>
+
+      {/* Modal Overlay for Input */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalLabel}>
+                  {modalField === 'pickup'
+                    ? 'Pickup Location'
+                    : modalField === 'destination'
+                    ? 'Destination'
+                    : 'Fare'}
+                </Text>
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder={
+                    modalField === 'pickup'
+                      ? address || 'Current Location'
+                      : modalField === 'destination'
+                      ? 'To'
+                      : 'EGP Offer your fare'
+                  }
+                  value={modalValue}
+                  onChangeText={setModalValue}
+                  keyboardType={modalField === 'fare' ? 'numeric' : 'default'}
+                  autoFocus
+                />
+                <TouchableOpacity style={styles.modalButton} onPress={saveModalValue}>
+                  <Text style={styles.modalButtonText}>OK</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
@@ -332,6 +406,48 @@ markerDot: {
   height: 10,
   backgroundColor: '#004080',
   borderRadius: 5,
+},
+
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContent: {
+  width: '85%',
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 24,
+  alignItems: 'center',
+},
+modalLabel: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  marginBottom: 12,
+  color: '#003366',
+},
+modalInput: {
+  width: '100%',
+  borderColor: '#004080',
+  borderWidth: 1,
+  borderRadius: 8,
+  paddingHorizontal: 10,
+  marginBottom: 18,
+  backgroundColor: '#fff',
+  height: 44,
+  fontSize: 16,
+},
+modalButton: {
+  backgroundColor: '#004080',
+  paddingVertical: 12,
+  paddingHorizontal: 32,
+  borderRadius: 8,
+},
+modalButtonText: {
+  color: '#fff',
+  fontWeight: 'bold',
+  fontSize: 16,
 },
 });
 
