@@ -267,6 +267,23 @@ const ClientHomeScreen = () => {
                   keyboardType={modalField === 'fare' ? 'numeric' : 'default'}
                   autoFocus
                 />
+                {/* Map picker for distination */}
+                {modalField === 'destination' && (
+                    <TouchableOpacity
+                      style={styles.mapPickerButton}
+                      onPress={() => {
+                        setModalVisible(false);
+                        navigation.navigate('MapPicker', {
+                          onSelect: (coords, addressText) => {
+                            setModalValue(addressText);
+                            setDestination(addressText);
+                          },
+                        });
+                      }}
+                    >
+                      <Text style={styles.mapPickerText}>📍 Pick location from map</Text>
+                    </TouchableOpacity>
+                  )}
                 <TouchableOpacity style={styles.modalButton} onPress={saveModalValue}>
                   <Text style={styles.modalButtonText}>OK</Text>
                 </TouchableOpacity>
@@ -448,6 +465,23 @@ modalButtonText: {
   color: '#fff',
   fontWeight: 'bold',
   fontSize: 16,
+},
+
+mapPickerButton: {
+  backgroundColor: '#cce0ff',
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 8,
+  marginBottom: 15,
+  alignItems: 'center',
+  borderColor: '#004080',
+  borderWidth: 1,
+},
+
+mapPickerText: {
+  color: '#004080',
+  fontSize: 16,
+  fontWeight: 'bold',
 },
 });
 
