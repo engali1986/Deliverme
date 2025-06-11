@@ -255,46 +255,22 @@ const ClientHomeScreen = () => {
                     ? 'Destination'
                     : 'Fare'}
                 </Text>
-                {modalField === 'pickup' ? (
-            <>
-              <TouchableOpacity
-                style={styles.mapPickerButton}
-                onPress={() => {
-                  setPickupLocation(address);
-                  setModalVisible(false);
-                }}
-              >
-                <Text style={styles.mapPickerText}>📍 Use Current Location</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.mapPickerButton}
-                onPress={() => {
-                  setModalVisible(false);
-                  navigation.navigate('MapPicker', {
-                    onSelect: (coords, addressText) => {
-                      setPickupLocation(addressText);
-                    },
-                  });
-                }}
-              >
-                <Text style={styles.mapPickerText}>🗺️ Pick location from map</Text>
-              </TouchableOpacity>
-            </>
-          ) : modalField === 'destination' ? (
-            <TouchableOpacity
-              style={styles.mapPickerButton}
-              onPress={() => {
-                setModalVisible(false);
-                navigation.navigate('MapPicker', {
-                  onSelect: (coords, addressText) => {
-                    setDestination(addressText);
-                  },
-                });
-              }}
-            >
-              <Text style={styles.mapPickerText}>📍 Pick location from map</Text>
-            </TouchableOpacity>
-          ) : (
+                {modalField === 'destination' ? (
+                    <TouchableOpacity
+                      style={styles.mapPickerButton}
+                      onPress={() => {
+                        setModalVisible(false);
+                        navigation.navigate('MapPicker', {
+                          onSelect: (coords, addressText) => {
+                            setModalValue(addressText);
+                            setDestination(addressText);
+                          },
+                        });
+                      }}
+                    >
+                      <Text style={styles.mapPickerText}>📍 Pick location from map</Text>
+                    </TouchableOpacity>
+                  ) : (
             <>
               <TextInput
                 style={styles.modalInput}
