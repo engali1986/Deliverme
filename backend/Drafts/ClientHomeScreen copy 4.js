@@ -170,9 +170,7 @@ const ClientHomeScreen = () => {
               initialRegion={region}
               onMapReady={() => setMapReady(true)}
             >
-          <Marker coordinate={region} >
-            <Ionicons name="location-sharp" size={36} color="red" />
-            </Marker>
+          <Marker coordinate={region} title={address} />
             </MapView>
           )}
         </View>
@@ -255,40 +253,40 @@ const ClientHomeScreen = () => {
                     ? 'Destination'
                     : 'Fare'}
                 </Text>
-                {modalField === 'destination' ? (
-            <TouchableOpacity
-              style={styles.mapPickerButton}
-              onPress={() => {
-                setModalVisible(false);
-                navigation.navigate('MapPicker', {
-                  onSelect: (coords, addressText) => {
-                    setModalValue(addressText);
-                    setDestination(addressText);
-                  },
-                });
-              }}
-            >
-              <Text style={styles.mapPickerText}>📍 Pick location from map</Text>
-            </TouchableOpacity>
-          ) : (
-            <>
-              <TextInput
-                style={styles.modalInput}
-                placeholder={
-                  modalField === 'pickup'
-                    ? address || 'Current Location'
-                    : 'EGP Offer your fare'
-                }
-                value={modalValue}
-                onChangeText={setModalValue}
-                keyboardType={modalField === 'fare' ? 'numeric' : 'default'}
-                autoFocus
-              />
-              <TouchableOpacity style={styles.modalButton} onPress={saveModalValue}>
-                <Text style={styles.modalButtonText}>OK</Text>
-              </TouchableOpacity>
-            </>
-          )}
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder={
+                    modalField === 'pickup'
+                      ? address || 'Current Location'
+                      : modalField === 'destination'
+                      ? 'To'
+                      : 'EGP Offer your fare'
+                  }
+                  value={modalValue}
+                  onChangeText={setModalValue}
+                  keyboardType={modalField === 'fare' ? 'numeric' : 'default'}
+                  autoFocus
+                />
+                {/* Map picker for distination */}
+                {modalField === 'destination' && (
+                    <TouchableOpacity
+                      style={styles.mapPickerButton}
+                      onPress={() => {
+                        setModalVisible(false);
+                        navigation.navigate('MapPicker', {
+                          onSelect: (coords, addressText) => {
+                            setModalValue(addressText);
+                            setDestination(addressText);
+                          },
+                        });
+                      }}
+                    >
+                      <Text style={styles.mapPickerText}>📍 Pick location from map</Text>
+                    </TouchableOpacity>
+                  )}
+                <TouchableOpacity style={styles.modalButton} onPress={saveModalValue}>
+                  <Text style={styles.modalButtonText}>OK</Text>
+                </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
           </View>
