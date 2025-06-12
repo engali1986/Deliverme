@@ -5,86 +5,81 @@ DeliverMe is a ride-sharing mobile application, built using **React Native** (fr
 ---
 
 ## 🚀 Features
-### **1. Client Features:**
-✅ Sign Up & Login (Email Verification Required)
-✅ Request a Ride
-✅ View Nearby Drivers
-✅ Multi-language Support (English & Arabic)
 
-### **2. Driver Features:**
-✅ Sign Up with Required Documents
-✅ Email Verification via Code
-✅ Upload License, Car Registration, and Personal Documents
-✅ Accept Ride Requests
+### **Client Features**
+- ✅ Sign Up & Login (with Email Verification)
+- ✅ Request a Ride (choose pickup: current location or map, choose destination from map, offer fare)
+- ✅ Interactive Map (shows user location, custom marker with address, custom compass/North button)
+- ✅ Multi-language Support (English & Arabic)
+- ✅ Side Menu (completed rides, settings, language toggle, logout)
+- ✅ Toast notifications for actions/errors
 
-### **3. Admin Features:**
-✅ View & Manage Clients & Drivers
-✅ Monitor Ride Requests
-✅ Manage Google Drive Uploads
+### **Driver Features**
+- ✅ Sign Up with Required Documents (license, registration, criminal record, personal photo)
+- ✅ Email Verification via Code
+- ✅ Upload and manage documents (Google Drive integration)
+- ✅ Login and access driver dashboard
+- ✅ Side Menu and logout
 
-### **4. Technologies Used:**
-- **Frontend:** React Native, Expo, React Navigation
-- **Backend:** Node.js, Express, MongoDB (Native Driver)
-- **Storage:** Google Drive API (for driver documents)
-- **Email:** Nodemailer with OAuth2
-- **Authentication:** JWT-based authentication
-- **Logging:** Winston Logger
+### **Backend Features**
+- ✅ REST API for authentication, ride requests, and document upload
+- ✅ JWT-based authentication
+- ✅ MongoDB for data storage
+- ✅ Google Drive API for driver document storage
+- ✅ Email verification for both clients and drivers
+- ✅ Winston logging
 
 ---
 
-## 📂 Project Folder Structure
+## 📂 Project Structure
+
 ```
 DeliverMe/
-│── backend/                   # Node.js & Express Backend
-│   │── controllers/           # API Controllers
-│   │   ├── authController.mjs # Handles authentication (Signup, Login, Verification)
-│   │── middlewares/           # Express Middlewares
-│   │   ├── uploadMiddleware.mjs  # Multer for file uploads
-│   │── routes/                # API Routes
-│   │   ├── authRoutes.mjs     # Authentication Routes
-│   │── services/              # Utility & External Services
-│   │   ├── googleDrive.mjs    # Google Drive Integration
-│   │── utils/                 # Logger, Configs
-│   │── server.mjs             # Express Server Entry Point
-│   │── config.mjs             # Environment Variables
+│── backend/
+│   │── server.mjs
+│   │── .env
+│   │── DriveServiceAccount.json
+│   │── Drafts/           # Screens and controllers (React Native code for reference, not used in backend runtime)
+│   │── src/              # (API, controllers, services, etc.)
 │
-│── frontend/                  # React Native App
+│── frontend/
+│   │── App.js
+│   │── app.json
+│   │── index.js
 │   │── src/
 │   │   ├── screens/
-│   │   │   ├── HomeScreen.js         # Main Home Screen
-│   │   │   ├── ClientSigninScreen.js # Client Login
-│   │   │   ├── ClientSignupScreen.js # Client Signup
-│   │   │   ├── DriverSigninScreen.js # Driver Login
-│   │   │   ├── DriverSignupScreen.js # Driver Signup with Verification Code
-│   │   │   ├── DriverHomeScreen.js   # Driver Dashboard
-│   │   │   ├── VerifyDriverScreen.js # Verification Code Entry
+│   │   │   ├── ClientHomeScreen.js
+│   │   │   ├── DriverHomeScreen.js
+│   │   │   ├── MapPickerScreen.js
+│   │   │   ├── DriverSignupScreen.js
+│   │   │   ├── DriverSigninScreen.js
+│   │   │   ├── ClientSigninScreen.js
+│   │   │   ├── ClientSignupScreen.js
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── hooks/
+│   │   ├── i18n/
 │   │   ├── navigation/
-│   │   │   ├── AppNavigator.js       # Navigation Setup
 │   │   ├── services/
-│   │   │   ├── api.js                # API Calls (Signup, Login, Verification)
-│   │   ├── assets/
-│   │   ├── App.js
-│   │   ├── i18n.js                    # Language Setup
-│   │   ├── styles/
-│   │   │   ├── theme.js               # App Theme (Shades of Blue)
+│   │   ├── utils/
+│   │── assets/
 │
-│── README.md                   # Project Documentation
-│── .env                         # Environment Variables
-│── package.json                 # Dependencies & Scripts
+│── README.md
+│── package.json
 ```
 
 ---
 
 ## 🛠️ Installation & Setup
 
-### **Backend Setup**
+### Backend Setup
 ```sh
 cd backend
 npm install
-npm start
+npm run dev
 ```
 
-### **Frontend Setup**
+### Frontend Setup
 ```sh
 cd frontend
 npm install
@@ -94,6 +89,7 @@ npx expo start
 ---
 
 ## 🔑 Environment Variables (`.env`)
+
 ```env
 # Backend
 MONGO_URI=mongodb+srv://your_mongo_url
@@ -112,18 +108,41 @@ API_BASE_URL=http://your_backend_ip:5000/api
 ---
 
 ## 🎯 How It Works
-1️⃣ **User Signs Up** → Enters details & gets a verification email.
-2️⃣ **Driver Uploads Documents** → License, Registration, Personal Photo.
-3️⃣ **Email Verification** → User enters the code to activate account.
-4️⃣ **Client Requests a Ride** → Nearby drivers get notified.
-5️⃣ **Driver Accepts Ride** → Ride starts, tracking enabled.
+
+1. **User Signs Up** → Enters details & gets a verification email.
+2. **Driver Uploads Documents** → License, Registration, Personal Photo.
+3. **Email Verification** → User enters the code to activate account.
+4. **Client Requests a Ride** → Selects pickup/destination on map, offers fare.
+5. **Driver Accepts Ride** → Ride starts, tracking enabled.
 
 ---
 
-## ✅ Next Steps & Future Improvements
-- **Real-time Ride Tracking** (Socket.io)
-- **In-App Payments Integration** (Stripe)
-- **Push Notifications** for Ride Requests
+## 📱 UI/UX Highlights
 
-🚀 **DeliverMe is now ready to deploy!** 🎉
+- **MapPicker**: Custom bottom bar with instruction and North button (compass icon), custom marker with address.
+- **Modals**: For selecting pickup, destination, and fare.
+- **Language Toggle**: Instantly switch between English and Arabic.
+- **Driver Document Upload**: Integrated with Google Drive.
+
+---
+
+## ✅ Current Progress
+
+- [x] Client and driver authentication flows
+- [x] Ride request form with map-based location picking
+- [x] Custom map marker with address and icon
+- [x] Modal for selecting pickup/destination/fare
+- [x] MapPicker with custom compass button beside instructions
+- [x] Driver document upload and verification
+- [x] Multi-language UI (English/Arabic)
+- [x] Toast notifications
+- [x] Side menu with logout and settings
+- [x] Backend API for rides and authentication
+
+---
+
+## 🚧 Next Steps & Future Improvements
+
+- [ ] Real-time ride status updates (WebSocket or polling)
+- [ ] Driver-side ride acceptance and navigation
 
