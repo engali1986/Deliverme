@@ -273,6 +273,13 @@ const ClientHomeScreen = () => {
                   navigation.navigate('MapPicker', {
                     onSelect: (coords, addressText) => {
                       setPickupLocation(addressText);
+                      console.log("ClientHomeScreen.js pickUpLocation coords:", coords);
+                      setRegion({
+                        latitude: coords.latitude,
+                        longitude: coords.longitude,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                      })
                     },
                   });
                 }}
@@ -288,6 +295,7 @@ const ClientHomeScreen = () => {
                 navigation.navigate('MapPicker', {
                   onSelect: (coords, addressText) => {
                     setDestination(addressText);
+                    console.log("ClientHomeScreen.js destination coords:", coords);
                   },
                 });
               }}
