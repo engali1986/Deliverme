@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -33,11 +33,14 @@ const ClientHomeScreen = () => {
   const [destination, setDestination] = useState('');
   const [fare, setFare] = useState('');
   const [region, setRegion] = useState(null);
+  const [pickupCoords, setPickupCoords] = useState(null);
   const [mapReady, setMapReady] = useState(false);
   const [address, setAddress] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [modalField, setModalField] = useState(null); // 'pickup' | 'destination' | 'fare'
   const [modalValue, setModalValue] = useState('');
+  const [destinationRegion, setDestinationRegion] = useState(null);
+  const mapRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -152,6 +155,21 @@ const ClientHomeScreen = () => {
     setModalVisible(false);
   };
 
+  useEffect(() => {
+    if (mapRef.current && pickupCoords && destinationRegion) {
+      mapRef.current.fitToCoordinates(
+        [
+          { latitude: pickupCoords.latitude, longitude: pickupCoords.longitude },
+          { latitude: destinationRegion.latitude, longitude: destinationRegion.longitude }
+        ],
+        {
+          edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
+          animated: true,
+        }
+      );
+    }
+  }, [pickupCoords, destinationRegion]);
+
   return (
     <View style={styles.rootWrapper}>
       <View style={styles.container}>
@@ -164,15 +182,23 @@ const ClientHomeScreen = () => {
           )}
           {region && (
             <MapView
+              ref={mapRef}
               style={styles.map}
               provider={PROVIDER_GOOGLE}
               showsUserLocation
               initialRegion={region}
               onMapReady={() => setMapReady(true)}
             >
-          <Marker coordinate={region} >
-            <Ionicons name="location-sharp" size={36} color="red" />
-            </Marker>
+              {pickupCoords && (
+                <Marker coordinate={pickupCoords}>
+                  <Ionicons name="location-sharp" size={36} color="red" />
+                </Marker>
+              )}
+              {destinationRegion && (
+                <Marker coordinate={destinationRegion}>
+                  <Ionicons name="location-sharp" size={36} color="blue" />
+                </Marker>
+              )}
             </MapView>
           )}
         </View>
@@ -259,8 +285,16 @@ const ClientHomeScreen = () => {
             <>
               <TouchableOpacity
                 style={styles.mapPickerButton}
-                onPress={() => {
+                onPress={async () => {
+                  // Get current location
+                  let location = await Location.getCurrentPositionAsync({});
                   setPickupLocation(address);
+                  setPickupCoords({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  });
                   setModalVisible(false);
                 }}
               >
@@ -274,7 +308,7 @@ const ClientHomeScreen = () => {
                     onSelect: (coords, addressText) => {
                       setPickupLocation(addressText);
                       console.log("ClientHomeScreen.js pickUpLocation coords:", coords);
-                      setRegion({
+                      setPickupCoords({
                         latitude: coords.latitude,
                         longitude: coords.longitude,
                         latitudeDelta: 0.01,
@@ -295,7 +329,15 @@ const ClientHomeScreen = () => {
                 navigation.navigate('MapPicker', {
                   onSelect: (coords, addressText) => {
                     setDestination(addressText);
-                    console.log("ClientHomeScreen.js destination coords:", coords);
+                    setDestinationRegion({
+                      latitude: coords.latitude,
+                      longitude: coords.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    });
+
+                    console.log("ClientHomeScreen.js destinationRegion coords:", coords);
+                    
                   },
                 });
               }}
