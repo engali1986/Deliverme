@@ -1,27 +1,4 @@
-/**
- * ClientHomeScreen.js
- * 
- * FLOW OVERVIEW:
- * - On mount, requests user's location and sets it as the initial pickup location and marker.
- * - User can select a destination location from the map picker; a blue marker is placed.
- * - If both pickup and destination markers are set, the map automatically zooms out to fit both.
- * - User can change the pickup location via the map picker; the red marker moves and the map refits.
- * - All marker and region updates are logged for debugging.
- * 
- * MAIN FUNCTIONS & HOOKS:
- * - useEffect (mount): Requests location permission, fetches current location, sets pickup marker and address.
- * - useEffect ([pickupCoords, destinationRegion]): Fits map to show both markers whenever either changes.
- * - MapView: Renders the map and both markers.
- * - Markers: Red for pickup, blue for destination.
- * 
- * UI/UX:
- * - Always shows pickup marker (default: user location).
- * - Shows destination marker after user selection.
- * - Map always fits both markers when both are set.
- * - All major actions are logged with file name for clarity.
- */
-
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -65,16 +42,9 @@ const ClientHomeScreen = () => {
   const [destinationRegion, setDestinationRegion] = useState(null);
   const mapRef = useRef(null);
 
-  // 1. On mount, set pickup to current location
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('ClientHomeScreen.js: Location permission not granted');
-        return;
-      }
       let location = await Location.getCurrentPositionAsync({});
-      console.log('ClientHomeScreen.js: Got current location', location.coords);
       setPickupCoords({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -87,32 +57,15 @@ const ClientHomeScreen = () => {
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
+      // Optionally reverse geocode for address
       let [place] = await Location.reverseGeocodeAsync(location.coords);
       let pickupAddress = place
         ? `${place.name || ''} ${place.street || ''} ${place.city || ''}`.trim()
         : 'Current Location';
       setPickupLocation(pickupAddress);
       setAddress(pickupAddress);
-      console.log('ClientHomeScreen.js: Set pickup address', pickupAddress);
     })();
   }, []);
-
-  // 2. Whenever both markers are set, fit map to show both
-  useEffect(() => {
-    if (mapRef.current && pickupCoords && destinationRegion) {
-      console.log('ClientHomeScreen.js: Fitting map to pickup and destination markers', pickupCoords, destinationRegion);
-      mapRef.current.fitToCoordinates(
-        [
-          { latitude: pickupCoords.latitude, longitude: pickupCoords.longitude },
-          { latitude: destinationRegion.latitude, longitude: destinationRegion.longitude }
-        ],
-        {
-          edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
-          animated: true,
-        }
-      );
-    }
-  }, [pickupCoords, destinationRegion]);
 
   const toggleMenu = () => {
     if (menuVisible) {
@@ -194,6 +147,20 @@ const ClientHomeScreen = () => {
     setModalVisible(false);
   };
 
+  useEffect(() => {
+    if (mapRef.current && pickupCoords && destinationRegion) {
+      mapRef.current.fitToCoordinates(
+        [
+          { latitude: pickupCoords.latitude, longitude: pickupCoords.longitude },
+          { latitude: destinationRegion.latitude, longitude: destinationRegion.longitude }
+        ],
+        {
+          edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
+          animated: true,
+        }
+      );
+    }
+  }, [pickupCoords, destinationRegion]);
 
   return (
     <View style={styles.rootWrapper}>
@@ -212,10 +179,7 @@ const ClientHomeScreen = () => {
               provider={PROVIDER_GOOGLE}
               showsUserLocation
               initialRegion={region}
-              onMapReady={() => {
-                setMapReady(true);
-                console.log('ClientHomeScreen.js: Map is ready');
-              }}
+              onMapReady={() => setMapReady(true)}
             >
               {pickupCoords && (
                 <Marker coordinate={pickupCoords}>
