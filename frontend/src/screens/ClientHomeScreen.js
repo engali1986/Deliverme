@@ -44,34 +44,26 @@ const ClientHomeScreen = () => {
 
   useEffect(() => {
     (async () => {
-      let locationAcccess = await Location.requestForegroundPermissionsAsync();
-      console.log('ClientHomeScreen.js Location Permission Status:', locationAcccess);
-      if (locationAcccess.status !== 'granted') {
-        Toast.show({ type: 'error', text1: 'Permission denied' });
-        return;
-      }
-
       let location = await Location.getCurrentPositionAsync({});
-      console.log('ClientHomeScreen.js Current Location:', location);
-
+      setPickupCoords({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
       setRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
-       // 🔄 Reverse Geocode
-    let [reverseGeocode] = await Location.reverseGeocodeAsync(location.coords);
-    console.log('ClientHomeScreen.js Reverse geocode result:', reverseGeocode);
-    const street = reverseGeocode?.name || reverseGeocode?.street || '';
-    const governorate = reverseGeocode?.region || reverseGeocode?.city || '';
-    const formatted =
-    reverseGeocode?.city
-      ? `${reverseGeocode.city}`
-      : street || governorate || 'Current Location';
-    setAddress(formatted);
-      // Set pickup location to current location
-      setPickupLocation(formatted || 'Current Location');
+      // Optionally reverse geocode for address
+      let [place] = await Location.reverseGeocodeAsync(location.coords);
+      let pickupAddress = place
+        ? `${place.name || ''} ${place.street || ''} ${place.city || ''}`.trim()
+        : 'Current Location';
+      setPickupLocation(pickupAddress);
+      setAddress(pickupAddress);
     })();
   }, []);
 
@@ -307,13 +299,13 @@ const ClientHomeScreen = () => {
                   navigation.navigate('MapPicker', {
                     onSelect: (coords, addressText) => {
                       setPickupLocation(addressText);
-                      console.log("ClientHomeScreen.js pickUpLocation coords:", coords);
                       setPickupCoords({
                         latitude: coords.latitude,
                         longitude: coords.longitude,
                         latitudeDelta: 0.01,
                         longitudeDelta: 0.01,
-                      })
+                      });
+                      console.log("ClientHomeScreen - Pickup Coords:", pickupCoords)
                     },
                   });
                 }}
@@ -335,9 +327,7 @@ const ClientHomeScreen = () => {
                       latitudeDelta: 0.01,
                       longitudeDelta: 0.01,
                     });
-
-                    console.log("ClientHomeScreen.js destinationRegion coords:", coords);
-                    
+                    console.log("ClientHomeScreen - Destination Coords:", destinationRegion);
                   },
                 });
               }}
