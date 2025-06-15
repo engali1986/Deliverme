@@ -44,6 +44,7 @@ import Toast from 'react-native-toast-message';
 import { LanguageContext } from '../context/LanguageContext.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
+import MapViewDirections from 'react-native-maps-directions';
 
 const { height } = Dimensions.get('window');
 
@@ -226,6 +227,15 @@ const ClientHomeScreen = () => {
                 <Marker coordinate={destinationRegion}>
                   <Ionicons name="location-sharp" size={36} color="blue" />
                 </Marker>
+              )}
+              {pickupCoords && destinationRegion && (
+                <MapViewDirections
+                  origin={pickupCoords}
+                  destination={destinationRegion}
+                  apikey="AIzaSyAYqU6VMbSfIBhLlYb3XqB4Cf3rceUPjiI" // Replace with your actual key
+                  strokeWidth={4}
+                  strokeColor="dodgerblue"
+                />
               )}
             </MapView>
           )}

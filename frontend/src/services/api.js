@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const BASE_URL = "http://192.168.174.200:5000/api/auth"; // Replace with your backend's deployed URL if applicable
+const BASE_URL = "http://192.168.200.200:5000/api/auth"; // Replace with your backend's deployed URL if applicable
 
 /**
  * Handles user signup for clients.
@@ -35,13 +35,13 @@ export async function clientSignup(data) {
 export async function clientSignin(data) {
   console.log("api.js clientsignin Data  mobile, password:",data)
   try {
-    const response = await fetch(`${BASE_URL}/client/signin`, {
+    const response = await fetchWithTimeout(`${BASE_URL}/client/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    });
+    }, 3000); // 10 seconds timeout
 
     console.log("api.js clientsignin response:",response)
     console.log("api.js clientsignin response.ok:",response.ok || "cannot read response.ok")
@@ -54,7 +54,6 @@ export async function clientSignin(data) {
     const result = await response.json();
     return result // Returns client data if no Token
 
-    
   } catch (error) {
     console.log("Driver Sign-In Error:", error);
     throw new Error(error.message || "Network error");
@@ -191,5 +190,15 @@ export async function verifyDriver(data) {
     throw new Error(error.message || "Network error");
   }
 }
-  
-  
+
+// Utility fetch with timeout
+export async function fetchWithTimeout(resource, options = {}, timeout = 10000) {
+  return Promise.race([
+    fetch(resource, options),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Request timed out')), timeout)
+    ),
+  ]);
+}
+
+
