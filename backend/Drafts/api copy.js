@@ -31,29 +31,19 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const BASE_URL = "http://192.168.200.200:5000/api/auth"; // Replace with your backend's deployed URL if applicable
 
-// Utility fetch with timeout
-export async function fetchWithTimeout(resource, options = {}, timeout = 10000) {
-  return Promise.race([
-    fetch(resource, options),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Request timed out')), timeout)
-    ),
-  ]);
-}
-
 /**
  * Handles user signup for clients.
  * @param {Object} data - The client signup details (email, mobile, name, password).
  */
 export async function clientSignup(data) {
   try {
-    const response = await fetchWithTimeout(`${BASE_URL}/client/signup`, {
+    const response = await fetch(`${BASE_URL}/client/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    }, 15000); // 15 seconds timeout
+    });
     console.log("api.js client signup response",response)
     console.log("api.js client signup response.ok",response.ok || "cannot find response.ok")
     if (!response.ok) {
@@ -81,7 +71,7 @@ export async function clientSignin(data) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    }, 15000); // 15 seconds timeout
+    }, 3000); // 10 seconds timeout
 
     console.log("api.js clientsignin response:",response)
     console.log("api.js clientsignin response.ok:",response.ok || "cannot read response.ok")
@@ -107,13 +97,14 @@ export async function clientSignin(data) {
 export async function verifyClient(data) {
   console.log("api.js verifyClient data mobile, verificationCode", data)
   try {
-    const response = await fetchWithTimeout(`${BASE_URL}/client/verify`, {
+    const response = await fetch(`${BASE_URL}/client/verify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    }, 15000); // 15 seconds timeout
+    });
+
     console.log("api.js verifyClient response", response)
 
     if (!response.ok) {
@@ -151,13 +142,13 @@ export async function driverSignup(data) {
   console.log("api.js driver signup formData:", formData)
   console.log("api.js driver signup base_url:", `${BASE_URL}/driver/signup` )
   // Send request to backend
-  const response = await fetchWithTimeout(`${BASE_URL}/driver/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: formData,
-    }, 15000); // 15 seconds timeout
+  const response = await fetch(`${BASE_URL}/driver/signup`, {
+  method: "POST",
+  body: formData,
+  headers: {
+    "Accept": "application/json", // ✅ No "Content-Type" needed; FormData sets it automatically
+  },
+  });
   console.log("api.js driver signup response.ok:", response.ok || "cannot find response.ok" )
   if (!response.ok) {
   const errorData = await response.json();
@@ -179,13 +170,14 @@ export async function driverSignup(data) {
 export async function driverSignin(data) {
   console.log("api.js driversignin Data  mobile, password:",data)
   try {
-    const response = await fetchWithTimeout(`${BASE_URL}/driver/signin`, {
+    const response = await fetch(`${BASE_URL}/driver/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    }, 15000); // 15 seconds timeout
+    });
+
     console.log("api.js driversignin response:",response)
     console.log("api.js driversignin response.ok:",response.ok || "cannot read response.ok")
 
@@ -208,13 +200,13 @@ export async function driverSignin(data) {
 export async function verifyDriver(data) {
   console.log("api.js verifyDriver data mobile, verificationCode", data)
   try {
-    const response = await fetchWithTimeout(`${BASE_URL}/driver/verify`, {
+    const response = await fetch(`${BASE_URL}/driver/verify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    }, 15000); // 15 seconds timeout
+    });
 
     console.log("api.js verifyDriver response", response)
 
@@ -229,6 +221,14 @@ export async function verifyDriver(data) {
   }
 }
 
-
+// Utility fetch with timeout
+export async function fetchWithTimeout(resource, options = {}, timeout = 10000) {
+  return Promise.race([
+    fetch(resource, options),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Request timed out')), timeout)
+    ),
+  ]);
+}
 
 
