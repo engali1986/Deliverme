@@ -232,7 +232,7 @@ const ClientHomeScreen = () => {
                 <MapViewDirections
                   origin={pickupCoords}
                   destination={destinationRegion}
-                  apikey="AIzaSyAYqU6VMbSfIBhLlYb3XqB4Cf3rceUPjiI" // Replace with your actual key
+                  apikey="AIzaSyDyO_DXMVORjMQjJQVhMyNCXOGDSSKf_OU" // Replace with your actual key
                   strokeWidth={4}
                   strokeColor="dodgerblue"
                 />
