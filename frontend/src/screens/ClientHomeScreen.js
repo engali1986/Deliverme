@@ -236,6 +236,13 @@ const ClientHomeScreen = () => {
                   apikey= {API_KEY}// Replace with your actual key
                   strokeWidth={4}
                   strokeColor="dodgerblue"
+                  onReady={result => {
+                  console.log('ClientHomeScreen.js Route distance (km):', result.distance);
+                  console.log('ClientHomeScreen.js Route duration (min):', result.duration);
+                  // You can set this in state to display in your UI:
+                  // setRouteDistance(result.distance);
+                  // setRouteDuration(result.duration);
+                }}
                 />
               )}
             </MapView>
