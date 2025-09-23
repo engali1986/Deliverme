@@ -35,38 +35,37 @@ DeliverMe is a ride-sharing mobile application, built using **React Native** (fr
 
 ```
 DeliverMe/
+│── backend/
+│   │── server.mjs
+│   │── .env
+│   │── DriveServiceAccount.json
+│   │── Drafts/           # Screens and controllers (React Native code for reference, not used in backend runtime)
+│   │── src/              # (API, controllers, services, etc.)
 │
-├── backend/
-│   ├── server.mjs
-│   ├── .env
-│   ├── DriveServiceAccount.json
-│   ├── app.log
-│   ├── package.json
-│   ├── Drafts/                # React Native screen drafts and controller drafts
-│   └── src/                   # Main backend source code (controllers, routes, etc.)
+│── frontend/
+│   │── App.js
+│   │── app.json
+│   │── index.js
+│   │── src/
+│   │   ├── screens/
+│   │   │   ├── ClientHomeScreen.js
+│   │   │   ├── DriverHomeScreen.js
+│   │   │   ├── MapPickerScreen.js
+│   │   │   ├── DriverSignupScreen.js
+│   │   │   ├── DriverSigninScreen.js
+│   │   │   ├── ClientSigninScreen.js
+│   │   │   ├── ClientSignupScreen.js
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── hooks/
+│   │   ├── i18n/
+│   │   ├── navigation/
+│   │   ├── services/
+│   │   ├── utils/
+│   │── assets/
 │
-├── frontend/
-│   ├── App.js
-│   ├── app.json
-│   ├── babel.config.js
-│   ├── index.js
-│   ├── .env
-│   ├── assets/                # Images, icons, etc.
-│   └── src/
-│       ├── screens/           # ClientHomeScreen, DriverHomeScreen, etc.
-│       ├── components/
-│       ├── context/
-│       ├── hooks/
-│       ├── i18n/
-│       ├── navigation/
-│       ├── services/          # API calls
-│       └── utils/
-│
-├── node_modules/
-├── package.json
-├── package-lock.json
-├── .gitignore
-└── README.md
+│── README.md
+│── package.json
 ```
 
 ---
