@@ -147,3 +147,61 @@ API_BASE_URL=http://your_backend_ip:5000/api
 - [ ] Real-time ride status updates (WebSocket or polling)
 - [ ] Driver-side ride acceptance and navigation
 
+---
+
+## 🛠️ Troubleshooting
+
+### Common Issues & Solutions
+
+#### 1. **Backend Not Reachable**
+- **Symptom:** The app shows a spinner or network error when trying to sign in or request a ride.
+- **Solution:**  
+  - Ensure the backend server is running (`npm run dev` in `/backend`).
+  - Check your `.env` files for correct `API_BASE_URL` and `MONGO_URI`.
+  - Make sure your backend port (default: 5000) is not blocked by a firewall.
+
+#### 2. **Google Maps Not Displaying**
+- **Symptom:** The map does not load or shows a blank screen.
+- **Solution:**  
+  - Verify your Google Maps API key in `frontend/.env`.
+  - Ensure billing is enabled for your Google Cloud project.
+  - Check for typos in the API key or missing permissions.
+
+#### 3. **Expo Location Permissions**
+- **Symptom:** Location is not detected or permission denied.
+- **Solution:**  
+  - Make sure you request location permissions in your code.
+  - On Android, check device settings for location permissions.
+  - On iOS, ensure location permissions are enabled for the app.
+
+#### 4. **Driver Document Upload Fails**
+- **Symptom:** Driver cannot upload documents or verification fails.
+- **Solution:**  
+  - Check Google Drive API credentials in `backend/.env`.
+  - Ensure the service account has access to the target Drive folder.
+  - Review backend logs (`app.log`) for error details.
+
+#### 5. **MongoDB Connection Issues**
+- **Symptom:** Backend cannot connect to MongoDB.
+- **Solution:**  
+  - Verify `MONGO_URI` in `backend/.env`.
+  - Ensure MongoDB is running and accessible from your backend server.
+  - Check for network/firewall issues.
+
+#### 6. **Environment Variables Not Loaded**
+- **Symptom:** API keys or secrets are undefined in code.
+- **Solution:**  
+  - Make sure `.env` files exist and are correctly formatted (no extra quotes or spaces).
+  - Restart your servers after editing `.env` files.
+  - For React Native, ensure Babel is configured for environment variables.
+
+#### 7. **Frontend/Backend Out of Sync**
+- **Symptom:** API endpoints return 404 or unexpected errors.
+- **Solution:**  
+  - Make sure both frontend and backend are using the same API endpoint paths.
+  - Update `API_BASE_URL` in frontend `.env` to match backend server address.
+
+---
+
+**If you encounter other issues, check the logs in `/backend/app.log` and use browser/Expo console for frontend errors. For further help, review the comments in the source files or contact the project maintainer.**
+
