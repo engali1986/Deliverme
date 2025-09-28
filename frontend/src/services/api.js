@@ -29,7 +29,7 @@
  *   - Adjust timeout and error handling as needed for production
 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const BASE_URL = "http://192.168.249.200:5000/api/auth"; // Replace with your backend's deployed URL if applicable
+const BASE_URL = "http://10.77.41.200:5000/api/auth"; // Replace with your backend's deployed URL if applicable
 
 // Utility fetch with timeout
 export async function fetchWithTimeout(resource, options = {}, timeout = 10000) {
@@ -153,9 +153,6 @@ export async function driverSignup(data) {
   // Send request to backend
   const response = await fetchWithTimeout(`${BASE_URL}/driver/signup`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: formData,
     }, 15000); // 15 seconds timeout
   console.log("api.js driver signup response.ok:", response.ok || "cannot find response.ok" )
