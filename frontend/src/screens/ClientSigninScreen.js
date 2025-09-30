@@ -149,7 +149,7 @@ const ClientSigninScreen = () => {
         {loading ? <ActivityIndicator size="large" />:<Button title={i18n.t('signIn')} onPress={handleSignIn} />}
         <Button
           title={i18n.t('signUp')}
-          onPress={() => navigation.navigate('DriverSignup')}
+          onPress={() => navigation.navigate('ClientSignup')}
         />
         </>
       ):(<>

@@ -212,6 +212,7 @@ const ClientHomeScreen = () => {
               ref={mapRef}
               style={styles.map}
               provider={PROVIDER_GOOGLE}
+               apikey= {API_KEY}// Replace with your actual key
               showsUserLocation
               initialRegion={region}
               onMapReady={() => {

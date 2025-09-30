@@ -202,7 +202,7 @@ export default function ClientSignupScreen() {
       </>):(<>
                 <Text style={styles.title}>Enter Verification Code</Text>
             <TextInput style={styles.input} placeholder={i18n.t("verification_code")} keyboardType="numeric" value={verificationCode} onChangeText={setVerificationCode} />
-            {loading ? <ActivityIndicator size="large" /> :<Button title={i18n.t("verify")} color="#acc6f5" onPress={handleVerify}  />}
+            {loading ? <ActivityIndicator size="large" /> :<Button title={i18n.t("verify")} color="#1261f3ff" onPress={handleVerify}  />}
               </>)}
 
     </ScrollView>  
