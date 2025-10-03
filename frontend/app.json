@@ -29,7 +29,8 @@
         "permissions": [],
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.yourname.deliverme"
     },
     "web": {
       "favicon": "./assets/favicon.png"
