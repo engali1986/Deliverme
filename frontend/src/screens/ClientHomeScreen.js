@@ -211,7 +211,7 @@ const ClientHomeScreen = () => {
             <MapView
               ref={mapRef}
               style={styles.map}
-              provider={PROVIDER_GOOGLE}
+              // provider={PROVIDER_GOOGLE}
                apikey= {API_KEY}
               showsUserLocation
               initialRegion={region}
