@@ -247,10 +247,7 @@ const ClientHomeScreen = () => {
                 />
               )}
             </MapView>
-
-            
           )}
-         
         </View>
 
         {/* Menu Button */}
