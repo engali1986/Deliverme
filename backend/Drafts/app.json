@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "Deliverme",
+    "slug": "Deliverme",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.deliverme"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "package": "com.yourname.deliverme",
+        "versionCode": 1,
+        "permissions": [],
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.yourname.deliverme"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-localization"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d88f53e4-c27b-47f4-bcfc-5a29a17d4083"
+      }
+    }
+  }
+}
