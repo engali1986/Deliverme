@@ -15,29 +15,35 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yourname.deliverme"
     },
     "android": {
-      "package": "com.yourname.deliverme",
-      "versionCode": 1,
-      "permissions": [],
       "adaptiveIcon": {
+        "package": "com.yourname.deliverme",
+        "config":{
+           "googleMaps": {
+          "apiKey": "process.env.API_KEY"
+        }
+        },
+        "versionCode": 1,
+        "permissions": [],
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "config": {
-        "googleMaps": {
-          "apiKey": "aaa"
-        }
-      }
+      "package": "com.yourname.deliverme"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font", "expo-localization"],
+    "plugins": [
+      "expo-font",
+      "expo-localization"
+    ],
     "extra": {
       "eas": {
         "projectId": "e10e5216-71d6-4e2e-9291-c945626bed7a"

@@ -45,7 +45,7 @@ import { LanguageContext } from '../context/LanguageContext.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
 import MapViewDirections from 'react-native-maps-directions';
-// import { API_KEY } from '@env';
+import { API_KEY } from '@env';
 
 const { height } = Dimensions.get('window');
 
@@ -211,8 +211,8 @@ const ClientHomeScreen = () => {
             <MapView
               ref={mapRef}
               style={styles.map}
-              // provider={PROVIDER_GOOGLE}
-              //  apikey= {API_KEY}
+              provider={PROVIDER_GOOGLE}
+               apikey= {API_KEY}
               showsUserLocation
               initialRegion={region}
               onMapReady={() => {
@@ -234,7 +234,7 @@ const ClientHomeScreen = () => {
                 <MapViewDirections
                   origin={pickupCoords}
                   destination={destinationRegion}
-                  // apikey= {API_KEY}// Replace with your actual key
+                  apikey= {API_KEY}// Replace with your actual key
                   strokeWidth={4}
                   strokeColor="dodgerblue"
                   onReady={result => {
