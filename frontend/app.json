@@ -15,7 +15,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yourname.deliverme"
@@ -27,20 +29,18 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "config": {
-        "googleMaps": {
-          "apiKey": "aaa"
-        }
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-font", "expo-localization"],
+    "plugins": [
+      "expo-font",
+      "expo-localization"
+    ],
     "extra": {
       "eas": {
-        "projectId": "e10e5216-71d6-4e2e-9291-c945626bed7a"
+        "projectId": "28260246-69e3-4f41-9c60-2ae1d1f6ec27"
       }
     }
   }
