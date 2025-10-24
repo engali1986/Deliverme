@@ -148,6 +148,7 @@ const ClientHomeScreen = () => {
   };
 
   const handleRequestRide = async () => {
+    console.log('ClientHomeScreen.js: Requesting ride with', { pickupLocation, destination, fare });
     if (!pickupLocation || !destination || !fare) {
       Toast.show({
         type: 'error',
@@ -288,7 +289,7 @@ const ClientHomeScreen = () => {
               pointerEvents="none"
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.findDriverBtn} onPress={handleRequestRide}>
+          <TouchableOpacity style={styles.findDriverBtn} disabled={destination.length===0 || pickupLocation.length===0? true: false} onPress={handleRequestRide}>
             <Text style={styles.findDriverText}>Find a driver</Text>
           </TouchableOpacity>
         </View>
