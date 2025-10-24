@@ -279,7 +279,7 @@ const ClientHomeScreen = () => {
               pointerEvents="none"
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => openModal('fare', fare)}>
+          <TouchableOpacity disabled={destination.length===0 || pickupLocation.length===0? true: false} onPress={() => openModal('fare', fare)}>
             <TextInput
               style={styles.input}
               placeholder="EGP Offer your fare"
