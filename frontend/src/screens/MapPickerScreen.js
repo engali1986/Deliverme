@@ -55,6 +55,7 @@ const MapPickerScreen = ({ route, navigation }) => {
           style={StyleSheet.absoluteFillObject}
           initialRegion={location}
           onPress={(e) => handleSelect(e.nativeEvent.coordinate)}
+          onPoiClick={(e) => handleSelect(e.nativeEvent.coordinate)}  // 👈 Handle business/POI taps
           rotateEnabled={true}
           showsCompass={false} // <-- Hide the default compass
         >

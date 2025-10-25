@@ -31,7 +31,8 @@
       "settings":"Settings",
       "logout":"Logout",
       "logout_success":"Logout successfully",
-      "logout_message":"Have a nice day!"
+      "logout_message":"Have a nice day!",
+      "Invalid_Fare":"Invalid Fare"
     },
     "ar": {
       "home_title": "مرحبًا بك في Deliverme",
@@ -65,7 +66,8 @@
       "settings":"الإعدادات",
       "logout":"تسجيل الخروج",
       "logout_success":"تم تسجيل الخروج بنجاح",
-      "logout_message":"نتمنى لك يوماً سعيداً!"
+      "logout_message":"نتمنى لك يوماً سعيداً!",
+      "Invalid_Fare":"أجرة غير صالحة"
   
     }
   }

@@ -45,7 +45,7 @@ import { LanguageContext } from '../context/LanguageContext.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
 import MapViewDirections from 'react-native-maps-directions';
-import { API_KEY } from '@env';
+import { API_KEY, KM_RATE } from '@env';
 
 const { height } = Dimensions.get('window');
 
@@ -65,6 +65,7 @@ const ClientHomeScreen = () => {
   const [modalField, setModalField] = useState(null); // 'pickup' | 'destination' | 'fare'
   const [modalValue, setModalValue] = useState('');
   const [destinationRegion, setDestinationRegion] = useState(null);
+  const [routeDistance, setRouteDistance] = useState(null); // Distance in kilometers
   const mapRef = useRef(null);
 
   // 1. On mount, set pickup to current location
@@ -116,6 +117,32 @@ const ClientHomeScreen = () => {
     }
   }, [pickupCoords, destinationRegion]);
 
+   // 3. Calculate the minimum fare based on distance
+  const calculateMinimumFare = () => {
+    if (routeDistance) {
+      return routeDistance * parseFloat(KM_RATE); // Multiply distance by KM_RATE
+    }
+    return 0;
+  };
+
+  // 4. Validate and set fare
+  const validateAndSetFare = (inputFare) => {
+    const minimumFare = calculateMinimumFare();
+    console.log('ClientHomeScreen.js: Calculated minimum fare', minimumFare);
+    if (inputFare < minimumFare) {
+      Toast.show({
+        type: 'error',
+        text1: i18n.t('Invalid_Fare'),
+        text2: `The fare must be at least ${minimumFare.toFixed(2)} EGP.`,
+      });
+      setFare(''); // Clear fare input
+      return; // Do not update the fare
+    }
+    console.log('ClientHomeScreen.js: Setting fare to', inputFare);
+    console.log('ClientHomeScreen.js: type of fair', typeof inputFare);
+    setFare(inputFare.toString()); // Update the fare if valid
+  };
+  // Menu toggle animation
   const toggleMenu = () => {
     if (menuVisible) {
       Animated.timing(slideAnim, {
@@ -191,9 +218,14 @@ const ClientHomeScreen = () => {
 
   // Helper to save modal value to the correct field
   const saveModalValue = () => {
+    console.log('ClientHomeScreen.js: Saving modal value', modalValue, 'for field', modalField);
     if (modalField === 'pickup') setPickupLocation(modalValue);
     if (modalField === 'destination') setDestination(modalValue);
-    if (modalField === 'fare') setFare(modalValue);
+    if (modalField === 'fare') {
+      console.log('ClientHomeScreen.js: Validating fare input', modalValue);
+      validateAndSetFare(parseFloat(modalValue)); // Validate fare before setting
+
+    } 
     setModalVisible(false);
   };
 
@@ -242,7 +274,7 @@ const ClientHomeScreen = () => {
                   console.log('ClientHomeScreen.js Route distance (km):', result.distance);
                   console.log('ClientHomeScreen.js Route duration (min):', result.duration);
                   // You can set this in state to display in your UI:
-                  // setRouteDistance(result.distance);
+                  setRouteDistance(result.distance);
                   // setRouteDuration(result.duration);
                 }}
                 />
