@@ -1,24 +1,96 @@
 /**
  * ClientHomeScreen.js
  * 
- * FLOW OVERVIEW:
- * - On mount, requests user's location and sets it as the initial pickup location and marker.
- * - User can select a destination location from the map picker; a blue marker is placed.
- * - If both pickup and destination markers are set, the map automatically zooms out to fit both.
- * - User can change the pickup location via the map picker; the red marker moves and the map refits.
- * - All marker and region updates are logged for debugging.
+ * This file defines the main screen for the client-side of the app. It provides functionalities
+ * for selecting pickup and destination locations, calculating the route distance, validating fares,
+ * and requesting rides. It also includes a side menu for additional options like completed rides,
+ * settings, and logout.
  * 
- * MAIN FUNCTIONS & HOOKS:
- * - useEffect (mount): Requests location permission, fetches current location, sets pickup marker and address.
- * - useEffect ([pickupCoords, destinationRegion]): Fits map to show both markers whenever either changes.
- * - MapView: Renders the map and both markers.
- * - Markers: Red for pickup, blue for destination.
+ * Key Features:
+ * 1. Dynamic Map Interaction:
+ *    - Displays the user's current location on the map.
+ *    - Allows the user to select pickup and destination locations.
+ *    - Automatically adjusts the map view to fit the markers.
+ *    - Displays the route between the pickup and destination locations.
  * 
- * UI/UX:
- * - Always shows pickup marker (default: user location).
- * - Shows destination marker after user selection.
- * - Map always fits both markers when both are set.
- * - All major actions are logged with file name for clarity.
+ * 2. Fare Validation:
+ *    - Calculates the minimum fare based on the distance and a rate per kilometer (KM_RATE).
+ *    - Ensures the entered fare is not less than the minimum fare.
+ * 
+ * 3. Multi-Language Support:
+ *    - Uses i18n for internationalization.
+ * 
+ * 4. Toast Notifications:
+ *    - Provides feedback for errors and success events.
+ * 
+ * 5. Responsive UI:
+ *    - Includes animations for the side menu and loading indicators for the map.
+ * 
+ * State Variables:
+ * - pickupCoords: Stores the coordinates of the pickup location.
+ * - destinationRegion: Stores the coordinates of the destination location.
+ * - region: Stores the initial region for the map.
+ * - mapReady: Tracks whether the map is ready to be displayed.
+ * - routeDistance: Stores the calculated distance between the pickup and destination locations.
+ * - pickupLocation: Stores the address of the pickup location.
+ * - destination: Stores the address of the destination location.
+ * - fare: Stores the fare entered by the user.
+ * - modalVisible: Controls the visibility of the modal for entering details.
+ * - modalField: Tracks which field (pickup, destination, or fare) is being edited in the modal.
+ * - modalValue: Stores the value entered in the modal.
+ * - menuVisible: Controls the visibility of the side menu.
+ * - slideAnim: Manages the animation for the side menu.
+ * 
+ * Functions:
+ * 1. useEffect for Initial Location Setup:
+ *    - Fetches the user's current location and sets it as the default pickup location.
+ * 
+ * 2. useEffect for Fitting Map to Markers:
+ *    - Automatically adjusts the map view to fit both the pickup and destination markers.
+ * 
+ * 3. calculateMinimumFare:
+ *    - Calculates the minimum fare based on the distance between the pickup and destination locations.
+ * 
+ * 4. validateAndSetFare:
+ *    - Validates the fare entered by the user and updates the fare state if valid.
+ * 
+ * 5. toggleMenu:
+ *    - Toggles the visibility of the side menu with an animation.
+ * 
+ * 6. handleLogout:
+ *    - Logs the user out by clearing their data from AsyncStorage and navigating to the home screen.
+ * 
+ * 7. handleRequestRide:
+ *    - Sends a ride request to the server with the entered details.
+ * 
+ * 8. openModal:
+ *    - Opens the modal for editing a specific field (pickup, destination, or fare).
+ * 
+ * 9. saveModalValue:
+ *    - Saves the value entered in the modal to the appropriate state variable.
+ * 
+ * 10. onMapReady:
+ *    - Sets the mapReady state to true when the map is fully loaded.
+ * 
+ * 11. onReady in MapViewDirections:
+ *    - Updates the routeDistance when the route between the pickup and destination is calculated.
+ * 
+ * Components:
+ * 1. Map Area:
+ *    - Displays the map with markers for the pickup and destination locations.
+ *    - Shows the route between the two locations using MapViewDirections.
+ * 
+ * 2. Ride Request Form:
+ *    - Allows the user to enter the pickup location, destination, and fare.
+ *    - Validates the fare and ensures all fields are filled before requesting a ride.
+ * 
+ * 3. Side Menu:
+ *    - Provides options for completed rides, settings, and logout.
+ *    - Slides in and out of view with an animation.
+ * 
+ * 4. Modal:
+ *    - Allows the user to edit the pickup location, destination, or fare.
+ *    - Validates the entered fare before saving.
  */
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
@@ -211,8 +283,10 @@ const ClientHomeScreen = () => {
 
   // Helper to open modal for a specific field
   const openModal = (field, value) => {
+    console.log('ClientHomeScreen.js: Opening modal for field', field, 'with value', value);
     setModalField(field);
     setModalValue(value);
+    setFare(''); // Clear fare when opening modal
     setModalVisible(true);
   };
 
@@ -223,6 +297,10 @@ const ClientHomeScreen = () => {
     if (modalField === 'destination') setDestination(modalValue);
     if (modalField === 'fare') {
       console.log('ClientHomeScreen.js: Validating fare input', modalValue);
+      if (isNaN(modalValue) || parseFloat(modalValue) <= 0 || modalValue.length===0) {
+        setFare(''); // Clear fare input
+        return; // Invalid fare input
+      }
       validateAndSetFare(parseFloat(modalValue)); // Validate fare before setting
 
     } 
