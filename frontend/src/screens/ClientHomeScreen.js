@@ -118,6 +118,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
 import MapViewDirections from 'react-native-maps-directions';
 import { API_KEY, KM_RATE } from '@env';
+import { requestRide } from '../services/api.js';
 
 const { height } = Dimensions.get('window');
 
@@ -257,27 +258,25 @@ const ClientHomeScreen = () => {
       return;
     }
     try {
-      const token = await AsyncStorage.getItem('userToken');
-      const response = await fetch('http://<your-ip>:5000/api/rides/request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ pickup: pickupLocation, destination, fare }),
+      const response = await requestRide({
+        pickup: pickupLocation, 
+        destination, 
+        fare: parseFloat(fare),
+      }); 
+      console.log('ClientHomeScreen.js: Ride requested successfully', response);
+      Toast.show({
+        type: 'success',
+        text1: 'Ride Requested',
+        text2: 'Your ride request has been sent successfully.',
       });
-      const data = await response.json();
-      if (response.ok) {
-        Toast.show({
-          type: 'success',
-          text1: 'Ride Requested',
-          text2: 'Searching for nearby drivers...',
-        });
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (err) {
-      Toast.show({ type: 'error', text1: 'Error', text2: err.message });
+      // Optionally, navigate to another screen or reset fields here
+    } catch (error) {
+      console.log('ClientHomeScreen.js: Ride request failed', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Request Failed',
+        text2: error.message,
+      });
     }
   };
 

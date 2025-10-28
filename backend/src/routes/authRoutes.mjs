@@ -37,6 +37,17 @@ router.post('/driver/signin', async(req,res)=>{
   const db = req.app.locals.db;  // Access the db instance from app.locals
   await driverSignIn(req,res,db)
 });
+// Request ride
+router.post('/client/request-ride', async (req, res) => {
+  const db = req.app.locals.db;  // Access the db instance from app.locals
+  // Implement the logic to handle ride request here
+  const rideDetails = req.body;
+  console.log("Ride request received:", rideDetails);
+  // Placeholder response
+  res.status(501).send({ message: "Not implemented" }); // Placeholder response
+});
+
+// Health check route 
 router.get("/",(req,res)=>{
     console.log(process.env.JWT_SECRET)
     res.send("Server working")

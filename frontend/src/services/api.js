@@ -226,6 +226,33 @@ export async function verifyDriver(data) {
   }
 }
 
+/**
+ * Submits a ride request for clients.
+ * @param {Object} param0 - The ride request details (pickup, destination, fare). 
+ * Requires Authorization header with Bearer token.
+ */
+export async function requestRide({ pickup, destination, fare }) {  
+  try {
+    const token = await AsyncStorage.getItem("clientToken");
+    const response = await fetchWithTimeout(`${BASE_URL}/client/request-ride`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ pickup, destination, fare }),
+    }, 15000); // 15 seconds timeout
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to request ride");
+    }
+    return await response.json();
+  } catch (error) {
+    throw new Error(error.message || "Network error");
+  }
+}
+
+
 
 
 
