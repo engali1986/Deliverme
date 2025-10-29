@@ -248,8 +248,8 @@ const ClientHomeScreen = () => {
   };
 
   const handleRequestRide = async () => {
-    console.log('ClientHomeScreen.js: Requesting ride with', { pickupLocation, destination, fare });
-    if (!pickupLocation || !destination || !fare) {
+    console.log('ClientHomeScreen.js: Requesting ride with', { pickupCoords, destinationRegion, fare });
+    if (!pickupCoords || !destinationRegion || !fare) {
       Toast.show({
         type: 'error',
         text1: 'Missing Fields',
@@ -259,8 +259,8 @@ const ClientHomeScreen = () => {
     }
     try {
       const response = await requestRide({
-        pickup: pickupLocation, 
-        destination, 
+        pickup: pickupCoords, 
+        destination: destinationRegion, 
         fare: parseFloat(fare),
       }); 
       console.log('ClientHomeScreen.js: Ride requested successfully', response);

@@ -242,12 +242,15 @@ export async function requestRide({ pickup, destination, fare }) {
       },
       body: JSON.stringify({ pickup, destination, fare }),
     }, 15000); // 15 seconds timeout
+    console.log("api.js requestRide response:",response)
+    console.log("api.js requestRide response.ok:",response.ok || "cannot read response.ok")
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to request ride");
     }
     return await response.json();
   } catch (error) {
+    console.log("Request Ride Error:", error);
     throw new Error(error.message || "Network error");
   }
 }
