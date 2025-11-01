@@ -168,9 +168,9 @@ async function sendDriverVerificationEmail(email, verificationCode) {
 
   try {
     await transporter.sendMail(mailOptions);
-    logger.info('Verification email sent to: %s', email);
+    logger.info('Verification email sent to driver: %s', email);
   } catch (error) {
-    logger.error('Error sending email: %s', error.message);
+    logger.error('Error sending email to driver: %s', error.message);
     throw new Error('Failed to send email');
   }
 }
@@ -608,6 +608,7 @@ export async function driverSignIn(req, res,db) {
     // Check verification status
     if (!driver.driverVerified) {
       logger.info("Driver not verified: %s", mobile);
+      await sendDriverVerificationEmail(driver.email, driver.verificationCode);
       return res.status(200).json({ message: "Verification required", driverVerified: false, email:driver.email });
     }
 

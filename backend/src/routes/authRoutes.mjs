@@ -47,6 +47,16 @@ router.post('/client/request-ride', async (req, res) => {
   res.status(501).send({ message: "Not implemented" }); // Placeholder response
 });
 
+router.patch('/driver/availability', async (req, res) => {
+  const db = req.app.locals.db;  // Access the db instance from app.locals
+  // Implement the logic to update driver availability here
+  const { available } = req.body;     
+  console.log("Driver availability update received:", available);
+  // Placeholder response
+  res.status(200).send({ message: "Not implemented" }); // Placeholder response
+});
+
+
 // Health check route 
 router.get("/",(req,res)=>{
     console.log(process.env.JWT_SECRET)

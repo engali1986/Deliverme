@@ -255,6 +255,35 @@ export async function requestRide({ pickup, destination, fare }) {
   }
 }
 
+/**
+ * Update driver availability (PATCH /driver/availability)
+ * @param {boolean} available
+ */
+export async function updateDriverAvailability(available) {
+  try {
+    const token = await AsyncStorage.getItem("driverToken");
+    const response = await fetchWithTimeout(`${BASE_URL}/driver/availability`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ available }),
+    }, 15000);
+    console.log("api.js updateDriverAvailability response:",response)
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.log("api.js updateDriverAvailability errorData:",errorData)
+      throw new Error(errorData.message || "Failed to update availability");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('updateDriverAvailability error', error);
+    throw error;
+  }
+}
+
 
 
 
