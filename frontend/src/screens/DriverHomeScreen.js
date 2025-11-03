@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   Animated,
   TouchableWithoutFeedback,
-  Switch,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import i18n from '../i18n/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,7 +16,7 @@ import Toast from 'react-native-toast-message';
 import { LanguageContext } from '../context/LanguageContext.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
-import { updateDriverAvailability } from '../services/api.js'; // new API helper
+import { updateDriverAvailability } from '../services/api.js'; // API helper
 
 const DriverHomeScreen = () => {
   const { language } = useContext(LanguageContext);
@@ -24,21 +24,20 @@ const DriverHomeScreen = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(-250));
 
-  // NEW: availability state + loading + cooldown
+  // availability + cooldown + requests
   const [isAvailable, setIsAvailable] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [cooldownActive, setCooldownActive] = useState(false);
-  const COOLDOWN_MS = 10000; // 10s client-side cooldown to avoid accidental rapid toggles
+  const COOLDOWN_MS = 10000; // 10s client-side cooldown
+  const [requests, setRequests] = useState([]); // current incoming requests list
 
   useEffect(() => {
-    // read initial availability from storage or fetch from server
     (async () => {
       try {
-        const token = await AsyncStorage.getItem('driverToken');
-        // optionally request profile to get initial availability
-        // simple fallback: preserve last chosen state in AsyncStorage
         const saved = await AsyncStorage.getItem('driverAvailable');
         if (saved !== null) setIsAvailable(saved === 'true');
+        // optionally fetch current pending requests for driver here
+        // fetchDriverRequests() ...
       } catch (e) {
         console.warn('DriverHomeScreen: could not load availability', e);
       }
@@ -81,9 +80,7 @@ const DriverHomeScreen = () => {
     }
   };
 
-  // NEW: availability toggle handler
   const onToggleAvailability = async (newValue) => {
-    console.log('Toggling availability to', newValue, typeof newValue);
     if (cooldownActive || updating) {
       Toast.show({ type: 'info', text1: 'Please wait', text2: 'Too many rapid changes' });
       return;
@@ -91,16 +88,28 @@ const DriverHomeScreen = () => {
 
     setUpdating(true);
     try {
-      const result = await updateDriverAvailability(newValue); // calls backend
-      console.log('Availability update result:', result);
-      if (result && result.message === 'Not implemented') {
-        console.log('Availability updated successfully');
+      const result = await updateDriverAvailability(newValue); // backend call
+      // Expecting { ok: true, available: boolean } or similar
+      if (result && (result.ok === true || result.available === newValue)) {
         setIsAvailable(newValue);
         await AsyncStorage.setItem('driverAvailable', newValue ? 'true' : 'false');
-        Toast.show({ type: 'success', text1: 'Status updated', text2: newValue ? 'You are now available' : 'You are now unavailable' });
+        Toast.show({
+          type: 'success',
+          text1: 'Status updated',
+          text2: newValue ? 'You are now available' : 'You are now unavailable',
+        });
         // start client cooldown
         setCooldownActive(true);
         setTimeout(() => setCooldownActive(false), COOLDOWN_MS);
+
+        // when becoming available, clear or fetch requests as appropriate
+        if (newValue) {
+          // fetch pending requests assigned to this driver (placeholder)
+          // setRequests(fetchedRequests);
+          setRequests([]); // keep empty until server pushes requests
+        } else {
+          setRequests([]); // hide requests when unavailable
+        }
       } else {
         throw new Error(result?.message || 'Update failed');
       }
@@ -112,40 +121,56 @@ const DriverHomeScreen = () => {
     }
   };
 
+  const renderRequestItem = ({ item }) => (
+    <View style={styles.requestItem}>
+      <Text style={styles.requestTitle}>{item.title || 'Ride Request'}</Text>
+      <Text style={styles.requestText}>{item.pickupAddress || item.pickup || 'Pickup unknown'}</Text>
+      <Text style={styles.requestText}>Fare: {item.fare ?? '—'}</Text>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      {/* Top bar with availability toggle */}
-      <View style={styles.topBar}>
-        <Text style={styles.topTitle}>{i18n.t('driver_home')}</Text>
-        <View style={styles.availabilityRow}>
-          <Text style={[styles.availText, isAvailable ? styles.availTrueText : styles.availFalseText]}>
-            {isAvailable ? 'Available' : 'Unavailable'}
-          </Text>
-          <Switch
-            value={isAvailable}
-            onValueChange={onToggleAvailability}
-            disabled={updating || cooldownActive}
-            trackColor={{ false: '#cce0ff', true: '#1565C0' }}
-            thumbColor="#ffffff"
-            ios_backgroundColor="#cce0ff"
-          />
-          {updating && <ActivityIndicator size="small" color="#1565C0" style={{ marginLeft: 8 }} />}
+      {/* Top row: menu button at left and wide availability switch filling remaining width */}
+      <View style={styles.topRow}>
+        <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
+          <Ionicons name="menu" size={26} color="#fff" />
+        </TouchableOpacity>
+
+        <View style={styles.switchContainer}>
+          <View style={[styles.switchWrapper, isAvailable ? styles.switchWrapperActive : null]}>
+            <WideToggle value={isAvailable} onValueChange={onToggleAvailability} disabled={updating || cooldownActive} />
+          </View>
+          {updating && <ActivityIndicator size="small" color="#1565C0" style={{ marginTop: 6 }} />}
         </View>
       </View>
 
-      {/* existing UI */}
-      {/* Menu Toggle Button */}
-      <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
-        <Ionicons name="menu" size={28} color="#fff" />
-      </TouchableOpacity>
+      {/* Instruction or requests area below top row */}
+      <View style={styles.infoBox}>
+        {!isAvailable ? (
+          <Text style={styles.instructionText}>
+            Toggle the switch to become available and receive ride requests.
+          </Text>
+        ) : requests.length === 0 ? (
+          <Text style={styles.noRequestsText}>No current requests</Text>
+        ) : (
+          <FlatList
+            data={requests}
+            keyExtractor={(item, idx) => item.id ?? String(idx)}
+            renderItem={renderRequestItem}
+            style={styles.requestsList}
+            ListEmptyComponent={<Text style={styles.noRequestsText}>No current requests</Text>}
+          />
+        )}
+      </View>
 
-      {/* rest of existing component unchanged */}
-      <View style={styles.sideMenuPlaceholder} />
+      {/* existing side menu overlay / animated menu */}
       {menuVisible && (
         <TouchableWithoutFeedback onPress={toggleMenu}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
       )}
+
       <Animated.View style={[styles.sideMenu, { transform: [{ translateX: slideAnim }] }]}>
         <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
           <Ionicons name="close" size={22} color="#fff" />
@@ -164,6 +189,56 @@ const DriverHomeScreen = () => {
   );
 };
 
+// --- New: WideToggle component (fills remaining width and animates knob) ---
+const WideToggle = ({ value, onValueChange, disabled }) => {
+  const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const [trackWidth, setTrackWidth] = useState(0);
+  const KNOB_SIZE = 36;
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: value ? 1 : 0,
+      duration: 180,
+      useNativeDriver: true,
+    }).start();
+  }, [value]);
+
+  const translateX = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [2, Math.max(0, (trackWidth - KNOB_SIZE - 4))],
+  });
+  const bgColor = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['rgba(18,35,64,0.06)', 'rgba(21,101,192,1)'], // light -> blue
+  });
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.9}
+      disabled={disabled}
+      onPress={() => !disabled && onValueChange(!value)}
+      onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+      style={[styles.wideToggleContainer, disabled && { opacity: 0.6 }]}
+    >
+      <Animated.View style={[styles.wideToggleTrack, { backgroundColor: bgColor }]} />
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.wideToggleKnob,
+          {
+            transform: [{ translateX }],
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.2,
+            shadowRadius: 2,
+            elevation: 3,
+          },
+        ]}
+      />
+    </TouchableOpacity>
+  );
+};
+// --- end WideToggle ---
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -171,36 +246,88 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingHorizontal: 20,
   },
-  topBar: {
+  topRow: {
     width: '100%',
-    marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    // no space-between: menu left, switch fills remaining space
+    marginBottom: 18,
   },
-  topTitle: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#003366',
-  },
-  availabilityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  availText: {
-    marginRight: 8,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  availTrueText: { color: '#0D47A1' },
-  availFalseText: { color: '#1976D2' },
   menuButton: {
     backgroundColor: '#004080',
     padding: 10,
     borderRadius: 6,
-    alignSelf: 'flex-start',
-    marginTop: 12,
+    marginRight: 12,
   },
+  // NEW: container that takes remaining width
+  switchContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  // switchWrapper now stretches to remaining width
+  switchWrapper: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: '#ffffff',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 30,
+    borderColor: '#1565C0',
+    borderWidth: 1,
+    elevation: 3,
+    justifyContent: 'center',
+  },
+  switchWrapperActive: {
+    backgroundColor: '#E3F2FD',
+  },
+  switch: {
+    alignSelf: 'flex-end',
+    transform: [{ scaleX: 1.8 }, { scaleY: 1.4 }], // make switch visually wider
+  },
+  infoBox: {
+    marginTop: 6,
+    width: '100%',
+    paddingHorizontal: 4,
+  },
+  instructionText: {
+    textAlign: 'center',
+    color: '#003366',
+    fontSize: 16,
+    backgroundColor: '#BBDEFB',
+    padding: 12,
+    borderRadius: 8,
+  },
+  noRequestsText: {
+    textAlign: 'center',
+    color: '#1565C0',
+    fontSize: 16,
+    backgroundColor: '#E3F2FD',
+    padding: 12,
+    borderRadius: 8,
+  },
+  requestsList: {
+    width: '100%',
+  },
+  requestItem: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    borderColor: '#1976D2',
+    borderWidth: 1,
+  },
+  requestTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0D47A1',
+    marginBottom: 6,
+  },
+  requestText: {
+    color: '#1565C0',
+    fontSize: 14,
+  },
+
   sideMenu: {
     position: 'absolute',
     left: 0,
@@ -245,6 +372,27 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     zIndex: 100,
+  },
+  wideToggleContainer: {
+    width: '100%',
+    height: 44,
+    borderRadius: 28,
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    overflow: 'hidden',
+  },
+  wideToggleTrack: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 28,
+    opacity: 1,
+  },
+  wideToggleKnob: {
+    position: 'absolute',
+    left: 2,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#fff',
   },
 });
 
