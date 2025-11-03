@@ -189,27 +189,32 @@ const DriverHomeScreen = () => {
   );
 };
 
-// --- New: WideToggle component (fills remaining width and animates knob) ---
+// --- Updated WideToggle component (labels centered) ---
 const WideToggle = ({ value, onValueChange, disabled }) => {
   const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
   const [trackWidth, setTrackWidth] = useState(0);
   const KNOB_SIZE = 36;
+
   useEffect(() => {
     Animated.timing(anim, {
       toValue: value ? 1 : 0,
       duration: 180,
-      useNativeDriver: true,
+      useNativeDriver: false,
     }).start();
   }, [value]);
 
   const translateX = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [2, Math.max(0, (trackWidth - KNOB_SIZE - 4))],
+    outputRange: [2, Math.max(0, trackWidth - KNOB_SIZE - 4)],
   });
+
   const bgColor = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['rgba(18,35,64,0.06)', 'rgba(21,101,192,1)'], // light -> blue
+    outputRange: ['rgba(200,208,216,0.25)', 'rgba(21,101,192,1)'],
   });
+
+  const offlineOpacity = anim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+  const onlineOpacity = anim.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
 
   return (
     <TouchableOpacity
@@ -220,6 +225,28 @@ const WideToggle = ({ value, onValueChange, disabled }) => {
       style={[styles.wideToggleContainer, disabled && { opacity: 0.6 }]}
     >
       <Animated.View style={[styles.wideToggleTrack, { backgroundColor: bgColor }]} />
+
+      {/* centered labels */}
+      <Animated.Text
+        style={[
+          styles.wideToggleLabel,
+          { opacity: offlineOpacity, color: '#0D47A1' },
+        ]}
+        numberOfLines={1}
+      >
+        OFFLINE
+      </Animated.Text>
+
+      <Animated.Text
+        style={[
+          styles.wideToggleLabel,
+          { opacity: onlineOpacity, color: '#fff' },
+        ]}
+        numberOfLines={1}
+      >
+        ONLINE
+      </Animated.Text>
+
       <Animated.View
         pointerEvents="none"
         style={[
@@ -375,24 +402,36 @@ const styles = StyleSheet.create({
   },
   wideToggleContainer: {
     width: '100%',
-    height: 44,
+    height: 48,
     borderRadius: 28,
     justifyContent: 'center',
-    paddingHorizontal: 4,
+    paddingHorizontal: 6,
     overflow: 'hidden',
   },
   wideToggleTrack: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 28,
-    opacity: 1,
   },
   wideToggleKnob: {
     position: 'absolute',
     left: 2,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#fff',
+  },
+  // CENTERED label style
+  wideToggleLabel: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    fontWeight: '700',
+    fontSize: 13,
+    includeFontPadding: false,
   },
 });
 
