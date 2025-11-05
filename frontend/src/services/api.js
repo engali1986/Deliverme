@@ -259,9 +259,10 @@ export async function requestRide({ pickup, destination, fare }) {
  * Update driver availability (PATCH /driver/availability)
  * @param {boolean} available
  */
-export async function updateDriverAvailability(available) {
+export async function updateDriverAvailability(available, coords) {
   try {
     const token = await AsyncStorage.getItem("driverToken");
+    console.log("api.js updateDriverAvailability coords:",coords)
     const response = await fetchWithTimeout(`${BASE_URL}/driver/availability`, {
       method: "PATCH",
       headers: {

@@ -17,6 +17,7 @@ import { LanguageContext } from '../context/LanguageContext.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
 import { updateDriverAvailability } from '../services/api.js'; // API helper
+import * as Location from 'expo-location';
 
 const DriverHomeScreen = () => {
   const { language } = useContext(LanguageContext);
@@ -88,7 +89,41 @@ const DriverHomeScreen = () => {
 
     setUpdating(true);
     try {
-      const result = await updateDriverAvailability(newValue); // backend call
+      // Request location permission first
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Toast.show({
+          type: 'error',
+          text1: 'Location permission required',
+          text2: 'Enable location to update availability.',
+        });
+        setUpdating(false);
+        return; // exit early if permission denied
+      }
+
+      // Get current position
+      let loc;
+      try {
+        loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+      } catch (locErr) {
+        console.error('Failed to get location', locErr);
+        Toast.show({
+          type: 'error',
+          text1: 'Location error',
+          text2: 'Could not get current location. Try again.',
+        });
+        setUpdating(false);
+        return;
+      }
+
+      const coords = {
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+      };
+
+      // include location when calling backend
+      const result = await updateDriverAvailability(newValue, coords); // backend call
+
       // Expecting { ok: true, available: boolean } or similar
       if (result && (result.ok === true || result.available === newValue)) {
         setIsAvailable(newValue);
@@ -102,10 +137,7 @@ const DriverHomeScreen = () => {
         setCooldownActive(true);
         setTimeout(() => setCooldownActive(false), COOLDOWN_MS);
 
-        // when becoming available, clear or fetch requests as appropriate
         if (newValue) {
-          // fetch pending requests assigned to this driver (placeholder)
-          // setRequests(fetchedRequests);
           setRequests([]); // keep empty until server pushes requests
         } else {
           setRequests([]); // hide requests when unavailable
