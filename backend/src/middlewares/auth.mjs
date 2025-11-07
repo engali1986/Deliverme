@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import logger from '../utils/logger.mjs';
 dotenv.config();
 
 // Middleware: expects Authorization: Bearer <token>
@@ -17,6 +18,7 @@ export default function authenticateToken(req, res, next) {
 
     jwt.verify(token, secret, (err, payload) => {
       if (err) {
+        logger.warn('Invalid token:', err);
         return res.status(401).json({ message: 'Invalid token' });
       }
       // payload should include driver id (e.g. { id, role, ... })

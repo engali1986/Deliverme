@@ -269,7 +269,9 @@ export async function updateDriverAvailability(available, coords) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ available }),
+      body: JSON.stringify({ available, 
+        location: coords
+       }),
     }, 15000);
     console.log("api.js updateDriverAvailability response:",response)
 

@@ -590,16 +590,27 @@ export async function verifyDriver(req, res, db) {
  */
 export async function updateDriverAvailability(req, res, db) {
   try {
-    // db can be passed or taken from app.locals
     const database = db || req.app?.locals?.db;
     if (!database) return res.status(500).json({ message: 'Database not initialized' });
 
-    // Require authenticated user
     const driverId = req.user?.id || req.user?._id;
     if (!driverId) return res.status(401).json({ message: 'Unauthorized' });
 
     const available = Boolean(req.body.available);
     const loc = req.body.location;
+
+    // Validate location if available = true
+    if (available) {
+      if (
+        !loc ||
+        typeof loc.latitude !== 'number' ||
+        typeof loc.longitude !== 'number' ||
+        !isFinite(loc.latitude) ||
+        !isFinite(loc.longitude)
+      ) {
+        return res.status(400).json({ message: 'Location not available' });
+      }
+    }
 
     const updateDoc = {
       $set: {
@@ -608,6 +619,7 @@ export async function updateDriverAvailability(req, res, db) {
       },
     };
 
+    // Add location if valid
     if (
       loc &&
       typeof loc.latitude === 'number' &&
@@ -623,21 +635,18 @@ export async function updateDriverAvailability(req, res, db) {
 
     const driversColl = database.collection('drivers');
 
-    // Use ObjectId when possible
     let filter;
     try {
       filter = ObjectId.isValid(driverId) ? { _id: new ObjectId(driverId) } : { _id: driverId };
-    } catch (e) {
-      // fallback if import failed for some reason
-      console.warn('ObjectId conversion failed, using raw driverId');
+    } catch {
       filter = { _id: driverId };
     }
 
-    const result = await driversColl.findOneAndUpdate(filter, updateDoc, { returnDocument: 'after' });
-    console.log("updateDriverAvailability result:",result);
+    const result = await driversColl.updateOne(filter, updateDoc)
+    console.log('updateDriverAvailability result:', result);
 
-    if (!result.value) {
-      console.warn('Driver not found for availability update:', driverId);
+    if (result.modifiedCount===0) {
+      logger.warn('Driver not found for ID: %s', driverId);
       return res.status(404).json({ message: 'Driver not found' });
     }
 
@@ -651,11 +660,10 @@ export async function updateDriverAvailability(req, res, db) {
         });
       }
     } catch (emitErr) {
-      // Non-fatal
       console.warn('Failed to emit availability update socket event', emitErr);
     }
 
-    return res.json({ ok: true, available: result.value.isAvailable, location: result.value.location || null });
+    return res.status(200).json({ message: 'Availability updated successfully' });
   } catch (err) {
     console.error('updateDriverAvailability error', err);
     return res.status(500).json({ message: 'Internal server error' });

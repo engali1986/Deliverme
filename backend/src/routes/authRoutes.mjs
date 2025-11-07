@@ -3,6 +3,7 @@ import { clientSignUp, clientSignIn, verifyClient, driverSignUp, driverSignIn, v
 import upload from "../middlewares/uploadMiddleware.mjs"
 import dotenv from "dotenv"
 import authenticateToken from '../middlewares/auth.mjs';
+import logger from '../utils/logger.mjs';
 
 dotenv.config()
 const router = express.Router();
@@ -54,7 +55,8 @@ router.patch('/driver/availability', authenticateToken, async (req, res) => {
   const db = req.app.locals.db;  // Access the db instance from app.locals
   try {
     // delegate to controller (controller will read req.user and req.body)
-    await updateDriverAvailability(req, res, db);
+    const updateDriver= await updateDriverAvailability(req, res, db);
+    logger.info('Route /driver/availability updateDrivedr', updateDriver);
   } catch (err) {
     console.error('Route /driver/availability error', err);
     res.status(500).json({ message: 'Server error' });
