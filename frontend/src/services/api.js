@@ -261,7 +261,7 @@ export async function requestRide({ pickup, destination, fare }) {
  */
 export async function updateDriverAvailability(available, coords) {
   try {
-    const token = await AsyncStorage.getItem("driverToken");
+    const token = await AsyncStorage.getItem("userToken");
     console.log("api.js updateDriverAvailability coords:",coords)
     const response = await fetchWithTimeout(`${BASE_URL}/driver/availability`, {
       method: "PATCH",

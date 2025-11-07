@@ -8,6 +8,7 @@ import logger from '../utils/logger.mjs';
 import {PassThrough} from "stream"
 import {fileURLToPath} from "url"
 import path from 'path';
+import { ObjectId } from 'mongodb';
 
 
 
@@ -576,6 +577,90 @@ export async function verifyDriver(req, res, db) {
   }
 }
 
+
+/**
+ * Update driver availability and optional location (protected).
+ * Expects:
+ *  - req.user populated by auth middleware (contains id)
+ *  - req.body.available (boolean)
+ *  - optional req.body.location = { latitude, longitude }
+ *
+ * Updates drivers collection: isAvailable and location (GeoJSON Point).
+ * Emits 'availability_updated' to driver's socketId if present.
+ */
+export async function updateDriverAvailability(req, res, db) {
+  try {
+    // db can be passed or taken from app.locals
+    const database = db || req.app?.locals?.db;
+    if (!database) return res.status(500).json({ message: 'Database not initialized' });
+
+    // Require authenticated user
+    const driverId = req.user?.id || req.user?._id;
+    if (!driverId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const available = Boolean(req.body.available);
+    const loc = req.body.location;
+
+    const updateDoc = {
+      $set: {
+        isAvailable: available,
+        updatedAt: new Date(),
+      },
+    };
+
+    if (
+      loc &&
+      typeof loc.latitude === 'number' &&
+      typeof loc.longitude === 'number' &&
+      isFinite(loc.latitude) &&
+      isFinite(loc.longitude)
+    ) {
+      updateDoc.$set.location = {
+        type: 'Point',
+        coordinates: [loc.longitude, loc.latitude],
+      };
+    }
+
+    const driversColl = database.collection('drivers');
+
+    // Use ObjectId when possible
+    let filter;
+    try {
+      filter = ObjectId.isValid(driverId) ? { _id: new ObjectId(driverId) } : { _id: driverId };
+    } catch (e) {
+      // fallback if import failed for some reason
+      console.warn('ObjectId conversion failed, using raw driverId');
+      filter = { _id: driverId };
+    }
+
+    const result = await driversColl.findOneAndUpdate(filter, updateDoc, { returnDocument: 'after' });
+    console.log("updateDriverAvailability result:",result);
+
+    if (!result.value) {
+      console.warn('Driver not found for availability update:', driverId);
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
+    // Emit socket event if io and socketId available
+    try {
+      const io = req.app.get('io');
+      if (io && result.value.socketId) {
+        io.to(result.value.socketId).emit('availability_updated', {
+          available: result.value.isAvailable,
+          location: result.value.location || null,
+        });
+      }
+    } catch (emitErr) {
+      // Non-fatal
+      console.warn('Failed to emit availability update socket event', emitErr);
+    }
+
+    return res.json({ ok: true, available: result.value.isAvailable, location: result.value.location || null });
+  } catch (err) {
+    console.error('updateDriverAvailability error', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
 
 // Driver Sign-In
 

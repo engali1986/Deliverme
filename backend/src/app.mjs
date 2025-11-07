@@ -5,7 +5,7 @@ import { connectDB } from './db/connect.mjs';
 import authRoutes from './routes/authRoutes.mjs';
 import logger from './utils/logger.mjs';
 import rateLimit from 'express-rate-limit';
-import { ensureIndexes } from './db/ensureIndexes.mjs'; // Import the ensureIndexes function
+import ensureIndexes  from './db/ensureIndexes.mjs'; // Import the ensureIndexes function
 
 const app = express();
 // Set rate limit (100 requests per 15 minutes)

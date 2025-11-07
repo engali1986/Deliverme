@@ -6,7 +6,9 @@ dotenv.config();
 export default function authenticateToken(req, res, next) {
   try {
     const auth = req.headers.authorization || req.headers.Authorization;
+    console.log("authenticateToken auth header:", auth);
     if (!auth || !auth.startsWith('Bearer ')) {
+      console.warn('Missing or invalid Authorization header');
       return res.status(401).json({ message: 'Missing or invalid Authorization header' });
     }
     const token = auth.split(' ')[1];

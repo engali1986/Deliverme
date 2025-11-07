@@ -1,7 +1,9 @@
 import express from 'express';
-import { clientSignUp, clientSignIn, verifyClient, driverSignUp, driverSignIn, verifyDriver } from '../controllers/authController.mjs';
+import { clientSignUp, clientSignIn, verifyClient, driverSignUp, driverSignIn, verifyDriver, updateDriverAvailability } from '../controllers/authController.mjs';
 import upload from "../middlewares/uploadMiddleware.mjs"
 import dotenv from "dotenv"
+import authenticateToken from '../middlewares/auth.mjs';
+
 dotenv.config()
 const router = express.Router();
 
@@ -47,15 +49,17 @@ router.post('/client/request-ride', async (req, res) => {
   res.status(501).send({ message: "Not implemented" }); // Placeholder response
 });
 
-router.patch('/driver/availability', async (req, res) => {
+// Protected route: update driver availability + optional location
+router.patch('/driver/availability', authenticateToken, async (req, res) => {
   const db = req.app.locals.db;  // Access the db instance from app.locals
-  // Implement the logic to update driver availability here
-  const { available } = req.body;     
-  console.log("Driver availability update received:", available);
-  // Placeholder response
-  res.status(200).send({ message: "Not implemented" }); // Placeholder response
+  try {
+    // delegate to controller (controller will read req.user and req.body)
+    await updateDriverAvailability(req, res, db);
+  } catch (err) {
+    console.error('Route /driver/availability error', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
-
 
 // Health check route 
 router.get("/",(req,res)=>{
