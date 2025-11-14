@@ -18,6 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
 import { updateDriverAvailability } from '../services/api.js'; // API helper
 import * as Location from 'expo-location';
+import { jwtDecode } from 'jwt-decode';
 
 const DriverHomeScreen = () => {
   const { language } = useContext(LanguageContext);
@@ -34,6 +35,25 @@ const DriverHomeScreen = () => {
 
   useEffect(() => {
     (async () => {
+      // Request location permission on mount
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Toast.show({
+          type: 'error',
+          text1: 'Location permission required',
+          text2: 'Enable location to use this feature.',
+        });
+        return; // Stop initialization if permission is not granted
+      }
+      // Get userId from token from AsyncStorage if needed
+      const token = await AsyncStorage.getItem('userToken');
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+      console.log('DriverHomeScreen: decoded token:', decoded);
+      console.log('DriverHomeScreen: userId from token:', userId);
+    
+
+      // load saved availability from AsyncStorage
       try {
         const saved = await AsyncStorage.getItem('driverAvailable');
         if (saved !== null) setIsAvailable(saved === 'true');
@@ -137,7 +157,7 @@ const DriverHomeScreen = () => {
         setCooldownActive(true);
         setTimeout(() => setCooldownActive(false), COOLDOWN_MS);
 
-        if (newValue) {
+        if (newValue===true) {
           setRequests([]); // keep empty until server pushes requests
         } else {
           setRequests([]); // hide requests when unavailable

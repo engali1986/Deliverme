@@ -651,16 +651,16 @@ export async function updateDriverAvailability(req, res, db) {
     }
 
     // Emit socket event if io and socketId available
-    try {
-      const io = req.app.get('io');
-      if (io && result.value.socketId) {
-        io.to(result.value.socketId).emit('availability_updated', {
-          available: result.value.isAvailable,
-          location: result.value.location || null,
-        });
-      }
-    } catch (emitErr) {
-      console.warn('Failed to emit availability update socket event', emitErr);
+    const io = req.app.get('io');
+    if (io) {
+      // const driver = await driversColl.findOne(filter, { projection: { socketId: 1 } });
+      // if (driver && driver.socketId) {
+      //   logger.info('Emitting availability_updated to driver socketId: %s', driver.socketId);
+      //   io.to(driver.socketId).emit('availability_updated', {
+      //     available: available,
+      //     location: loc || null,
+      //   });
+      // }
     }
 
     return res.status(200).json({ message: 'Availability updated successfully' });

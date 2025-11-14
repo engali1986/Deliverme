@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { connectDB } from './db/connect.mjs';
@@ -6,6 +7,7 @@ import authRoutes from './routes/authRoutes.mjs';
 import logger from './utils/logger.mjs';
 import rateLimit from 'express-rate-limit';
 import ensureIndexes  from './db/ensureIndexes.mjs'; // Import the ensureIndexes function
+import { Server } from 'socket.io';
 
 const app = express();
 // Set rate limit (100 requests per 15 minutes)
@@ -14,6 +16,24 @@ const limiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per window
   message: 'Too many requests, please try again later.',
 });
+// setup socket.io
+// Create HTTP server from Express app
+const server = http.createServer(app);
+
+const io = new Server(server,{
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  } 
+});
+io.on('connection', (socket) => {
+  console.log('New client connected:', socket.id);
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
+});
+app.set('io', io); // Make io accessible in routes via req.app.get('io')
 
 // Apply rate limiting to all routes
 app.use(limiter);
