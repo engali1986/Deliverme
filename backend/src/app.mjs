@@ -26,12 +26,20 @@ const io = new Server(server,{
     methods: ['GET', 'POST'],
   } 
 });
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log('New client connected:', socket.id);
+  socket.on('driverStatus', (data) => {
+    console.log('Driver status update:', data);
+    // Broadcast to all connected clients except the sender
+    socket.broadcast.emit('driverStatus', data);
+  });
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });
+});
+server.listen(3001, () => {
+  console.log('Socket.io server listening on port 3001');
 });
 app.set('io', io); // Make io accessible in routes via req.app.get('io')
 

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useEffect, useRef, use } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import LanguageToggle from '../components/LanguageToggle.js';
 import { updateDriverAvailability } from '../services/api.js'; // API helper
 import * as Location from 'expo-location';
 import { jwtDecode } from 'jwt-decode';
+import io from 'socket.io-client';
 
 const DriverHomeScreen = () => {
   const { language } = useContext(LanguageContext);
@@ -32,6 +33,23 @@ const DriverHomeScreen = () => {
   const [cooldownActive, setCooldownActive] = useState(false);
   const COOLDOWN_MS = 10000; // 10s client-side cooldown
   const [requests, setRequests] = useState([]); // current incoming requests list
+  const socketRef = useRef(null);
+  // useEffect for socket.io testing can be added here
+  useEffect(() => {
+    // Initialize socket connection
+    socketRef.current = io('http://10.38.193.200:3001'); // replace with actual backend URL
+    const socket = socketRef.current;
+
+    socket.on('connect', () => {
+      console.log('Socket connected:', socket.id);
+      // Optionally emit drivers current location or status here
+      socket.emit('driverStatus', { id: socket.id, status: 'available' });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     (async () => {
