@@ -19,7 +19,7 @@ import LanguageToggle from '../components/LanguageToggle.js';
 import { updateDriverAvailability } from '../services/api.js'; // API helper
 import * as Location from 'expo-location';
 import { jwtDecode } from 'jwt-decode';
-import io, { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 
 const DriverHomeScreen = () => {
   const { language } = useContext(LanguageContext);
@@ -40,15 +40,15 @@ const DriverHomeScreen = () => {
     socketRef.current = io('http://10.38.193.200:3001'); // replace with actual backend URL
     const socket = socketRef.current;
 
-    socket.on('connect', () => {
-      console.log('Socket connected:', socket.id);
-      // Optionally emit drivers current location or status here
-      socket.emit('driverStatus', { id: socket.id, status: isAvailable });
-    });
+    // socket.on('connect', () => {
+    //   console.log('Socket connected:', socket.id);
+    //   // Optionally emit drivers current location or status here
+    //   socket.emit('driverStatus', { id: socket.id, status: isAvailable });
+    // });
 
-    return () => {
-      socket.disconnect();
-    };
+    // return () => {
+    //   socket.disconnect();
+    // };
   }, []);
 
   useEffect(() => {
@@ -171,7 +171,7 @@ const DriverHomeScreen = () => {
           text1: 'Status updated',
           text2: newValue ? 'You are now available' : 'You are now unavailable',
         });
-        socketRef.current.emit('driverStatus', { id: socketRef.current.id, status: newValue });
+        socketRef.current.emit('driverStatus', { id: socketRef.current.id, status: newValue, location: coords });
         // start client cooldown
         setCooldownActive(true);
         setTimeout(() => setCooldownActive(false), COOLDOWN_MS);
