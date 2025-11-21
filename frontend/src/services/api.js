@@ -29,7 +29,7 @@
  *   - Adjust timeout and error handling as needed for production
 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const BASE_URL = " https://deliverme-el2x.onrender.com/api/auth"; // Replace with your backend's deployed URL if applicable
+const BASE_URL = "https://deliverme-el2x.onrender.com/api/auth"; // Replace with your backend's deployed URL if applicable
 
 // Utility fetch with timeout
 export async function fetchWithTimeout(resource, options = {}, timeout = 10000) {
@@ -178,6 +178,7 @@ export async function driverSignin(data) {
   try {
     const response = await fetchWithTimeout(`${BASE_URL}/driver/signin`, {
       method: "POST",
+      mode: 'no-cors',
       headers: {
         "Content-Type": "application/json",
       },
@@ -265,6 +266,7 @@ export async function updateDriverAvailability(available, coords) {
     console.log("api.js updateDriverAvailability coords:",coords)
     const response = await fetchWithTimeout(`${BASE_URL}/driver/availability`, {
       method: "PATCH",
+      mode: 'no-cors',
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
