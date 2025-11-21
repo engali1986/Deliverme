@@ -37,7 +37,7 @@ const DriverHomeScreen = () => {
   // useEffect for socket.io testing can be added here
   useEffect(() => {
     // Initialize socket connection
-    socketRef.current = io('http://10.38.193.200:3001'); // replace with actual backend URL
+    socketRef.current = io('http://192.168.126.12:3001'); // replace with actual backend URL
     const socket = socketRef.current;
 
     // socket.on('connect', () => {
