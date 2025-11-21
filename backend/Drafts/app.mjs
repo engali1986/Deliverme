@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { connectDB } from './db/connect.mjs';
@@ -6,6 +7,7 @@ import authRoutes from './routes/authRoutes.mjs';
 import logger from './utils/logger.mjs';
 import rateLimit from 'express-rate-limit';
 import ensureIndexes  from './db/ensureIndexes.mjs'; // Import the ensureIndexes function
+import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -17,7 +19,33 @@ const limiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per window
   message: 'Too many requests, please try again later.',
 });
+// setup socket.io
+// Create HTTP server from Express app
+const server = http.createServer(app);
 
+const io = new Server(server,{
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  } 
+});
+io.on('connection', async (socket) => {
+  console.log('New client connected:', socket.id);
+  socket.on('driverStatus', (data) => {
+    console.log('Driver status update:', data);
+    // Broadcast to all connected clients except the sender
+    socket.broadcast.emit('driverStatus', data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
+});
+const socketPort=process.env.SOCKET_PORT
+server.listen(socketPort, () => {
+  console.log('Socket.io server listening on port',socketPort);
+});
+app.set('io', io); // Make io accessible in routes via req.app.get('io')
 
 // Apply rate limiting to all routes
 app.use(limiter);
