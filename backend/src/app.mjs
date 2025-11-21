@@ -8,6 +8,9 @@ import logger from './utils/logger.mjs';
 import rateLimit from 'express-rate-limit';
 import ensureIndexes  from './db/ensureIndexes.mjs'; // Import the ensureIndexes function
 import { Server } from 'socket.io';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 // Set rate limit (100 requests per 15 minutes)
@@ -38,8 +41,9 @@ io.on('connection', async (socket) => {
     console.log('Client disconnected:', socket.id);
   });
 });
-server.listen(3001, () => {
-  console.log('Socket.io server listening on port 3001');
+const socketPort=process.env.SOCKET_PORT
+server.listen(socketPort, () => {
+  console.log('Socket.io server listening on port',socketPort);
 });
 app.set('io', io); // Make io accessible in routes via req.app.get('io')
 

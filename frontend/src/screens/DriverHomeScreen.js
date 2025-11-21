@@ -37,7 +37,7 @@ const DriverHomeScreen = () => {
   // useEffect for socket.io testing can be added here
   useEffect(() => {
     // Initialize socket connection
-    socketRef.current = io('https://deliverme-el2x.onrender.com:3001'); // replace with actual backend URL
+    socketRef.current = io('https://deliverme-el2x.onrender.com'); // replace with actual backend URL
     const socket = socketRef.current;
 
     // socket.on('connect', () => {
