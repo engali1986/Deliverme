@@ -26,6 +26,7 @@ io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
 
   socket.on("driverStatus", (data) => {
+    console.log("Received driverStatus for driver:", socket.id);
     console.log("Driver status:", data);
     socket.broadcast.emit("driverStatus", data);
   });

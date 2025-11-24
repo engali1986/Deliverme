@@ -37,7 +37,7 @@ const DriverHomeScreen = () => {
   // useEffect for socket.io testing can be added here
   useEffect(() => {
     // Initialize socket connection
-    socketRef.current = io('https://deliverme-el2x.onrender.com'); // replace with actual backend URL
+    socketRef.current = io('http://10.158.201.200:5000'); // replace with actual backend URL
     const socket = socketRef.current;
 
     // socket.on('connect', () => {
@@ -171,6 +171,8 @@ const DriverHomeScreen = () => {
           text1: 'Status updated',
           text2: newValue ? 'You are now available' : 'You are now unavailable',
         });
+        // Emit status via socket.io
+        console.log('Emitting driverStatus via socket.io:', { id: socketRef.current.id, status: newValue, location: coords });  
         socketRef.current.emit('driverStatus', { id: socketRef.current.id, status: newValue, location: coords });
         // start client cooldown
         setCooldownActive(true);
