@@ -589,6 +589,8 @@ export async function verifyDriver(req, res, db) {
  * Emits 'availability_updated' to driver's socketId if present.
  */
 export async function updateDriverAvailability(req, res, db) {
+  logger.info('updateDriverAvailability called with body: %o', req.body);
+  logger.info('updateDriverAvailability user: %o', req.user);
   try {
     const database = db || req.app?.locals?.db;
     if (!database) return res.status(500).json({ message: 'Database not initialized' });
