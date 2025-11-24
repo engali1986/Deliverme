@@ -83,6 +83,11 @@ const DriverHomeScreen = () => {
     })();
   }, []);
 
+// useEfeect to log isAvailable changes
+  useEffect(() => {
+    console.log('Driver availability changed for sockket.id', socketRef.current?.id, 'to', isAvailable  );
+  }, [isAvailable]);
+
   const toggleMenu = () => {
     if (menuVisible) {
       Animated.timing(slideAnim, {
