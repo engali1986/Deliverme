@@ -23,6 +23,7 @@
     "expo-localization": "~16.1.5",
     "expo-location": "~18.1.5",
     "expo-status-bar": "~2.2.3",
+    "expo-task-manager": "^14.0.8",
     "firebase": "^11.1.0",
     "i18n-js": "^3.8.0",
     "jwt-decode": "^4.0.0",
