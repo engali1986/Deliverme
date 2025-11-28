@@ -6,7 +6,8 @@ module.exports = ({ config }) => {
       permissions: [
         "INTERNET",
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
       ],
       config: {
         googleMaps: {

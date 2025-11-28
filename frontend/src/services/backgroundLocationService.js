@@ -7,6 +7,7 @@ const LOCATION_TASK_NAME = 'background-location-task';
 const DISTANCE_THRESHOLD = 100; // 100 meters
 
 // Define background task
+if(TaskManager && TaskManager.defineTask ){
 TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   if (error) {
     console.error('Background location error:', error);
@@ -44,6 +45,10 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
     }
   }
 });
+}else{
+  console.warn('TaskManager is not available. Background location tracking will not work.');
+}
+
 
 // Start background location tracking
 export async function startBackgroundLocationTracking() {
