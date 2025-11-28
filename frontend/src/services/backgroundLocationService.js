@@ -52,6 +52,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
 
 // Start background location tracking
 export async function startBackgroundLocationTracking() {
+  console.log('Starting background location tracking...');
   try {
     const isTaskDefined = TaskManager.isTaskDefined(LOCATION_TASK_NAME);
     if (!isTaskDefined) {
