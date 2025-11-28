@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useEffect, useRef, use } from 'react';
 import {
   View,
   Text,
@@ -16,8 +16,7 @@ import Toast from 'react-native-toast-message';
 import { LanguageContext } from '../context/LanguageContext.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LanguageToggle from '../components/LanguageToggle.js';
-import { updateDriverAvailability } from '../services/api.js';
-import { startBackgroundLocationTracking, stopBackgroundLocationTracking } from '../services/backgroundLocationService.js';
+import { updateDriverAvailability } from '../services/api.js'; // API helper
 import * as Location from 'expo-location';
 import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
@@ -28,107 +27,66 @@ const DriverHomeScreen = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(-250));
 
+  // availability + cooldown + requests
   const [isAvailable, setIsAvailable] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [cooldownActive, setCooldownActive] = useState(false);
-  const COOLDOWN_MS = 10000;
-  const [requests, setRequests] = useState([]);
-
+  const COOLDOWN_MS = 10000; // 10s client-side cooldown
+  const [requests, setRequests] = useState([]); // current incoming requests list
   const socketRef = useRef(null);
-  const driverIdRef = useRef(null);
-
-  // Initialize Socket.IO
+  // useEffect for socket.io testing can be added here
   useEffect(() => {
-    socketRef.current = io('http://10.158.201.200:5000', {
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      reconnectionAttempts: 5,
-    });
+    // Initialize socket connection
+    socketRef.current = io('http://10.158.201.200:5000'); // replace with actual backend URL
+    const socket = socketRef.current;
 
-    socketRef.current.on('connect', () => {
-      console.log('Socket connected:', socketRef.current.id);
-      // Register driver if available
-      if (driverIdRef.current && isAvailable) {
-        socketRef.current.emit('driver:register', { driverId: driverIdRef.current });
-      }
-    });
+    // socket.on('connect', () => {
+    //   console.log('Socket connected:', socket.id);
+    //   // Optionally emit drivers current location or status here
+    //   socket.emit('driverStatus', { id: socket.id, status: isAvailable });
+    // });
 
-    socketRef.current.on('new_ride', (data) => {
-      console.log('New ride request:', data);
-      setRequests((prev) => [...prev, data]);
-      Toast.show({
-        type: 'success',
-        text1: 'New Ride Request!',
-        text2: `Pickup: ${data.pickupLocation?.address || 'Unknown'}`,
-      });
-    });
-
-    socketRef.current.on('disconnect', () => {
-      console.log('Socket disconnected');
-    });
-
-    return () => {
-      socketRef.current?.disconnect();
-    };
+    // return () => {
+    //   socket.disconnect();
+    // };
   }, []);
 
-  // Initialize permissions and load state
   useEffect(() => {
     (async () => {
+      // Request location permission on mount
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Toast.show({
+          type: 'error',
+          text1: 'Location permission required',
+          text2: 'Enable location to use this feature.',
+        });
+        return; // Stop initialization if permission is not granted
+      }
+      // Get userId from token from AsyncStorage if needed
+      const token = await AsyncStorage.getItem('userToken');
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+      console.log('DriverHomeScreen: decoded token:', decoded);
+      console.log('DriverHomeScreen: userId from token:', userId);
+    
+
+      // load saved availability from AsyncStorage
       try {
-        // Request foreground + background location permissions
-        const { status: fgStatus } = await Location.requestForegroundPermissionsAsync();
-        const bgStatus = await requestBackgroundLocationPermission();
-
-        if (fgStatus !== 'granted' || bgStatus !== 'granted') {
-          console.warn('DriverHomeScreen Location permissions not granted');
-        }
-
-        // Get driver ID from token
-        const token = await AsyncStorage.getItem('userToken');
-        if (token) {
-          const decoded = jwtDecode(token);
-          const driverId = decoded.id || decoded.sub;
-          driverIdRef.current = driverId;
-          console.log('DriverHomeScreen: driverId:', driverId);
-
-          // Register with socket
-          if (socketRef.current) {
-            socketRef.current.emit('driver:register', { driverId });
-          }
-        }else{
-          console.warn('DriverHomeScreen: No user token found');
-        }
-
-        // Load saved availability
         const saved = await AsyncStorage.getItem('driverAvailable');
-        if (saved === 'true') {
-          setIsAvailable(true);
-          // Start background tracking if was available
-          await startBackgroundLocationTracking();
-        }
+        if (saved !== null) setIsAvailable(saved === 'true');
+        // optionally fetch current pending requests for driver here
+        // fetchDriverRequests() ...
       } catch (e) {
-        console.warn('DriverHomeScreen init error:', e);
+        console.warn('DriverHomeScreen: could not load availability', e);
       }
     })();
-
-    // Cleanup on unmount
-    return () => {
-      stopBackgroundLocationTracking().catch(console.warn);
-    };
   }, []);
 
-  // Request background location permission (Android 11+)
-  const requestBackgroundLocationPermission = async () => {
-    try {
-      const { status } = await Location.requestBackgroundPermissionsAsync();
-      return status === 'granted';
-    } catch (e) {
-      console.warn('Background location permission request failed:', e);
-      return false;
-    }
-  };
+// useEfeect to log isAvailable changes
+  useEffect(() => {
+    console.log('Driver availability changed for sockket.id', socketRef.current?.id, 'to', isAvailable  );
+  }, [isAvailable]);
 
   const toggleMenu = () => {
     if (menuVisible) {
@@ -149,11 +107,6 @@ const DriverHomeScreen = () => {
 
   const handleLogout = async () => {
     try {
-      // Turn off availability before logout
-      if (isAvailable) {
-        await updateDriverAvailability(false, null);
-        await stopBackgroundLocationTracking();
-      }
       await AsyncStorage.clear();
       Toast.show({
         type: 'success',
@@ -179,7 +132,7 @@ const DriverHomeScreen = () => {
 
     setUpdating(true);
     try {
-      // Request location permission
+      // Request location permission first
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         Toast.show({
@@ -188,7 +141,7 @@ const DriverHomeScreen = () => {
           text2: 'Enable location to update availability.',
         });
         setUpdating(false);
-        return;
+        return; // exit early if permission denied
       }
 
       // Get current position
@@ -211,45 +164,30 @@ const DriverHomeScreen = () => {
         longitude: loc.coords.longitude,
       };
 
-      // Call backend API
-      const result = await updateDriverAvailability(newValue, coords);
+      // include location when calling backend
+      const result = await updateDriverAvailability(newValue, coords); // backend call
 
+      // Expecting { ok: true, available: boolean } or similar
       if (result && (result.ok === true || result.available === newValue)) {
         setIsAvailable(newValue);
         await AsyncStorage.setItem('driverAvailable', newValue ? 'true' : 'false');
-
         Toast.show({
           type: 'success',
           text1: 'Status updated',
           text2: newValue ? 'You are now available' : 'You are now unavailable',
         });
-
-        // Emit to socket
-        if (socketRef.current && driverIdRef.current) {
-          socketRef.current.emit('driverStatus', {
-            driverId: driverIdRef.current,
-            status: newValue,
-            location: coords,
-          });
-        }
-
-        // Start/stop background location tracking
-        if (newValue === true) {
-          const started = await startBackgroundLocationTracking();
-          if (!started) {
-            Toast.show({
-              type: 'error',
-              text1: 'Background location failed',
-              text2: 'Could not start background tracking',
-            });
-          }
-        } else {
-          await stopBackgroundLocationTracking();
-        }
-
+        // Emit status via socket.io
+        console.log('Emitting driverStatus via socket.io:', { id: socketRef.current.id, status: newValue, location: coords });  
+        socketRef.current.emit('driverStatus', { id: socketRef.current.id, status: newValue, location: coords });
+        // start client cooldown
         setCooldownActive(true);
         setTimeout(() => setCooldownActive(false), COOLDOWN_MS);
-        setRequests([]);
+
+        if (newValue===true) {
+          setRequests([]); // keep empty until server pushes requests
+        } else {
+          setRequests([]); // hide requests when unavailable
+        }
       } else {
         throw new Error(result?.message || 'Update failed');
       }
@@ -265,15 +203,13 @@ const DriverHomeScreen = () => {
     <View style={styles.requestItem}>
       <Text style={styles.requestTitle}>{item.title || 'Ride Request'}</Text>
       <Text style={styles.requestText}>{item.pickupAddress || item.pickup || 'Pickup unknown'}</Text>
-      <Text style={styles.requestText}>Fare: ₹{item.fare ?? '—'}</Text>
-      <TouchableOpacity style={styles.acceptButton}>
-        <Text style={styles.acceptButtonText}>Accept Ride</Text>
-      </TouchableOpacity>
+      <Text style={styles.requestText}>Fare: {item.fare ?? '—'}</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
+      {/* Top row: menu button at left and wide availability switch filling remaining width */}
       <View style={styles.topRow}>
         <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
           <Ionicons name="menu" size={26} color="#fff" />
@@ -281,16 +217,13 @@ const DriverHomeScreen = () => {
 
         <View style={styles.switchContainer}>
           <View style={[styles.switchWrapper, isAvailable ? styles.switchWrapperActive : null]}>
-            <WideToggle
-              value={isAvailable}
-              onValueChange={onToggleAvailability}
-              disabled={updating || cooldownActive}
-            />
+            <WideToggle value={isAvailable} onValueChange={onToggleAvailability} disabled={updating || cooldownActive} />
           </View>
           {updating && <ActivityIndicator size="small" color="#1565C0" style={{ marginTop: 6 }} />}
         </View>
       </View>
 
+      {/* Instruction or requests area below top row */}
       <View style={styles.infoBox}>
         {!isAvailable ? (
           <Text style={styles.instructionText}>
@@ -304,10 +237,12 @@ const DriverHomeScreen = () => {
             keyExtractor={(item, idx) => item.id ?? String(idx)}
             renderItem={renderRequestItem}
             style={styles.requestsList}
+            ListEmptyComponent={<Text style={styles.noRequestsText}>No current requests</Text>}
           />
         )}
       </View>
 
+      {/* existing side menu overlay / animated menu */}
       {menuVisible && (
         <TouchableWithoutFeedback onPress={toggleMenu}>
           <View style={styles.overlay} />
@@ -332,7 +267,7 @@ const DriverHomeScreen = () => {
   );
 };
 
-// --- WideToggle Component ---
+// --- Updated WideToggle component (labels centered) ---
 const WideToggle = ({ value, onValueChange, disabled }) => {
   const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
   const [trackWidth, setTrackWidth] = useState(0);
@@ -369,15 +304,22 @@ const WideToggle = ({ value, onValueChange, disabled }) => {
     >
       <Animated.View style={[styles.wideToggleTrack, { backgroundColor: bgColor }]} />
 
+      {/* centered labels */}
       <Animated.Text
-        style={[styles.wideToggleLabel, { opacity: offlineOpacity, color: '#0D47A1' }]}
+        style={[
+          styles.wideToggleLabel,
+          { opacity: offlineOpacity, color: '#0D47A1' },
+        ]}
         numberOfLines={1}
       >
         OFFLINE
       </Animated.Text>
 
       <Animated.Text
-        style={[styles.wideToggleLabel, { opacity: onlineOpacity, color: '#fff' }]}
+        style={[
+          styles.wideToggleLabel,
+          { opacity: onlineOpacity, color: '#fff' },
+        ]}
         numberOfLines={1}
       >
         ONLINE
@@ -400,6 +342,7 @@ const WideToggle = ({ value, onValueChange, disabled }) => {
     </TouchableOpacity>
   );
 };
+// --- end WideToggle ---
 
 const styles = StyleSheet.create({
   container: {
@@ -412,6 +355,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
+    // no space-between: menu left, switch fills remaining space
     marginBottom: 18,
   },
   menuButton: {
@@ -420,11 +364,13 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginRight: 12,
   },
+  // NEW: container that takes remaining width
   switchContainer: {
     flex: 1,
     alignItems: 'flex-end',
     justifyContent: 'center',
   },
+  // switchWrapper now stretches to remaining width
   switchWrapper: {
     width: '100%',
     maxWidth: 420,
@@ -439,6 +385,10 @@ const styles = StyleSheet.create({
   },
   switchWrapperActive: {
     backgroundColor: '#E3F2FD',
+  },
+  switch: {
+    alignSelf: 'flex-end',
+    transform: [{ scaleX: 1.8 }, { scaleY: 1.4 }], // make switch visually wider
   },
   infoBox: {
     marginTop: 6,
@@ -481,19 +431,8 @@ const styles = StyleSheet.create({
   requestText: {
     color: '#1565C0',
     fontSize: 14,
-    marginBottom: 4,
   },
-  acceptButton: {
-    marginTop: 8,
-    backgroundColor: '#1565C0',
-    paddingVertical: 10,
-    borderRadius: 6,
-  },
-  acceptButtonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: '600',
-  },
+
   sideMenu: {
     position: 'absolute',
     left: 0,
@@ -559,6 +498,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#fff',
   },
+  // CENTERED label style
   wideToggleLabel: {
     position: 'absolute',
     left: 0,
