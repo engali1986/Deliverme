@@ -75,7 +75,12 @@ export async function startBackgroundLocationTracking() {
         notificationBody: 'Your location is being tracked for ride requests.',
         notificationColor: '#1565C0',
       },
-    });
+    }).then((res) => {
+      console.log('Location updates started successfully');
+      console.log(res);
+    }).catch((e) => {
+      console.error('Error starting location updates:', e);
+    })
 
     console.log('Background location tracking started');
     return true;
