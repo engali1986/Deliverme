@@ -36,7 +36,16 @@
     },
     "plugins": [
       "expo-font",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Deliverme to use your location.",
+          "locationWhenInUsePermission": "Allow Deliverme to use your location while you are using the app.",
+          "isAndroidBackgroundLocationEnabled": true,
+         "isAndroidForegroundServiceEnabled": true
+        }
+      ]
     ],
     "extra": {
       "eas": {
