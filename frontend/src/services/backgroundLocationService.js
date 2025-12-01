@@ -88,6 +88,7 @@ export async function startBackgroundLocationTracking() {
     console.error('Failed to start background location:', e);
     return false;
   }
+  
 }
 
 // Stop background location tracking
