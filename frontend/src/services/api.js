@@ -29,7 +29,7 @@
  *   - Adjust timeout and error handling as needed for production
 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const BASE_URL = "http://10.110.22.200:5000/api/auth"; // Replace with your backend's deployed URL if applicable
+const BASE_URL = "https://deliverme-el2x.onrender.com/api/auth"; // Replace with your backend's deployed URL if applicable
 
 // Utility fetch with timeout
 export async function fetchWithTimeout(resource, options = {}, timeout = 10000) {
