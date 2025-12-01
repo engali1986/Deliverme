@@ -2,7 +2,7 @@ import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location'; // Changed from expo-background-location
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { updateDriverLocation } from './api.js';
-
+import { addLog } from '../utils/Logger.js';
 const LOCATION_TASK_NAME = 'background-location-task';
 const DISTANCE_THRESHOLD = 100; // 100 meters
 
@@ -33,6 +33,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         };
 
         console.log('Background task: location update', coords);
+        addLog(`Background location update: ${JSON.stringify(coords)}`, 'info');
 
         // Send to backend
         // const result = await updateDriverLocation(coords);

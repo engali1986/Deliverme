@@ -16,7 +16,7 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Clipboard from "expo-clipboard";
+// import * as Clipboard from "expo-clipboard";
 
 
 const STORAGE_KEY = "DEV_LOGS";
@@ -97,11 +97,11 @@ const LogViewer = forwardRef((props, ref) => {
   });
 
   // Copy logs to clipboard
-  const copyLogs = async () => {
-    const allText = filteredLogs.map((log) => log.text).join("\n");
-    await Clipboard.setStringAsync(allText);
-    Alert.alert("Copied!", "Logs have been copied to clipboard.");
-  };
+  // const copyLogs = async () => {
+  //   const allText = filteredLogs.map((log) => log.text).join("\n");
+  //   await Clipboard.setStringAsync(allText);
+  //   Alert.alert("Copied!", "Logs have been copied to clipboard.");
+  // };
 
  
   return (
@@ -136,9 +136,9 @@ const LogViewer = forwardRef((props, ref) => {
       />
 
       {/* Action buttons */}
-      <View style={styles.actionRow}>
+      {/* <View style={styles.actionRow}>
         <Button title="Copy Logs" onPress={copyLogs} />
-      </View>
+      </View> */}
 
       {/* Log display */}
       <ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContent}>

@@ -21,6 +21,7 @@ import { startBackgroundLocationTracking, stopBackgroundLocationTracking } from 
 import * as Location from 'expo-location';
 import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
+import LogViewer from '../components/LogViewer.js';
 
 const DriverHomeScreen = () => {
   const { language } = useContext(LanguageContext);
@@ -36,6 +37,7 @@ const DriverHomeScreen = () => {
 
   const socketRef = useRef(null);
   const driverIdRef = useRef(null);
+  const logRef = useRef(null);
 
   // Initialize Socket.IO
   useEffect(() => {
@@ -313,6 +315,7 @@ const DriverHomeScreen = () => {
             style={styles.requestsList}
           />
         )}
+        <LogViewer ref={logRef}/> 
       </View>
 
       {menuVisible && (
