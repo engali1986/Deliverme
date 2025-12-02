@@ -14,7 +14,6 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-  DeviceEventEmitter,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as Clipboard from "expo-clipboard";
@@ -42,8 +41,6 @@ const LogViewer = forwardRef((props, ref) => {
       }
     };
     loadLogs();
-
-
   }, []);
 
   // Save logs whenever they change + auto-scroll
@@ -61,22 +58,6 @@ const LogViewer = forwardRef((props, ref) => {
       scrollRef.current.scrollToEnd({ animated: true });
     }
   }, [logs]);
-  // Listen for external log events
-  useEffect(() => {
-  const subNew = DeviceEventEmitter.addListener("newLog", (entry) => {
-    setLogs((prev) => [...prev, entry]);
-  });
-  const subClear = DeviceEventEmitter.addListener("clearLogs", () => {
-    setLogs([]);
-  });
-
-  return () => {
-    subNew.remove();
-    subClear.remove();
-  };
-}, []);
-
-
 
   // Expose methods to parent
   useImperativeHandle(ref, () => ({

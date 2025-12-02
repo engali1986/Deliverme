@@ -1,6 +1,5 @@
 // logger.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { DeviceEventEmitter } from "react-native";
 
 const STORAGE_KEY = "DEV_LOGS";
 
@@ -14,9 +13,6 @@ export async function addLog(message, level = "info") {
     logs.push(entry);
 
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-
-    // 🔔 Broadcast to listeners
-    DeviceEventEmitter.emit("newLog", entry);
   } catch (err) {
     console.warn("Failed to add log:", err);
   }
@@ -25,7 +21,6 @@ export async function addLog(message, level = "info") {
 export async function clearLogs() {
   try {
     await AsyncStorage.removeItem(STORAGE_KEY);
-    DeviceEventEmitter.emit("clearLogs");
   } catch (err) {
     console.warn("Failed to clear logs:", err);
   }
