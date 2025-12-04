@@ -41,7 +41,7 @@ const DriverHomeScreen = () => {
 
   // Initialize Socket.IO
   useEffect(() => {
-    socketRef.current = io('https://deliverme-el2x.onrender.com', {
+    socketRef.current = io('http://10.110.22.200:5000', {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
