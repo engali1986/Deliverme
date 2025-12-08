@@ -20,6 +20,7 @@ import { updateDriverAvailability } from '../services/api.js';
 import { startBackgroundLocationTracking, stopBackgroundLocationTracking } from '../services/backgroundLocationService.js';
 import * as Location from 'expo-location';
 import { jwtDecode } from 'jwt-decode';
+import io from 'socket.io-client';
 import LogViewer from '../components/LogViewer.js';
 
 const DriverHomeScreen = () => {
@@ -34,10 +35,45 @@ const DriverHomeScreen = () => {
   const COOLDOWN_MS = 10000;
   const [requests, setRequests] = useState([]);
 
+  const socketRef = useRef(null);
   const driverIdRef = useRef(null);
   const logRef = useRef(null);
 
+  // Initialize Socket.IO
+  useEffect(() => {
+    socketRef.current = io('http://10.110.22.200:5000', {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+    });
 
+    socketRef.current.on('connect', () => {
+      console.log('Socket connected:', socketRef.current.id);
+      // Register driver if available
+      if (driverIdRef.current && isAvailable) {
+        socketRef.current.emit('driver:register', { driverId: driverIdRef.current });
+      }
+    });
+
+    socketRef.current.on('new_ride', (data) => {
+      console.log('New ride request:', data);
+      setRequests((prev) => [...prev, data]);
+      Toast.show({
+        type: 'success',
+        text1: 'New Ride Request!',
+        text2: `Pickup: ${data.pickupLocation?.address || 'Unknown'}`,
+      });
+    });
+
+    socketRef.current.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, []);
 
   // Initialize permissions and load state
   useEffect(() => {
@@ -66,7 +102,10 @@ const DriverHomeScreen = () => {
           driverIdRef.current = driverId;
           console.log('DriverHomeScreen: driverId:', driverId);
 
-          
+          // Register with socket
+          if (socketRef.current) {
+            socketRef.current.emit('driver:register', { driverId });
+          }
         }else{
           console.warn('DriverHomeScreen: No user token found');
         }
@@ -194,6 +233,14 @@ const DriverHomeScreen = () => {
           text2: newValue ? 'You are now available' : 'You are now unavailable',
         });
 
+        // Emit to socket
+        if (socketRef.current && driverIdRef.current) {
+          socketRef.current.emit('driverStatus', {
+            driverId: driverIdRef.current,
+            status: newValue,
+            location: coords,
+          });
+        }
 
         // Start/stop background location tracking
         if (newValue === true) {
