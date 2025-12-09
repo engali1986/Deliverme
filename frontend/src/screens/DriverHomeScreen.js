@@ -21,6 +21,7 @@ import { startBackgroundLocationTracking, stopBackgroundLocationTracking } from 
 import * as Location from 'expo-location';
 import { jwtDecode } from 'jwt-decode';
 import LogViewer from '../components/LogViewer.js';
+import { initSocket, getSocket, closeSocket } from '../services/socket.js';
 
 const DriverHomeScreen = () => {
   const { language } = useContext(LanguageContext);
@@ -43,6 +44,8 @@ const DriverHomeScreen = () => {
   useEffect(() => {
     (async () => {
       try {
+        // Initialize socket connection
+        await initSocket();
         // Request foreground + background location permissions
         const { status: fgStatus } = await Location.requestForegroundPermissionsAsync().then(res=>{
           console.log('DriverHomeScreen Foreground location permission status:', res.status);
@@ -77,6 +80,10 @@ const DriverHomeScreen = () => {
           setIsAvailable(true);
           // Start background tracking if was available
           await startBackgroundLocationTracking();
+          const socket = getSocket();
+          if (socket && driverIdRef.current) {
+            socket.emit('driver:register', { driverId: driverIdRef.current, isAvailable: true });
+          }
         }
       } catch (e) {
         console.warn('DriverHomeScreen init error:', e);
@@ -107,6 +114,7 @@ const DriverHomeScreen = () => {
         duration: 300,
         useNativeDriver: true,
       }).start(() => setMenuVisible(false));
+
     } else {
       setMenuVisible(true);
       Animated.timing(slideAnim, {
@@ -204,9 +212,14 @@ const DriverHomeScreen = () => {
               text1: 'Background location failed',
               text2: 'Could not start background tracking',
             });
+            setIsAvailable(false);
+            await AsyncStorage.setItem("driverAvailable", "false");
+            return;
           }
+          if (socket) socket.emit("driver:availability", { driverId: driverIdRef.current, isAvailable: true });
         } else {
           await stopBackgroundLocationTracking();
+          if (socket) socket.emit("driver:availability", { driverId: driverIdRef.current, isAvailable: false });
         }
 
         setCooldownActive(true);
