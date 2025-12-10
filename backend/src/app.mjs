@@ -7,6 +7,7 @@ import logger from './utils/logger.mjs';
 import rateLimit from 'express-rate-limit';
 import ensureIndexes  from './db/ensureIndexes.mjs'; // Import the ensureIndexes function
 import dotenv from 'dotenv';
+import Redis from 'ioredis';
 
 dotenv.config();
 
@@ -45,6 +46,20 @@ connectDB().then(async(client) => {
 });
 // Routes
 app.use('/api/auth', authRoutes);
+// Redis test route
+app.get('/api/redis-test', async (req, res) => {
+  try {
+    const redis = new Redis(process.env.REDIS_HOST);
+    await redis.set('test-key', 'Hello, Redis!'); // Set a test key
+    const value = await redis.get('test-key'); // Get the test key
+    res.json({ message: 'Redis is working!', value });
+    redis.disconnect();
+  } catch (error) {
+    logger.error('Redis error: %s', error.message);
+    res.status(500).json({ message: 'Redis error', error: error.message });
+  }
+});
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   logger.error('Unhandled error: %s', err.message);
