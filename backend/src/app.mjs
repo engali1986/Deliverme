@@ -47,18 +47,54 @@ connectDB().then(async(client) => {
 // Routes
 app.use('/api/auth', authRoutes);
 // Redis test route
-app.get('/api/redis-test', async (req, res) => {
+// This route connects to Redis, stores 100 items, and returns a success message.
+app.get('/api/redis-store', async (req, res) => {
   try {
     const redis = new Redis(process.env.REDIS_HOST);
-    await redis.set('test-key', 'Hello, Redis!'); // Set a test key
-    const value = await redis.get('test-key'); // Get the test key
-    res.json({ message: 'Redis is working!', value });
+
+    // Store 100 items
+    const setPromises = [];
+    for (let i = 1; i <= 100; i++) {
+      setPromises.push(redis.set(`test-key-${i}`, `Hello, Redis ${i}`));
+    }
+    await Promise.all(setPromises);
+
+    res.json({ message: 'Stored 100 items in Redis!' });
+
     redis.disconnect();
   } catch (error) {
-    logger.error('Redis error: %s', error.message);
-    res.status(500).json({ message: 'Redis error', error: error.message });
+    logger.error('Redis store error: %s', error.message);
+    res.status(500).json({ message: 'Redis store error', error: error.message });
   }
 });
+// This route connects to Redis, retrieves the 100 stored items, and returns them in the response.
+app.get('/api/redis-get', async (req, res) => {
+  try {
+    const redis = new Redis(process.env.REDIS_HOST);
+
+    // Retrieve all 100 items
+    const getPromises = [];
+    for (let i = 1; i <= 100; i++) {
+      getPromises.push(redis.get(`test-key-${i}`));
+    }
+    const values = await Promise.all(getPromises);
+
+    // Format response
+    const result = values.map((value, i) => ({
+      key: `test-key-${i + 1}`,
+      value,
+    }));
+
+    res.json({ message: 'Fetched 100 items from Redis!', data: result });
+
+    redis.disconnect();
+  } catch (error) {
+    logger.error('Redis get error: %s', error.message);
+    res.status(500).json({ message: 'Redis get error', error: error.message });
+  }
+});
+
+
 
 // Global Error Handler
 app.use((err, req, res, next) => {
