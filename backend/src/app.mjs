@@ -49,24 +49,47 @@ app.use('/api/auth', authRoutes);
 // Redis test route
 // This route connects to Redis, stores 100 items, and returns a success message.
 app.get('/api/redis-store', async (req, res) => {
+  const start = process.hrtime();
+
   try {
-    const redis = new Redis(process.env.REDIS_HOST);
+    const redis = new Redis(process.env.REDIS_URL);
 
-    // Store 100 items
-    const setPromises = [];
-    for (let i = 1; i <= 100; i++) {
-      setPromises.push(redis.set(`test-key-${i}`, `Hello, Redis ${i}`));
+    const TOTAL = 10_000_000;
+    const BATCH_SIZE = 5_000;
+
+    for (let i = 1; i <= TOTAL; i += BATCH_SIZE) {
+      const pipeline = redis.pipeline();
+
+      for (let j = i; j < i + BATCH_SIZE && j <= TOTAL; j++) {
+        pipeline.set(`test-key-${j}`, `Hello Redis ${j}`);
+      }
+
+      await pipeline.exec();
+
+      if (i % 100_000 === 0) {
+        console.log(`Stored ${i} records`);
+      }
     }
-    await Promise.all(setPromises);
-
-    res.json({ message: 'Stored 100 items in Redis!' });
 
     redis.disconnect();
+
+    const diff = process.hrtime(start);
+    const timeTakenMs = diff[0] * 1000 + diff[1] / 1e6;
+
+    res.json({
+      message: 'Stored 10 million items successfully',
+      timeMs: timeTakenMs.toFixed(2)
+    });
+
   } catch (error) {
-    logger.error('Redis store error: %s', error.message);
-    res.status(500).json({ message: 'Redis store error', error: error.message });
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 });
+
+
+
+
 // This route connects to Redis, retrieves the 100 stored items, and returns them in the response.
 app.get('/api/redis-get', async (req, res) => {
   try {
