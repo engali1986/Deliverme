@@ -1,3 +1,42 @@
+/**
+ * DriverHomeScreen.js
+ * 
+ * This file defines the `DriverHomeScreen` component, which serves as the home screen for drivers in the app.
+ * It includes functionality for managing driver availability, handling ride requests, and interacting with the backend.
+ * 
+ * Functions:
+ * 
+ * 1. **requestBackgroundLocationPermission**:
+ *    - Requests background location permissions from the user (specific to Android 11+).
+ * 
+ * 2. **toggleMenu**:
+ *    - Toggles the visibility of the side menu with an animation.
+ * 
+ * 3. **handleLogout**:
+ *    - Logs the user out by clearing stored data, stopping background location tracking, and navigating to the home screen.
+ * 
+ * 4. **onToggleAvailability**:
+ *    - Toggles the driver's availability status, updates the backend, and starts/stops background location tracking.
+ * 
+ * 5. **renderRequestItem**:
+ *    - Renders individual ride request items in the list of requests.
+ * 
+ * 6. **WideToggle**:
+ *    - A custom toggle switch component used to display and toggle the driver's availability status.
+ * 
+ * 7. **useEffect (Initialization)**:
+ *    - Handles initialization tasks such as requesting permissions, setting up the socket connection, and loading saved state.
+ * 
+ * 8. **useEffect (Cleanup)**:
+ *    - Cleans up resources (e.g., stops background location tracking) when the component is unmounted.
+ * 
+ * Components:
+ * - **DriverHomeScreen**:
+ *   - The main component that renders the UI, including the availability toggle, ride requests, and side menu.
+ * - **WideToggle**:
+ *   - A reusable toggle switch component for managing availability.
+ */
+
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import {
   View,

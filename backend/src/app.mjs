@@ -7,7 +7,7 @@ import logger from './utils/logger.mjs';
 import rateLimit from 'express-rate-limit';
 import ensureIndexes  from './db/ensureIndexes.mjs'; // Import the ensureIndexes function
 import dotenv from 'dotenv';
-import Redis from 'ioredis';
+
 
 dotenv.config();
 
@@ -46,78 +46,6 @@ connectDB().then(async(client) => {
 });
 // Routes
 app.use('/api/auth', authRoutes);
-// Redis test route
-// This route connects to Redis, stores 100 items, and returns a success message.
-app.get('/api/redis-store', async (req, res) => {
-  const start = process.hrtime();
-
-  try {
-    const redis = new Redis(process.env.REDIS_URL);
-
-    const TOTAL = 10_000_000;
-    const BATCH_SIZE = 5_000;
-
-    for (let i = 1; i <= TOTAL; i += BATCH_SIZE) {
-      const pipeline = redis.pipeline();
-
-      for (let j = i; j < i + BATCH_SIZE && j <= TOTAL; j++) {
-        pipeline.set(`test-key-${j}`, `Hello Redis ${j}`);
-      }
-
-      await pipeline.exec();
-
-      if (i % 100_000 === 0) {
-        console.log(`Stored ${i} records`);
-      }
-    }
-
-    redis.disconnect();
-
-    const diff = process.hrtime(start);
-    const timeTakenMs = diff[0] * 1000 + diff[1] / 1e6;
-
-    res.json({
-      message: 'Stored 10 million items successfully',
-      timeMs: timeTakenMs.toFixed(2)
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-
-
-
-// This route connects to Redis, retrieves the 100 stored items, and returns them in the response.
-app.get('/api/redis-get', async (req, res) => {
-  try {
-    const redis = new Redis(process.env.REDIS_HOST);
-
-    // Retrieve all 100 items
-    const getPromises = [];
-    for (let i = 1; i <= 100; i++) {
-      getPromises.push(redis.get(`test-key-${i}`));
-    }
-    const values = await Promise.all(getPromises);
-
-    // Format response
-    const result = values.map((value, i) => ({
-      key: `test-key-${i + 1}`,
-      value,
-    }));
-
-    res.json({ message: 'Fetched 100 items from Redis!', data: result });
-
-    redis.disconnect();
-  } catch (error) {
-    logger.error('Redis get error: %s', error.message);
-    res.status(500).json({ message: 'Redis get error', error: error.message });
-  }
-});
-
-
 
 // Global Error Handler
 app.use((err, req, res, next) => {
