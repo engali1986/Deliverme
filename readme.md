@@ -1,38 +1,41 @@
 # DeliverMe - Ride Sharing App
 
-DeliverMe is a ride-sharing mobile application, built using **React Native** (frontend) and **Node.js with Express and MongoDB** (backend). The app supports **driver and client accounts**, allows users to **sign up, verify their email, request rides**, and integrates **Google Drive API for storing driver documents**.
+DeliverMe is a ride-sharing mobile application built using **React Native** (frontend) and **Node.js with Express and MongoDB** (backend). The app supports **driver and client accounts**, allows users to **sign up, verify their email, request rides**, and integrates **Google Drive API for storing driver documents**. It also includes **background location tracking** for drivers and real-time ride updates using **Socket.IO**.
 
 ---
 
 ## 🚀 Features
 
 ### **Client Features**
-- ✅ Sign Up & Login (with Email Verification)
-- ✅ Request a Ride (choose pickup: current location or map, choose destination from map, offer fare)
-- ✅ Interactive Map (shows user location, custom marker with address, custom compass/North button)
-- ✅ Multi-language Support (English & Arabic)
-- ✅ Side Menu (completed rides, settings, language toggle, logout)
-- ✅ Toast notifications for actions/errors
+- ✅ **Sign Up & Login**: Clients can create accounts and log in securely.
+- ✅ **Request a Ride**: Choose pickup location (current location or map), destination, and offer fare.
+- ✅ **Interactive Map**: Displays user location, custom marker with address, and compass/North button.
+- ✅ **Multi-language Support**: Instantly switch between English and Arabic.
+- ✅ **Side Menu**: Access completed rides, settings, language toggle, and logout.
+- ✅ **Toast Notifications**: Provides feedback for actions and errors.
 
 ### **Driver Features**
-- ✅ Sign Up with Required Documents (license, registration, criminal record, personal photo)
-- ✅ Email Verification via Code
-- ✅ Upload and manage documents (Google Drive integration)
-- ✅ Login and access driver dashboard
-- ✅ Side Menu and logout
+- ✅ **Sign Up with Required Documents**: Drivers upload license, registration, criminal record, and personal photo.
+- ✅ **Email Verification**: Drivers verify their email via a code.
+- ✅ **Login and Dashboard**: Access driver dashboard with ride requests.
+- ✅ **Background Location Tracking**: Tracks driver location every 100 meters while online.
+- ✅ **Real-time Ride Updates**: Receive ride requests via Socket.IO.
+- ✅ **Side Menu**: Access settings, language toggle, and logout.
 
 ### **Backend Features**
-- ✅ REST API for authentication, ride requests, and document upload
-- ✅ JWT-based authentication
-- ✅ MongoDB for data storage
-- ✅ Google Drive API for driver document storage
-- ✅ Email verification for both clients and drivers
-- ✅ Winston logging
+- ✅ **REST API**: Handles authentication, ride requests, and document uploads.
+- ✅ **JWT-based Authentication**: Secure token-based authentication for clients and drivers.
+- ✅ **MongoDB Integration**: Stores user data, ride requests, and driver documents.
+- ✅ **Google Drive API**: Stores driver documents securely.
+- ✅ **Email Verification**: Sends verification codes for account activation.
+- ✅ **Socket.IO Integration**: Enables real-time ride updates for drivers.
+- ✅ **Winston Logging**: Logs server activity for debugging and monitoring.
 
 ---
 
 ## 📂 Project Structure
 
+### **Frontend**
 ```
 DeliverMe/
 │
