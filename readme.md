@@ -40,36 +40,62 @@ DeliverMe is a ride-sharing mobile application built using **React Native** (fro
 DeliverMe/
 │
 ├── backend/
-│   ├── server.mjs
-│   ├── .env
-│   ├── DriveServiceAccount.json
-│   ├── app.log
-│   ├── package.json
-│   ├── Drafts/                # React Native screen drafts and controller drafts
-│   └── src/                   # Main backend source code (controllers, routes, etc.)
+│   ├── server.mjs                # Main server file for backend
+│   ├── .env                      # Environment variables for backend
+│   ├── DriveServiceAccount.json  # Google Drive API credentials
+│   ├── package.json              # Backend dependencies and scripts
+│   ├── Drafts/                   # Draft files for development
+│   │   ├── api.js                # Draft API implementation
+│   │   ├── app.config.json       # Draft app configuration
+│   │   ├── ClientHomeScreen.js   # Draft client home screen logic
+│   │   ├── DriverHomeScreen.js   # Draft driver home screen logic
+│   │   └── ...other files        # Additional draft files
+│   └── src/                      # Main backend source code
+│       ├── app.mjs               # Backend app entry point
+│       ├── controllers/          # Controllers for handling requests
+│       │   ├── authController.mjs # Authentication logic
+│       ├── db/                   # Database connection and setup
+│       │   ├── connect.mjs       # MongoDB connection setup
+│       ├── middlewares/          # Middleware functions
+│       │   ├── auth.mjs          # Authentication middleware
+│       ├── routes/               # API routes
+│       │   ├── authRoutes.mjs    # Authentication routes
+│       └── utils/                # Utility functions
+│           ├── logger.mjs        # Logging utility
 │
 ├── frontend/
-│   ├── App.js
-│   ├── app.json
-│   ├── babel.config.js
-│   ├── index.js
-│   ├── .env
-│   ├── assets/                # Images, icons, etc.
-│   └── src/
-│       ├── screens/           # ClientHomeScreen, DriverHomeScreen, etc.
-│       ├── components/
-│       ├── context/
-│       ├── hooks/
-│       ├── i18n/
-│       ├── navigation/
-│       ├── services/          # API calls
-│       └── utils/
+│   ├── App.js                    # Main entry point for React Native app
+│   ├── app.json                  # App configuration for Expo
+│   ├── babel.config.js           # Babel configuration
+│   ├── index.js                  # App initialization
+│   ├── .env                      # Environment variables for frontend
+│   ├── assets/                   # Static assets like images and fonts
+│   └── src/                      # Main frontend source code
+│       ├── screens/              # Screens for the app
+│       │   ├── ClientHomeScreen.js # Client home screen UI
+│       │   ├── DriverHomeScreen.js # Driver home screen UI
+│       ├── components/           # Reusable UI components
+│       │   ├── LanguageToggle.js # Language toggle component
+│       │   ├── LogViewer.js      # Log viewer component
+│       ├── context/              # Context API for state management
+│       │   ├── LanguageContext.js # Language context provider
+│       ├── hooks/                # Custom React hooks
+│       │   ├── usefonts.js       # Hook for loading fonts
+│       ├── i18n/                 # Internationalization setup
+│       │   ├── i18n.js           # i18n configuration
+│       ├── navigation/           # Navigation setup
+│       │   ├── AppNavigator.js   # App navigation structure
+│       ├── services/             # API and background services
+│       │   ├── api.js            # API service for backend communication
+│       └── utils/                # Utility functions
+│           ├── auth.js           # Authentication utilities
+│           ├── localization.js   # Localization utilities
 │
-├── node_modules/
-├── package.json
-├── package-lock.json
-├── .gitignore
-└── README.md
+├── node_modules/                 # Dependencies
+├── package.json                  # Project dependencies and scripts
+├── package-lock.json             # Dependency lock file
+├── .gitignore                    # Git ignore rules
+└── README.md                     # Project documentation
 ```
 
 ---

@@ -10,9 +10,37 @@ import {fileURLToPath} from "url"
 import path from 'path';
 import { ObjectId } from 'mongodb';
 
+/*
+This file contains the core logic for authentication-related operations. Below is an overview of how the functions in this file are utilized by the routes and interact with other parts of the backend:
 
+1. **Routes**:
+   - The functions in this file are invoked by the routes defined in `authRoutes.mjs`.
+     - Example: `clientSignUp`, `clientSignIn`, `driverSignUp`, etc., are called by their respective routes to handle client and driver authentication.
 
+2. **Google Drive Integration**:
+   - Functions like `createDriverFolder` and `uploadFileToDrive` interact with the Google Drive API to manage driver document storage.
+     - These are used in the `/driver/signup` route to create a folder for the driver and upload their documents.
 
+3. **Email Verification**:
+   - `sendClientVerificationEmail` and `sendDriverVerificationEmail` use Nodemailer with OAuth2 to send verification emails.
+     - These are triggered during the `/client/signup` and `/driver/signup` processes to verify user accounts.
+
+4. **JWT Authentication**:
+   - `generateToken` creates JWT tokens for authenticated users.
+     - These tokens are used in routes like `/driver/availability` to secure access to protected resources.
+
+5. **Database Operations**:
+   - MongoDB is used for storing and retrieving user data.
+     - Example: `clientSignUp` and `driverSignUp` interact with the `clients` and `drivers` collections to register new users.
+
+6. **Utilities**:
+   - `logger.mjs` is used extensively to log important events and errors for debugging and monitoring.
+
+7. **Environment Variables**:
+   - Sensitive data like `JWT_SECRET`, `CLIENT_ID`, and `REFRESH_TOKEN` are loaded using `dotenv`.
+
+This modular design ensures that the authentication logic is reusable and easy to maintain, while keeping the routes clean and focused on request handling.
+*/
 
 
 dotenv.config();
@@ -175,6 +203,8 @@ async function sendDriverVerificationEmail(email, verificationCode) {
     throw new Error('Failed to send email');
   }
 }
+
+
 // Client Sign-Up
 export async function clientSignUp(req, res,db) {
   const { email, mobile, name, password } = req.body;

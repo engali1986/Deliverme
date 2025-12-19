@@ -8,6 +8,43 @@ import logger from '../utils/logger.mjs';
 dotenv.config()
 const router = express.Router();
 
+/*
+This file defines the authentication-related routes for the application. Below is an overview of how these routes interact with other parts of the backend:
+
+1. **Controllers**:
+   - Each route delegates its core logic to functions in `authController.mjs`.
+     - Example: `clientSignUp`, `driverSignIn`, etc., handle the business logic for user authentication and database operations.
+
+2. **Middlewares**:
+   - `uploadMiddleware.mjs`: Used in the `/driver/signup` route to handle file uploads (e.g., driver documents).
+   - `auth.mjs`: Used in the `/driver/availability` route to verify JWT tokens for protected routes.
+
+3. **Database**:
+   - The `db` instance is accessed via `req.app.locals.db` and passed to controllers for database operations.
+
+4. **Utilities**:
+   - `logger.mjs`: Used to log important events, such as driver availability updates.
+
+5. **Environment Variables**:
+   - Loaded using `dotenv` to configure sensitive data like `JWT_SECRET`.
+
+6. **Routes Overview**:
+   - **Client Routes**:
+     - `POST /client/signup`: Registers a new client.
+     - `POST /client/verify`: Verifies client email.
+     - `POST /client/signin`: Authenticates client login.
+   - **Driver Routes**:
+     - `POST /driver/signup`: Registers a new driver (with document upload).
+     - `POST /driver/verify`: Verifies driver email.
+     - `POST /driver/signin`: Authenticates driver login.
+     - `PATCH /driver/availability`: Updates driver availability (protected route).
+   - **Miscellaneous**:
+     - `POST /client/request-ride`: Placeholder for ride request logic.
+     - `GET /`: Health check route to verify server status.
+
+This modular structure ensures that routes remain clean and delegate their logic to appropriate controllers and middlewares, making the codebase easier to maintain and extend.
+*/
+
 // Client Routes
 router.post('/client/signup', async (req, res) => {
     const db = req.app.locals.db;  // Access the db instance from app.locals
