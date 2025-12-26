@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import app from './src/app.mjs';
 import { Server as SocketIOServer } from 'socket.io';
+import { initSocket } from './src/socket/SocketIndex.mjs';
+import { closeRedis } from './src/redis/redisClient.mjs';
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 5000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -28,20 +30,8 @@ async function start() {
     // Make io available to routes/middlewares
     app.set('io', io);
 
-    // Socket.IO handlers
-    io.on('connection', (socket) => {
-      console.log('Socket connected:', socket.id);
-
-      socket.on('driverStatus', (data) => {
-        console.log('Received driverStatus from', socket.id, data);
-        // Broadcast to other clients (or use rooms/namespaces in production)
-        socket.broadcast.emit('driverStatus', data);
-      });
-
-      socket.on('disconnect', (reason) => {
-        console.log('Socket disconnected:', socket.id, reason);
-      });
-    });
+   // 🔥 Initialize socket logic
+    initSocket(io);
 
     // Start listening
     server.listen(PORT, HOST, () => {
@@ -52,6 +42,7 @@ async function start() {
     const shutdown = async (signal) => {
       console.log(`Received ${signal}. Shutting down gracefully...`);
       try {
+        await closeRedis();
         io.close(); // stop socket.io
         server.close((err) => {
           if (err) {

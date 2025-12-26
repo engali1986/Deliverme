@@ -1,4 +1,5 @@
 // src/app.mjs
+// Take care about cors
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
