@@ -92,9 +92,14 @@ export async function initSocket() {
   });
 
   /* ---------- CONNECTION ERROR ---------- */
-  socket.on("connect_error", (err) => {
+  socket.on("connect_error", async (err) => {
     console.error("❌ Socket connect error:", err.message);
     addLog(`Socket connect error: ${err.message}`, "error");
+    if (err.message === "Unauthorized") {
+      await AsyncStorage.removeItem("userToken");
+      socket.disconnect(); // stop infinite retries
+      alert("Session expired. Please login again.");
+    }
   });
 
   return socket;

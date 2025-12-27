@@ -2,6 +2,7 @@ import { getRedis } from '../redis/redisClient.mjs';
 import logger from '../utils/logger.mjs';
 
 export function registerDriverSocket(io, socket) {
+  logger.info(`Registering driver socket: ${socket}`);
   socket.on('driverStatus', (data) => {
     socket.broadcast.emit('driverStatus', data);
   });
@@ -10,6 +11,7 @@ export function registerDriverSocket(io, socket) {
     try {
       const { latitude, longitude, driverId } = coords;
         const redis = await getRedis();
+        logger.info(`Driver Location coords recieved: ${coords} `)
 
       await redis.geoAdd('drivers:geo', {
         longitude,
