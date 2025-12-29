@@ -9,6 +9,7 @@ import compression from 'compression';
 import dotenv from 'dotenv';
 
 import authRoutes from './routes/authRoutes.mjs';
+import redisDebugRoutes from './routes/redisDebugRoutes.mjs';
 import { connectDB } from './db/connect.mjs';
 import ensureIndexes from './db/ensureIndexes.mjs';
 import logger from './utils/logger.mjs';
@@ -116,7 +117,7 @@ app.get('/ready', async (req, res) => {
    Routes
 ====================================================== */
 app.use('/api/auth', authRoutes);
-
+app.use('/api/debug/redis', redisDebugRoutes);
 /* ======================================================
    Database initialization (non-blocking)
 ====================================================== */

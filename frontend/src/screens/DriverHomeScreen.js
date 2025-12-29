@@ -75,17 +75,26 @@ const DriverHomeScreen = () => {
          try {
            // Initialize socket connection
            await initSocket();
-           // Request foreground + background location permissions
-           const { status: fgStatus } = await Location.requestForegroundPermissionsAsync().then(res=>{
-             console.log('DriverHomeScreen Foreground location permission status:', res.status);
-             return res;
-           }).catch(err=>{ console.warn('Foreground location permission request failed:', err); return { status: 'denied' }; })  ;
-           const bgStatus = await requestBackgroundLocationPermission().then(granted=>{
-             console.log('DriverHomeScreen Background location permission granted:', granted);
-             return granted ? 'granted' : 'denied';
-           }).catch(err=>{ console.warn('Background location permission request failed:', err); return 'denied'; }); 
-           console.log('DriverHomeScreen Location permissions:', fgStatus, bgStatus);
-   
+           // Foreground permission
+            const { status: fgStatus } =
+              await Location.requestForegroundPermissionsAsync();
+
+            console.log(
+              'DriverHomeScreen Foreground location permission:',
+              fgStatus
+            );
+
+            // Background permission
+            const { status: bgStatus } =
+              await Location.requestBackgroundPermissionsAsync();
+
+            console.log(
+              'DriverHomeScreen Background location permission:',
+              bgStatus
+            );
+            if(fgStatus === 'granted' && bgStatus === 'granted'){
+              locationPermissionGranted.current = true;
+            }
            if (fgStatus !== 'granted' || bgStatus !== 'granted') {
              console.warn('DriverHomeScreen Location permissions not granted');
            }

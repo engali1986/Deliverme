@@ -64,7 +64,7 @@ let lastEmitTime = 0;
 ========================= */
 
 export async function initSocket() {
-  if (socket && socket.connected) return socket;
+  if (socket && socket?.connected) return socket;
 
   const token = await AsyncStorage.getItem("userToken");
 
@@ -123,6 +123,10 @@ export async function emitLocation(coords) {
     if (socket?.connected) {
       socket.emit("driverLocation", coords, (ack) => {
         if (!ack?.ok) {
+          if (ack?.reason === "TOKEN_EXPIRED") {
+            handleTokenExpired();
+            return;
+          }
           console.warn("⚠️ Location not acknowledged, buffering");
           bufferLocation(coords);
         }
@@ -186,24 +190,24 @@ async function flushBufferedLocations() {
 
     if (!pending.length) return;
 
-    console.log(`🚚 Flushing ${pending.length} buffered locations`);
+    console.log(`🚚 Flushing last buffered locations`);
 
-    for (let i = 0; i < pending.length; i += BATCH_SIZE) {
-      const batch = pending
-        .slice(i, i + BATCH_SIZE)
-        .map((p) => p.coords);
-
-      socket.emit("driverLocationBatch", batch, (ack) => {
-        if (!ack?.ok) {
-          console.warn("Batch not acknowledged");
-        }
-      });
-    }
+    const last = pending[pending.length - 1];
+    socket.emit("driverLocation", last.coords);
 
     await AsyncStorage.removeItem("pendingLocations");
   } catch (err) {
     console.error("Flush buffered locations failed:", err);
   }
+}
+
+/* =========================
+   TOKEN EXPIRED HANDLER
+========================= */
+async function handleTokenExpired() {
+  await AsyncStorage.removeItem("userToken");
+  closeSocket();
+  alert("Session expired. Please login again.");
 }
 
 /* =========================

@@ -1,28 +1,37 @@
-import { getRedis } from '../redis/redisClient.mjs';
-import logger from '../utils/logger.mjs';
+// src/socket/driver.socket.mjs
+import jwt from "jsonwebtoken";
+import { getRedis } from "../redis/redisClient.mjs";
+import logger from "../utils/logger.mjs";
 
 export function registerDriverSocket(io, socket) {
-  logger.info(`Registering driver socket: ${socket}`);
-  socket.on('driverStatus', (data) => {
-    socket.broadcast.emit('driverStatus', data);
-  });
 
-  socket.on('driverLocation', async (coords, ack) => {
+  /* =========================
+     DRIVER LOCATION
+  ========================= */
+  socket.on("driverLocation", async (coords, ack) => {
     try {
-      const { latitude, longitude, driverId } = coords;
-        const redis = await getRedis();
-        logger.info(`Driver Location coords recieved: ${coords} `)
+      // Re-check token (important for long sessions)
+      jwt.verify(socket.token, process.env.JWT_SECRET);
 
-      await redis.geoAdd('drivers:geo', {
+      const { latitude, longitude } = coords;
+      const driverId = socket.user.id;
+
+      const redis = await getRedis();
+
+      await redis.geoAdd("drivers:geo", {
         longitude,
         latitude,
-        member: driverId,
+        member: driverId, // overwrites previous location
       });
 
       ack?.({ ok: true });
     } catch (err) {
-      logger.error('driverLocation error: %s', err.message);
-      ack?.({ ok: false });
+      logger.warn(
+        `driverLocation auth failed for ${socket.user?.id}`
+      );
+
+      ack?.({ ok: false, reason: "TOKEN_EXPIRED" });
+      socket.disconnect(true);
     }
   });
 }
