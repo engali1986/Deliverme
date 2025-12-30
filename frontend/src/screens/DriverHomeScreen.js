@@ -265,13 +265,18 @@ const DriverHomeScreen = () => {
         </TouchableOpacity>
 
         <View style={styles.switchContainer}>
-          <WideToggle
-            value={isAvailable}
-            onValueChange={onToggleAvailability}
-            disabled={updating || cooldownActive}
-          />
-          {updating && <ActivityIndicator size="small" />}
-        </View>
+  <View style={styles.switchWrapper}>
+    <WideToggle
+      value={isAvailable}
+      onValueChange={onToggleAvailability}
+      disabled={updating || cooldownActive}
+    />
+  </View>
+
+  {updating && (
+    <ActivityIndicator size="small" color="#1565C0" style={{ marginTop: 6 }} />
+  )}
+</View>
       </View>
 
       <View style={styles.infoBox}>
@@ -316,8 +321,11 @@ const DriverHomeScreen = () => {
 /* ------------------------------------------------------------------ */
 /* Wide Toggle                                                         */
 /* ------------------------------------------------------------------ */
+
 const WideToggle = ({ value, onValueChange, disabled }) => {
   const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const [trackWidth, setTrackWidth] = useState(0);
+  const KNOB_SIZE = 36;
 
   useEffect(() => {
     Animated.timing(anim, {
@@ -329,18 +337,67 @@ const WideToggle = ({ value, onValueChange, disabled }) => {
 
   const translateX = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [2, 46],
+    outputRange: [2, Math.max(0, trackWidth - KNOB_SIZE - 4)],
+  });
+
+  const bgColor = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['rgba(200,208,216,0.25)', 'rgba(21,101,192,1)'],
+  });
+
+  const offlineOpacity = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0],
+  });
+
+  const onlineOpacity = anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
   });
 
   return (
     <TouchableOpacity
+      activeOpacity={0.9}
       disabled={disabled}
-      onPress={() => onValueChange(!value)}
-      style={styles.toggleContainer}
+      onPress={() => !disabled && onValueChange(!value)}
+      onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+      style={[styles.wideToggleContainer, disabled && { opacity: 0.6 }]}
     >
-      <Animated.View style={styles.toggleTrack} />
       <Animated.View
-        style={[styles.toggleKnob, { transform: [{ translateX }] }]}
+        style={[styles.wideToggleTrack, { backgroundColor: bgColor }]}
+      />
+
+      <Animated.Text
+        style={[
+          styles.wideToggleLabel,
+          { opacity: offlineOpacity, color: '#0D47A1' },
+        ]}
+      >
+        OFFLINE
+      </Animated.Text>
+
+      <Animated.Text
+        style={[
+          styles.wideToggleLabel,
+          { opacity: onlineOpacity, color: '#fff' },
+        ]}
+      >
+        ONLINE
+      </Animated.Text>
+
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.wideToggleKnob,
+          {
+            transform: [{ translateX }],
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.2,
+            shadowRadius: 2,
+            elevation: 3,
+          },
+        ]}
       />
     </TouchableOpacity>
   );
@@ -364,17 +421,52 @@ const styles = StyleSheet.create({
   logoutButton: { marginTop: 40, backgroundColor: '#003366', padding: 12 },
   logoutText: { color: '#fff', textAlign: 'center' },
   overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.4)' },
-  toggleContainer: { width: 80, height: 40, backgroundColor: '#ccc', borderRadius: 20 },
-  toggleTrack: { ...StyleSheet.absoluteFillObject, borderRadius: 20 },
-  toggleKnob: {
-    width: 36,
-    height: 36,
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    position: 'absolute',
-    top: 2,
-    left: 2,
-  },
+  wideToggleContainer: {
+  width: '100%',
+  height: 48,
+  borderRadius: 28,
+  justifyContent: 'center',
+  paddingHorizontal: 6,
+  overflow: 'hidden',
+},
+  wideToggleTrack: {
+  ...StyleSheet.absoluteFillObject,
+  borderRadius: 28,
+},
+
+wideToggleKnob: {
+  position: 'absolute',
+  left: 2,
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  backgroundColor: '#fff',
+},
+wideToggleLabel: {
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  top: 0,
+  bottom: 0,
+  textAlign: 'center',
+  textAlignVertical: 'center',
+  fontWeight: '700',
+  fontSize: 13,
+  includeFontPadding: false,
+},
+
+switchWrapper: {
+  width: '100%',
+  maxWidth: 420,
+  backgroundColor: '#ffffff',
+  paddingVertical: 8,
+  paddingHorizontal: 12,
+  borderRadius: 30,
+  borderColor: '#1565C0',
+  borderWidth: 1,
+  elevation: 3,
+},
+
 });
 
 export default DriverHomeScreen;

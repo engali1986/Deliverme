@@ -1,12 +1,11 @@
 import express from "express";
 import { getRedis } from "../redis/redisClient.mjs";
-import authenticateToken from "../middlewares/auth.mjs";
 
 const router = express.Router();
 
 /**
  * ⚠️ DEBUG ONLY
- * Protect with auth or remove in production
+  * Routes to inspect Redis-stored driver locations.
  */
 
 /* =========================
@@ -76,6 +75,49 @@ router.get("/nearby", async (req, res) => {
       drivers,
     });
   } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* =========================
+   GET ALL DRIVERS WITH COORDS
+========================= */
+router.get("/drivers/full", async (req, res) => {
+  try {
+    const redis = await getRedis();
+
+    // 1️⃣ Get all driver IDs
+    const driverIds = await redis.zRange("drivers:geo", 0, -1);
+
+    if (!driverIds.length) {
+      return res.json({
+        count: 0,
+        drivers: [],
+      });
+    }
+
+    // 2️⃣ Get positions for all drivers in ONE call
+    const positions = await redis.geoPos("drivers:geo", driverIds);
+
+    // 3️⃣ Merge IDs + coordinates
+    const drivers = driverIds.map((driverId, index) => {
+      const pos = positions[index];
+
+      if (!pos) return null;
+
+      return {
+        driverId,
+        latitude: pos.latitude,
+        longitude: pos.longitude,
+      };
+    }).filter(Boolean);
+
+    res.json({
+      count: drivers.length,
+      drivers,
+    });
+  } catch (err) {
+    console.error("Redis drivers/full error:", err);
     res.status(500).json({ message: err.message });
   }
 });
