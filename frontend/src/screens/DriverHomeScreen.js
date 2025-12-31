@@ -293,6 +293,7 @@ const DriverHomeScreen = () => {
             renderItem={renderRequestItem}
           />
         )}
+        <LogViewer />
       </View>
 
       {menuVisible && (
@@ -308,11 +309,14 @@ const DriverHomeScreen = () => {
           <Ionicons name="close" size={22} color="#fff" />
         </TouchableOpacity>
 
-        <LanguageToggle />
+        <Text style={styles.menuItem}>{i18n.t('completed_rides')}</Text>
+          <Text style={styles.menuItem}>{i18n.t('settings')}</Text>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>{i18n.t('logout')}</Text>
-        </TouchableOpacity>
+          <LanguageToggle />
+
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText}>{i18n.t('logout')}</Text>
+          </TouchableOpacity>
       </Animated.View>
     </View>
   );
@@ -416,9 +420,37 @@ const styles = StyleSheet.create({
   requestText: { marginVertical: 6 },
   acceptButton: { backgroundColor: '#1565C0', padding: 10, borderRadius: 6 },
   acceptButtonText: { color: '#fff', textAlign: 'center' },
-  sideMenu: { position: 'absolute', width: 250, left: 0, top: 0, bottom: 0 },
-  closeButton: { position: 'absolute', right: 10, top: 10 },
-  logoutButton: { marginTop: 40, backgroundColor: '#003366', padding: 12 },
+  sideMenu: {
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  bottom: 0,
+  width: 250,
+  backgroundColor: '#cce0ff',
+  padding: 20,
+  paddingTop: 60,
+  zIndex: 200,
+},
+  closeButton: {
+  position: 'absolute',
+  top: 10,
+  right: 10,
+  zIndex: 210,
+  backgroundColor: '#003366',
+  padding: 5,
+  borderRadius: 15,
+},
+menuItem: {
+  marginVertical: 15,
+  fontSize: 18,
+  color: '#003366',
+},
+  logoutButton: {
+  marginTop: 40,
+  backgroundColor: '#003366',
+  paddingVertical: 12,
+  borderRadius: 6,
+},
   logoutText: { color: '#fff', textAlign: 'center' },
   overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.4)' },
   wideToggleContainer: {

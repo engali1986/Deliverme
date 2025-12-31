@@ -50,7 +50,7 @@ import { addLog } from "../utils/Logger";
    CONFIGURATION
 ========================= */
 
-const SOCKET_URL = "http://10.110.22.200:5000";
+const SOCKET_URL = "http://10.129.11.200:5000";
 
 const LOCATION_EMIT_INTERVAL = 3000; // ms (3 seconds)
 const MAX_BUFFERED_LOCATIONS = 50;
