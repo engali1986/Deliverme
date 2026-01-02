@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
@@ -20,6 +20,38 @@ export default function AppNavigator({ initialRouteName }) {
   console.log(AsyncStorage.getItem("userToken"));
   console.log(AsyncStorage.getItem("userType"));
   console.log(AsyncStorage.getItem("userData"));
+  useEffect(() => {
+    const onSessionExpired = async () => {
+      // 🔥 Optional safety cleanup (UI-side)
+      await AsyncStorage.multiRemove([
+        "userToken",
+        "userType",
+        "userData",
+        "driverAvailable",
+        "pendingLocations",
+      ]);
+
+      Toast.show({
+        type: "error",
+        text1: "Session expired",
+        text2: "Please login again",
+      });
+
+      // 🔐 Reset navigation stack
+      navigationRef.current?.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      });
+    };
+
+    // ✅ Register once
+    AppEvents.on(EVENTS.SESSION_EXPIRED, onSessionExpired);
+
+    // ✅ Cleanup on unmount (rare, but correct)
+    return () => {
+      AppEvents.off(EVENTS.SESSION_EXPIRED, onSessionExpired);
+    };
+  }, []);
   return (
     <NavigationContainer>
        

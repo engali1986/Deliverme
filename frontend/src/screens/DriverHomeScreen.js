@@ -71,8 +71,24 @@ const DriverHomeScreen = () => {
   useEffect(() => {
     let mounted = true;
 
+    const LogAllstoredItems= async function logAllAsyncStorage() {
+          try {
+            const keys = await AsyncStorage.getAllKeys();
+            const items = await AsyncStorage.multiGet(keys);
+
+            console.log("📦DriverHomeScreen.js AsyncStorage contents:");
+            items.forEach(([key, value]) => {
+              console.log(`${key}:`, value);
+            });
+          } catch (e) {
+            console.error("DriverHomeScreen.js Failed to log AsyncStorage", e);
+          }
+        }
+
     (async () => {
          try {
+          // Log all AsyncStorage items
+          await LogAllstoredItems();
            // Initialize socket connection
            await initSocket();
            // Foreground permission

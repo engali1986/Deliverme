@@ -119,6 +119,10 @@ export async function emitLocation(coords) {
     }
 
     lastEmitTime = now;
+  //  check socket
+    if (!socket) {
+    await initSocket();
+    }
 
     if (socket?.connected) {
       socket.emit("driverLocation", coords, (ack) => {

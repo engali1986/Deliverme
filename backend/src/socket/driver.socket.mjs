@@ -17,13 +17,13 @@ export function registerDriverSocket(io, socket) {
       const driverId = socket.user.id;
 
       const redis = await getRedis();
-
-      await redis.geoAdd("drivers:geo", {
-        longitude,
-        latitude,
-        member: driverId, // overwrites previous location
-      });
-
+    //  Redis multi for geo add and alive key
+      await redis.multi()
+      .geoAdd("drivers:geo", { longitude, latitude, member: driverId })
+      .set(`driver:${driverId}:alive`, 1, { EX: 15 }) // 15 sec TTL
+      .exec();
+      logger.info(`Updated location for driver ${driverId}: (${latitude}, ${longitude})`);
+    // Send ACK
       ack?.({ ok: true });
     } catch (err) {
       logger.warn(
