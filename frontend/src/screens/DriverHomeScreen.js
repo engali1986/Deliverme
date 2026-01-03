@@ -68,27 +68,33 @@ const DriverHomeScreen = () => {
   /* ------------------------------------------------------------------ */
   /* Initialization                                                     */
   /* ------------------------------------------------------------------ */
+  const logAllAsyncStorage = async () => {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+
+    if (keys.length === 0) {
+      console.log("AsyncStorage is empty");
+      return;
+    }
+
+    const items = await AsyncStorage.multiGet(keys);
+
+    console.log("===== AsyncStorage Dump =====");
+    items.forEach(([key, value]) => {
+      console.log(`${key}:`, value);
+    });
+    console.log("===== End AsyncStorage Dump =====");
+  } catch (err) {
+    console.warn("Failed to log AsyncStorage:", err);
+  }
+};
   useEffect(() => {
     let mounted = true;
 
-    const LogAllstoredItems= async function logAllAsyncStorage() {
-          try {
-            const keys = await AsyncStorage.getAllKeys();
-            const items = await AsyncStorage.multiGet(keys);
-
-            console.log("📦DriverHomeScreen.js AsyncStorage contents:");
-            items.forEach(([key, value]) => {
-              console.log(`${key}:`, value);
-            });
-          } catch (e) {
-            console.error("DriverHomeScreen.js Failed to log AsyncStorage", e);
-          }
-        }
-
     (async () => {
          try {
-          // Log all AsyncStorage items
-          await LogAllstoredItems();
+          // log all AsyncStorage items
+            await logAllAsyncStorage();
            // Initialize socket connection
            await initSocket();
            // Foreground permission

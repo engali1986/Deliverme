@@ -45,12 +45,14 @@
 import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addLog } from "../utils/Logger";
+import AppEvents, { EVENTS } from "../utils/AppEvents";
+import { stopBackgroundLocationTracking } from "../services/backgroundLocationService";
 
 /* =========================
    CONFIGURATION
 ========================= */
 
-const SOCKET_URL = "http://10.129.11.200:5000";
+const SOCKET_URL = "http://10.103.196.200:5000";
 
 const LOCATION_EMIT_INTERVAL = 3000; // ms (3 seconds)
 const MAX_BUFFERED_LOCATIONS = 50;
@@ -208,10 +210,17 @@ async function flushBufferedLocations() {
 /* =========================
    TOKEN EXPIRED HANDLER
 ========================= */
-async function handleTokenExpired() {
-  await AsyncStorage.removeItem("userToken");
+export async function handleTokenExpired() {
+  await stopBackgroundLocationTracking();
+  await AsyncStorage.multiRemove([
+    "userToken",
+    "driverAvailable",
+    "pendingLocations",
+  ]);
   closeSocket();
-  alert("Session expired. Please login again.");
+
+  // 🔔 Notify the app
+  AppEvents.emit(EVENTS.SESSION_EXPIRED);
 }
 
 /* =========================

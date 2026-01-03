@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
@@ -10,6 +10,8 @@ import DriverHomeScreen from '../screens/DriverHomeScreen';
 import ClientHomeScreen from '../screens/ClientHomeScreen';
 import MapPickerScreen from '../screens/MapPickerScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppEvents, { EVENTS } from '../utils/AppEvents';
+import Toast from 'react-native-toast-message';
 
 
 
@@ -20,40 +22,27 @@ export default function AppNavigator({ initialRouteName }) {
   console.log(AsyncStorage.getItem("userToken"));
   console.log(AsyncStorage.getItem("userType"));
   console.log(AsyncStorage.getItem("userData"));
+  const navigationRef = useRef(null);
   useEffect(() => {
-    const onSessionExpired = async () => {
-      // 🔥 Optional safety cleanup (UI-side)
-      await AsyncStorage.multiRemove([
-        "userToken",
-        "userType",
-        "userData",
-        "driverAvailable",
-        "pendingLocations",
-      ]);
+  AppEvents.on(EVENTS.SESSION_EXPIRED, () => {
+    Toast.show({
+      type: "error",
+      text1: "Session expired",
+      text2: "Please login again",
+    });
 
-      Toast.show({
-        type: "error",
-        text1: "Session expired",
-        text2: "Please login again",
-      });
+    navigationRef.current?.reset({
+      index: 0,
+      routes: [{ name: "Home" }],
+    });
+  });
 
-      // 🔐 Reset navigation stack
-      navigationRef.current?.reset({
-        index: 0,
-        routes: [{ name: "Home" }],
-      });
-    };
-
-    // ✅ Register once
-    AppEvents.on(EVENTS.SESSION_EXPIRED, onSessionExpired);
-
-    // ✅ Cleanup on unmount (rare, but correct)
-    return () => {
-      AppEvents.off(EVENTS.SESSION_EXPIRED, onSessionExpired);
-    };
-  }, []);
+  return () => {
+    AppEvents.off(EVENTS.SESSION_EXPIRED);
+  };
+}, []);
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
        
       <Stack.Navigator
         initialRouteName={initialRouteName}
