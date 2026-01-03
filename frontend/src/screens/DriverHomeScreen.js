@@ -1,21 +1,252 @@
 /**
- * DriverHomeScreen.js
+ * ============================================================================
+ * DRIVER HOME SCREEN – LOGIC FLOW DIAGRAM
+ * ============================================================================
  *
- * Production-ready driver home screen for a ride-hailing app.
+ * ┌───────────────────────┐
+ * │   App / Screen Load   │
+ * └───────────┬───────────┘
+ *             │
+ *             ▼
+ * ┌────────────────────────────┐
+ * │ Initialize Socket.IO        │
+ * │ Request Location Permissions│
+ * │ Decode JWT → driverId       │
+ * └───────────┬────────────────┘
+ *             │
+ *             ▼
+ * ┌────────────────────────────┐
+ * │ Read AsyncStorage           │
+ * │ driverAvailable ?           │
+ * └───────────┬────────────────┘
+ *     YES     │      NO
+ *             │
+ *     ▼       ▼
+ * ┌───────────────┐     ┌──────────────────┐
+ * │ Set ONLINE     │     │ Stay OFFLINE     │
+ * │ Start BG Track │     │ Idle State       │
+ * │ Register Socket│     │ Waiting Action   │
+ * └───────────────┘     └──────────────────┘
  *
- * Features:
- * - Driver availability toggle (online/offline)
- * - Safe backend synchronization
- * - Background location tracking
- * - Socket.IO real-time integration
- * - Cooldown & spam protection
- * - Clean socket lifecycle handling
  *
- * Architecture rules:
- * - REST API: availability state + initial location
- * - Socket.IO: realtime availability & ride events
- * - Background task: movement updates (distance-based)
+ * ──────────────────────────────────────────────────────────────────────────
+ * DRIVER TOGGLES AVAILABILITY
+ * ──────────────────────────────────────────────────────────────────────────
+ *
+ *            ┌──────────────────────┐
+ *            │ Toggle Pressed        │
+ *            └──────────┬───────────┘
+ *                       │
+ *        ┌──────────────▼──────────────┐
+ *        │ Permission Check             │
+ *        │ Cooldown / Updating Check   │
+ *        └──────────┬─────────────────┘
+ *                   │
+ *        ┌──────────▼──────────┐
+ *        │  Toggle BLOCKED     │◄───── Missing permission
+ *        └────────────────────┘
+ *
+ *                   │ OK
+ *                   ▼
+ *        ┌────────────────────────────┐
+ *        │ Get Current Location (GPS) │  ← if going ONLINE
+ *        └──────────┬─────────────────┘
+ *                   │
+ *                   ▼
+ *        ┌────────────────────────────┐
+ *        │ REST API                    │
+ *        │ updateDriverAvailability   │
+ *        └──────────┬─────────────────┘
+ *                   │
+ *        ┌──────────▼──────────┐
+ *        │ Socket.IO Emit       │
+ *        │ driver:availability │
+ *        └──────────┬──────────┘
+ *                   │
+ *        ┌──────────▼──────────┐
+ *        │ Background Tracking │
+ *        │ START / STOP        │
+ *        └──────────┬──────────┘
+ *                   │
+ *        ┌──────────▼──────────┐
+ *        │ Save State           │
+ *        │ AsyncStorage        │
+ *        └─────────────────────┘
+ *
+ *
+ * ──────────────────────────────────────────────────────────────────────────
+ * REAL-TIME RIDE FLOW
+ * ──────────────────────────────────────────────────────────────────────────
+ *
+ * ┌────────────────────────────┐
+ * │ Socket.IO                  │
+ * │ ride:request event         │
+ * └──────────┬─────────────────┘
+ *            │
+ *            ▼
+ * ┌────────────────────────────┐
+ * │ Add request to UI state    │
+ * │ Show request card          │
+ * └────────────────────────────┘
+ *
+ *
+ * ──────────────────────────────────────────────────────────────────────────
+ * LOGOUT FLOW
+ * ──────────────────────────────────────────────────────────────────────────
+ *
+ * ┌──────────────────────┐
+ * │ Logout Pressed       │
+ * └──────────┬───────────┘
+ *            │
+ *            ▼
+ * ┌────────────────────────────┐
+ * │ If ONLINE → Set OFFLINE    │
+ * │ Stop BG Tracking           │
+ * └──────────┬─────────────────┘
+ *            │
+ *            ▼
+ * ┌────────────────────────────┐
+ * │ Close Socket               │
+ * │ Clear AsyncStorage         │
+ * └──────────┬─────────────────┘
+ *            │
+ *            ▼
+ * ┌────────────────────────────┐
+ * │ Navigate → Home Screen     │
+ * └────────────────────────────┘
+ *
+ * * PURPOSE
+ * -------
+ * Main home screen for the Driver in the ride-hailing application.
+ * This screen is responsible for:
+ * - Managing driver online/offline availability
+ * - Handling background & foreground location tracking
+ * - Syncing driver state with backend and Socket.IO
+ * - Displaying ride requests (real-time)
+ * - Providing logout, language switching, and side menu navigation
+ *
+ *
+ * CORE FEATURES
+ * -------------
+ *
+ * 1️⃣ Driver Availability (ONLINE / OFFLINE)
+ * -----------------------------------------
+ * - Driver can toggle availability using a custom WideToggle component.
+ * - When ONLINE:
+ *   • Current GPS location is captured.
+ *   • Availability is sent to backend via REST API.
+ *   • Background location tracking is started.
+ *   • Driver is registered on Socket.IO for real-time events.
+ * - When OFFLINE:
+ *   • Background tracking is stopped.
+ *   • Backend is notified.
+ *   • Socket availability is updated.
+ *
+ *
+ * 2️⃣ Location Permissions & Safety
+ * --------------------------------
+ * - Requests BOTH foreground and background location permissions.
+ * - Availability toggle is blocked if permissions are missing.
+ * - Prevents driver from going online without proper permissions.
+ *
+ *
+ * 3️⃣ Background Location Tracking
+ * -------------------------------
+ * - Uses Expo background tasks.
+ * - Runs only when driver is ONLINE.
+ * - Sends location updates based on movement (not time-based).
+ * - Automatically stopped when driver goes OFFLINE or logs out.
+ *
+ *
+ * 4️⃣ Backend Synchronization (REST)
+ * ---------------------------------
+ * - REST API is the single source of truth for:
+ *   • Driver availability state
+ *   • Initial location when going ONLINE
+ * - Ensures backend consistency even if socket disconnects.
+ *
+ *
+ * 5️⃣ Real-Time Updates (Socket.IO)
+ * --------------------------------
+ * - Socket initialized once when screen loads.
+ * - Events used:
+ *   • driver:register       → initial driver registration
+ *   • driver:availability   → availability updates
+ *   • ride:request          → incoming ride requests
+ * - Socket listeners are cleaned up on unmount.
+ *
+ *
+ * 6️⃣ Cooldown & Spam Protection
+ * ------------------------------
+ * - Prevents rapid ON/OFF toggling.
+ * - Cooldown duration: 10 seconds.
+ * - Protects backend, Redis, and socket events from spamming.
+ *
+ *
+ * 7️⃣ Persistent Driver State
+ * ---------------------------
+ * - Driver availability is saved in AsyncStorage.
+ * - On app restart:
+ *   • Availability is restored.
+ *   • Background tracking resumes automatically if driver was ONLINE.
+ *
+ *
+ * 8️⃣ Session Safety & Auto Logout
+ * -------------------------------
+ * - JWT token is decoded to extract driverId.
+ * - If token is missing or invalid:
+ *   • Socket is closed
+ *   • AsyncStorage is cleared
+ *   • User is redirected to Home screen
+ *
+ *
+ * 9️⃣ Side Menu & UI Controls
+ * ---------------------------
+ * - Animated side menu with overlay.
+ * - Menu items:
+ *   • Completed rides (placeholder)
+ *   • Settings (placeholder)
+ *   • Language switch (Arabic / English)
+ *   • Logout
+ *
+ *
+ * 🔟 Logging & Debugging
+ * ---------------------
+ * - Dumps all AsyncStorage keys on screen load (DEBUG only).
+ * - Integrated LogViewer component for runtime logs.
+ *
+ *
+ * COMPONENT STRUCTURE
+ * -------------------
+ * - DriverHomeScreen (main container)
+ * - WideToggle (custom animated availability switch)
+ * - LanguageToggle
+ * - LogViewer
+ *
+ *
+ * ARCHITECTURE RULES
+ * ------------------
+ * - REST API:
+ *   • Availability state
+ *   • Initial location
+ *
+ * - Socket.IO:
+ *   • Real-time availability
+ *   • Ride requests
+ *
+ * - Background Task:
+ *   • Continuous driver location updates
+ *
+ *
+ * IMPORTANT NOTES
+ * ---------------
+ * - Background tracking MUST NEVER run when driver is OFFLINE.
+ * - Socket lifecycle must be cleanly handled on logout/unmount.
+ * - Cooldown logic is critical for system stability.
+ *
+ * ============================================================================
  */
+ 
 
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import {
