@@ -28,7 +28,7 @@
  * 
  * State Variables:
  * - pickupCoords: Stores the coordinates of the pickup location.
- * - destinationRegion: Stores the coordinates of the destination location.
+ * - destinationCoords: Stores the coordinates of the destination location.
  * - region: Stores the initial region for the map.
  * - mapReady: Tracks whether the map is ready to be displayed.
  * - routeDistance: Stores the calculated distance between the pickup and destination locations.
@@ -137,7 +137,7 @@ const ClientHomeScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalField, setModalField] = useState(null); // 'pickup' | 'destination' | 'fare'
   const [modalValue, setModalValue] = useState('');
-  const [destinationRegion, setDestinationRegion] = useState(null);
+  const [destinationCoords, setdestinationCoords] = useState(null);
   const [routeDistance, setRouteDistance] = useState(null); // Distance in kilometers
   const mapRef = useRef(null);
 
@@ -175,12 +175,12 @@ const ClientHomeScreen = () => {
 
   // 2. Whenever both markers are set, fit map to show both
   useEffect(() => {
-    if (mapRef.current && pickupCoords && destinationRegion) {
-      console.log('ClientHomeScreen.js: Fitting map to pickup and destination markers', pickupCoords, destinationRegion);
+    if (mapRef.current && pickupCoords && destinationCoords) {
+      console.log('ClientHomeScreen.js: Fitting map to pickup and destination markers', pickupCoords, destinationCoords);
       mapRef.current.fitToCoordinates(
         [
           { latitude: pickupCoords.latitude, longitude: pickupCoords.longitude },
-          { latitude: destinationRegion.latitude, longitude: destinationRegion.longitude }
+          { latitude: destinationCoords.latitude, longitude: destinationCoords.longitude }
         ],
         {
           edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
@@ -188,7 +188,7 @@ const ClientHomeScreen = () => {
         }
       );
     }
-  }, [pickupCoords, destinationRegion]);
+  }, [pickupCoords, destinationCoords]);
 
    // 3. Calculate the minimum fare based on distance
   const calculateMinimumFare = () => {
@@ -248,8 +248,8 @@ const ClientHomeScreen = () => {
   };
 
   const handleRequestRide = async () => {
-    console.log('ClientHomeScreen.js: Requesting ride with', { pickupCoords, destinationRegion, fare });
-    if (!pickupCoords || !destinationRegion || !fare) {
+    console.log('ClientHomeScreen.js: Requesting ride with', { pickupCoords, destinationCoords, fare });
+    if (!pickupCoords || !destinationCoords || !fare) {
       Toast.show({
         type: 'error',
         text1: 'Missing Fields',
@@ -260,7 +260,7 @@ const ClientHomeScreen = () => {
     try {
       const response = await requestRide({
         pickup: pickupCoords, 
-        destination: destinationRegion, 
+        destination: destinationCoords, 
         fare: parseFloat(fare),
       }); 
       console.log('ClientHomeScreen.js: Ride requested successfully', response);
@@ -275,7 +275,7 @@ const ClientHomeScreen = () => {
       Toast.show({
         type: 'error',
         text1: 'Request Failed',
-        text2: error.message,
+        text2: error.message || 'Failed to request ride.',
       });
     }
   };
@@ -335,15 +335,15 @@ const ClientHomeScreen = () => {
                   <Ionicons name="location-sharp" size={36} color="red" />
                 </Marker>
               )}
-              {destinationRegion && (
-                <Marker coordinate={destinationRegion}>
+              {destinationCoords && (
+                <Marker coordinate={destinationCoords}>
                   <Ionicons name="location-sharp" size={36} color="blue" />
                 </Marker>
               )}
-              {pickupCoords && destinationRegion && (
+              {pickupCoords && destinationCoords && (
                 <MapViewDirections
                   origin={pickupCoords}
-                  destination={destinationRegion}
+                  destination={destinationCoords}
                   apikey= {API_KEY}// Replace with your actual key
                   strokeWidth={4}
                   strokeColor="dodgerblue"
@@ -489,13 +489,13 @@ const ClientHomeScreen = () => {
                 navigation.navigate('MapPicker', {
                   onSelect: (coords, addressText) => {
                     setDestination(addressText);
-                    setDestinationRegion({
+                    setdestinationCoords({
                       latitude: coords.latitude,
                       longitude: coords.longitude,
                       latitudeDelta: 0.01,
                       longitudeDelta: 0.01,
                     });
-                    console.log("ClientHomeScreen - Destination Coords:", destinationRegion);
+                    console.log("ClientHomeScreen - Destination Coords:", destinationCoords);
                   },
                 });
               }}

@@ -52,7 +52,7 @@ import { stopBackgroundLocationTracking } from "../services/backgroundLocationSe
    CONFIGURATION
 ========================= */
 
-const SOCKET_URL = "http://10.103.196.200:5000";
+const SOCKET_URL = "http://10.140.98.200:5000";
 
 const LOCATION_EMIT_INTERVAL = 3000; // ms (3 seconds)
 const MAX_BUFFERED_LOCATIONS = 50;

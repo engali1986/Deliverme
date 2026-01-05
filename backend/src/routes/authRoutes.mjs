@@ -83,6 +83,10 @@ router.post('/client/request-ride', async (req, res) => {
   // Implement the logic to handle ride request here
   const rideDetails = req.body;
   console.log("Ride request received:", rideDetails);
+  // TODO: find available drivers within radius, notify them, using redis
+ const drivers = [];
+ 
+
   // Placeholder response
   res.status(501).send({ message: "Not implemented" }); // Placeholder response
 });
