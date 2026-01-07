@@ -4,6 +4,7 @@ import upload from "../middlewares/uploadMiddleware.mjs"
 import dotenv from "dotenv"
 import authenticateToken from '../middlewares/auth.mjs';
 import logger from '../utils/logger.mjs';
+import {getRedis} from "../redis/redisClient.mjs";
 
 dotenv.config()
 const router = express.Router();
@@ -83,10 +84,6 @@ router.post('/client/request-ride', async (req, res) => {
   // Implement the logic to handle ride request here
   const rideDetails = req.body;
   console.log("Ride request received:", rideDetails);
-  // TODO: find available drivers within radius, notify them, using redis
- const drivers = [];
- 
-
   // Placeholder response
   res.status(501).send({ message: "Not implemented" }); // Placeholder response
 });

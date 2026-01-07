@@ -54,6 +54,44 @@ export async function getRedis() {
   return redisClient;
 }
 
+// ================================
+// GEO helpers for drivers
+// ================================
+
+export async function addDriverToGeo(driverId, longitude, latitude) {
+  const redis = await initRedis();
+
+  await redis.geoAdd('drivers:geo', {
+    longitude,
+    latitude,
+    member: driverId.toString(),
+  });
+}
+
+export async function removeDriverFromGeo(driverId) {
+  const redis = await initRedis();
+  await redis.zRem('drivers:geo', driverId.toString());
+}
+
+export async function findNearbyDrivers(longitude, latitude, radiusKm = 5, limit = 20) {
+  const redis = await initRedis();
+
+  return redis.geoSearch(
+    'drivers:geo',
+    {
+      longitude,
+      latitude,
+    },
+    {
+      radius: radiusKm,
+      unit: 'km',
+      WITHDIST: true,
+      COUNT: limit,
+      SORT: 'ASC',
+    }
+  );
+}
+
 /**
  * Graceful shutdown
  */

@@ -18,10 +18,21 @@ export function registerDriverSocket(io, socket) {
 
       const redis = await getRedis();
     //  Redis multi for geo add and alive key
-      await redis.multi()
-      .geoAdd("drivers:geo", { longitude, latitude, member: driverId })
-      .set(`driver:${driverId}:alive`, 1, { EX: 15 }) // 15 sec TTL
-      .exec();
+      const multi = redis.multi()
+        .geoAdd("drivers:geo", { longitude, latitude, member: driverId })
+        .set(`driver:${driverId}:alive`, 1, { EX: 15 }); // 15 sec TTL
+
+      // avoid hanging indefinitely by racing with a timeout
+      const execPromise = multi.exec();
+      const res = await Promise.race([
+        execPromise,
+        new Promise((_, rej) => setTimeout(() => rej(new Error("Redis exec timeout")), 2000))
+      ]);
+
+      logger.info({ redisMultiRes: res });
+      if (Array.isArray(res) && res.some(r => r instanceof Error)) {
+        logger.warn(`Redis multi returned command error for driver ${driverId}`, { res });
+      }
       logger.info(`Updated location for driver ${driverId}: (${latitude}, ${longitude})`);
     // Send ACK
       ack?.({ ok: true });

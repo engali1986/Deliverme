@@ -9,6 +9,7 @@ import {PassThrough} from "stream"
 import {fileURLToPath} from "url"
 import path from 'path';
 import { ObjectId } from 'mongodb';
+import { removeDriverFromGeo, findNearbyDrivers,addDriverToGeo } from "../redis/redisClient.mjs";
 
 /*
 This file contains the core logic for authentication-related operations. Below is an overview of how the functions in this file are utilized by the routes and interact with other parts of the backend:
@@ -682,18 +683,7 @@ export async function updateDriverAvailability(req, res, db) {
       return res.status(404).json({ message: 'Driver not found' });
     }
 
-    // Emit socket event if io and socketId available
-    const io = req.app.get('io');
-    if (io) {
-      // const driver = await driversColl.findOne(filter, { projection: { socketId: 1 } });
-      // if (driver && driver.socketId) {
-      //   logger.info('Emitting availability_updated to driver socketId: %s', driver.socketId);
-      //   io.to(driver.socketId).emit('availability_updated', {
-      //     available: available,
-      //     location: loc || null,
-      //   });
-      // }
-    }
+    
 
     return res.status(200).json({ message: 'Availability updated successfully' });
   } catch (err) {
