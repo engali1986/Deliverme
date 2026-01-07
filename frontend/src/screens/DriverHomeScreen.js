@@ -277,7 +277,7 @@ import {
   startBackgroundLocationTracking,
   stopBackgroundLocationTracking,
 } from '../services/backgroundLocationService';
-import { initSocket, getSocket, closeSocket } from '../services/socket';
+import { initSocket, getSocket, closeSocket } from '../services/DriverSocket';
 
 const COOLDOWN_MS = 10000;
 
@@ -492,6 +492,7 @@ const DriverHomeScreen = () => {
         type: 'error',
         text1: 'Availability update failed',
       });
+      handleLogout()
     } finally {
       setUpdating(false);
     }

@@ -159,9 +159,9 @@ const createTransporter = async () => {
 /**
  * Generates a JWT token for authentication.
  */
-function generateToken(user) {
+function generateToken(user, role) {
   return jwt.sign(
-    { id: user._id, mobile: user.mobile, name: user.name },
+    { id: user._id, mobile: user.mobile, name: user.name, role },
     process.env.JWT_SECRET,
     { expiresIn: 60*2 } // Token expires in 2 minutes
   );
@@ -333,7 +333,7 @@ export async function verifyClient(req, res, db) {
     logger.info("Client Verification result: %s", Verification);
     if (Verification.modifiedCount>0) {
       // Generate JWT token 
-      const token = generateToken(client);
+      const token = generateToken(client, "client");
       res.status(200).json({
         message: "Client verified successfully",
         clientVerified: true,
@@ -383,7 +383,7 @@ export async function clientSignIn(req, res,db) {
     }
 
     // Generate JWT token
-    const token = generateToken(client);
+    const token = generateToken(client, "client");
 
     // Successful login
     logger.info("Client successfully signed in: %s", mobile);
@@ -589,7 +589,7 @@ export async function verifyDriver(req, res, db) {
     logger.info("Driver Verification result: %s", Verification);
     if (Verification.modifiedCount>0) {
       // Generate JWT token 
-      const token = generateToken(driver);
+      const token = generateToken(driver, "driver");
       res.status(200).json({
         message: "Driver verified successfully",
         driverVerified: true,
@@ -728,7 +728,7 @@ export async function driverSignIn(req, res,db) {
     }
 
     // Generate JWT token
-    const token = generateToken(driver);
+    const token = generateToken(driver, "driver");
 
     // Successful login
     logger.info("Driver successfully signed in: %s", mobile);

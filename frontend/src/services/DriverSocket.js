@@ -46,7 +46,7 @@ import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addLog } from "../utils/Logger";
 import AppEvents, { EVENTS } from "../utils/AppEvents";
-import { stopBackgroundLocationTracking } from "../services/backgroundLocationService";
+import { stopBackgroundLocationTracking } from "./backgroundLocationService";
 
 /* =========================
    CONFIGURATION
