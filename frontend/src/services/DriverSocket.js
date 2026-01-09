@@ -128,6 +128,7 @@ export async function emitLocation(coords) {
 
     if (socket?.connected) {
       socket.emit("driverLocation", coords, (ack) => {
+        console.log("Location ACK received:", ack);
         if (!ack?.ok) {
           if (ack?.reason === "TOKEN_EXPIRED") {
             handleTokenExpired();

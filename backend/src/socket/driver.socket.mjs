@@ -2,7 +2,7 @@
 import jwt from "jsonwebtoken";
 import { getRedis } from "../redis/redisClient.mjs";
 import logger from "../utils/logger.mjs";
-
+import { addDriverToGeo } from "../redis/redisClient.mjs";
 export function registerDriverSocket(io, socket) {
 
   /* =========================
@@ -15,27 +15,9 @@ export function registerDriverSocket(io, socket) {
 
       const { latitude, longitude } = coords;
       const driverId = socket.user.id;
+      await addDriverToGeo(driverId, longitude, latitude, ack);
 
-      const redis = await getRedis();
-    //  Redis multi for geo add and alive key
-      const multi = redis.multi()
-        .geoAdd("drivers:geo", { longitude, latitude, member: driverId })
-        .set(`driver:${driverId}:alive`, 1, { EX: 15 }); // 15 sec TTL
-
-      // avoid hanging indefinitely by racing with a timeout
-      const execPromise = multi.exec();
-      const res = await Promise.race([
-        execPromise,
-        new Promise((_, rej) => setTimeout(() => rej(new Error("Redis exec timeout")), 2000))
-      ]);
-
-      logger.info({ redisMultiRes: res });
-      if (Array.isArray(res) && res.some(r => r instanceof Error)) {
-        logger.warn(`Redis multi returned command error for driver ${driverId}`, { res });
-      }
-      logger.info(`Updated location for driver ${driverId}: (${latitude}, ${longitude})`);
-    // Send ACK
-      ack?.({ ok: true });
+    console.log("Driver socket ACK:", ack);  
     } catch (err) {
       logger.warn(
         `driverLocation auth failed for ${socket.user?.id}`

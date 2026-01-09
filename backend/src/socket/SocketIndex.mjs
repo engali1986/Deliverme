@@ -40,6 +40,10 @@ export function initSocket(io) {
   ========================= */
   io.on("connection", (socket) => {
     if (socket.user.role === "driver") {
+      if(socket.user.id){
+        logger.info(`🟢 Driver connected: ${socket.user.id}`);
+        socket.join(socket.user.id); // Join room with driver ID
+      }
       logger.info(`🟢 Driver connected: ${socket.user.id}`);
       registerDriverSocket(io, socket);
     } else {
