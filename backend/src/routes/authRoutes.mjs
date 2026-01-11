@@ -4,7 +4,7 @@ import upload from "../middlewares/uploadMiddleware.mjs"
 import dotenv from "dotenv"
 import authenticateToken from '../middlewares/auth.mjs';
 import logger from '../utils/logger.mjs';
-import {getRedis} from "../redis/redisClient.mjs";
+import {ObjectId} from "mongodb"
 
 dotenv.config()
 const router = express.Router();
@@ -79,13 +79,45 @@ router.post('/driver/signin', async(req,res)=>{
   await driverSignIn(req,res,db)
 });
 // Request ride
-router.post('/client/request-ride', async (req, res) => {
-  const db = req.app.locals.db;  // Access the db instance from app.locals
-  // Implement the logic to handle ride request here
-  const rideDetails = req.body;
-  console.log("Ride request received:", rideDetails);
-  // Placeholder response
-  res.status(501).send({ message: "Not implemented" }); // Placeholder response
+router.post('/client/request-ride', authenticateToken, async (req, res) => {
+  try{
+    const db = req.app.locals.db;  // Access the db instance from app.locals
+    const io= req.app.locals.io; // Access the Socket.io instance from app.locals
+    const ClientId= req.user.id
+    const { pickup, destination, fare } = req.body;
+    console.log("Request ride by client:", ClientId, "with data:", req.body);
+    console.log("Ride Request type of data:", typeof pickup, typeof destination, typeof fare);
+    if(!pickup || !destination || !fare || !ClientId || fare<=0 || typeof fare!=="number" || typeof pickup!=="object" || typeof destination!=="object" ){
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+     // 1️⃣ Create ride record
+    const ride = {
+      clientId: new ObjectId(ClientId),
+      pickup: {
+        type: 'Point',
+        coordinates: [pickup.longitude, pickup.latitude],
+      },
+      destination:{
+        type: 'Point',
+        coordinates: [destination.longitude, destination.latitude],
+      },
+      fare,
+      status: 'SEARCHING',
+      createdAt: new Date(),
+    };
+    const result = await db.collection('rides').insertOne(ride);
+    console.log("Ride insertion result:", result);
+    const rideId = result.insertedId.toString();
+    console.log("New ride created with ID:", rideId);
+
+
+
+    res.status(501).send({ message: "Not implemented" }); // Placeholder response
+
+  }catch{
+
+  }
+  
 });
 
 // Protected route: update driver availability + optional location

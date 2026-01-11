@@ -234,7 +234,9 @@ export async function verifyDriver(data) {
  */
 export async function requestRide({ pickup, destination, fare }) {  
   try {
-    const token = await AsyncStorage.getItem("clientToken");
+    const token = await AsyncStorage.getItem("userToken");
+    console.log("api.js requestRide pickup, destination, fare:", pickup, destination, fare)
+    console.log("api.js requestRide token:", token)
     const response = await fetchWithTimeout(`${BASE_URL}/client/request-ride`, {
       method: "POST",
       headers: {
