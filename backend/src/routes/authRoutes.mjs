@@ -5,6 +5,7 @@ import dotenv from "dotenv"
 import authenticateToken from '../middlewares/auth.mjs';
 import logger from '../utils/logger.mjs';
 import {ObjectId} from "mongodb"
+import { findNearbyDrivers } from '../redis/redisClient.mjs';
 
 dotenv.config()
 const router = express.Router();
@@ -109,6 +110,16 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
     console.log("Ride insertion result:", result);
     const rideId = result.insertedId.toString();
     console.log("New ride created with ID:", rideId);
+
+    // 2️⃣ Find nearby drivers (Redis GEO)
+    const drivers = await findNearbyDrivers(
+      pickup.longitude,
+      pickup.latitude,
+      5,   // km
+      20   // max drivers
+    );
+    console.log(`Found aliveDrivers ${drivers.length} nearby drivers`, drivers);
+
 
 
 

@@ -63,7 +63,7 @@ export async function addDriverToGeo(driverId, longitude, latitude, ack) {
 
   const multi = redis.multi()
         .geoAdd("drivers:geo", { longitude, latitude, member: driverId })
-        .set(`driver:${driverId}:alive`, 1, { EX: 15 }); // 15 sec TTL
+        .set(`driver:${driverId}:alive`, 1, { EX: 120 }); // 120 sec TTL
 
       // avoid hanging indefinitely by racing with a timeout
       const execPromise = multi.exec();
@@ -90,21 +90,32 @@ export async function removeDriverFromGeo(driverId) {
 
 export async function findNearbyDrivers(longitude, latitude, radiusKm = 5, limit = 20) {
   const redis = await initRedis();
+  const drivers = await redis.sendCommand([
+  'GEORADIUS',
+  'drivers:geo',
+  longitude.toString(),
+  latitude.toString(),
+  radiusKm.toString(),
+  'km',
+  'WITHDIST',
+  'COUNT',
+  limit.toString(),
+  'ASC',
+]);
+  console.log('Nearby drivers from Redis:', drivers);
+  const aliveDrivers = [];
 
-  return redis.geoSearch(
-    'drivers:geo',
-    {
-      longitude,
-      latitude,
-    },
-    {
-      radius: radiusKm,
-      unit: 'km',
-      WITHDIST: true,
-      COUNT: limit,
-      SORT: 'ASC',
+    for (const [driverId, distance] of drivers) {
+      const alive = await redis.exists(`driver:${driverId}:alive`);
+      console.log(`Driver ${driverId} alive status:`, alive);
+      if (alive) {
+        aliveDrivers.push([driverId, distance]);
+      } else {
+        // cleanup stale driver
+        await redis.zRem('drivers:geo', driverId);
+      }
     }
-  );
+  return aliveDrivers;
 }
 
 /**
