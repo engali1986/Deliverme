@@ -28,3 +28,26 @@ export function registerDriverSocket(io, socket) {
     }
   });
 }
+
+/* =========================
+     DRIVER HEARTBEAT (STATIONARY)
+  ========================= */
+  socket.on("driverHeartbeat", async (_, ack) => {
+    try {
+      jwt.verify(socket.token, process.env.JWT_SECRET);
+
+      const redis = await getRedis();
+      const driverId = socket.user.id;
+
+      // Refresh TTL ONLY
+      await redis.set(`driver:${driverId}:alive`, 1, { EX: 120 });
+
+      ack?.({ ok: true });
+    } catch (err) {
+      logger.warn(`driverHeartbeat auth failed for ${socket.user?.id}`);
+      ack?.({ ok: false, reason: "TOKEN_EXPIRED" });
+      socket.disconnect(true);
+    }
+  });
+
+

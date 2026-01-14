@@ -1,11 +1,10 @@
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location'; // Changed from expo-background-location
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { updateDriverLocation } from './api.js';
 import { addLog } from '../utils/Logger.js';
 import { emitLocation } from './DriverSocket.js';
 const LOCATION_TASK_NAME = 'background-location-task';
-const DISTANCE_THRESHOLD = 100; // 100 meters
+const DISTANCE_THRESHOLD = 500; // 500 meters
 
 // Define background task
 if(TaskManager && TaskManager.defineTask ){
@@ -15,18 +14,20 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
     return;
   }
 
-  if (data) {
+  try {
+    if (data) {
     const { locations } = data;
-    const location = locations[0];
+    
+    const isAvailable = await AsyncStorage.getItem('driverAvailable');
+    if (isAvailable !== 'true') {
+      console.log('Driver not available, skipping location update');
+      return;
+    }
+    let locationUpdated=false
 
-    if (location) {
-      try {
-        const isAvailable = await AsyncStorage.getItem('driverAvailable');
-        if (isAvailable !== 'true') {
-          console.log('Driver not available, skipping location update');
-          return;
-        }
-
+    if (locations && locations.length > 0) {
+      const location = locations[0];
+       if (location) {
         const coords = {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
@@ -37,17 +38,25 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         addLog(`Background location update: ${JSON.stringify(coords)}`, 'info');
         // Emit location via socket
         await emitLocation(coords);
-
-        // Send to backend
-        // const result = await updateDriverLocation(coords);
-        // if (!result) {
-        //   console.warn('Location update failed');
-        // }
-      } catch (e) {
-        console.error('Background location update error:', e);
+        locationUpdated=true         
       }
+
     }
+
+    // 🔁 Heartbeat fallback (no movement)
+    if (!locationUpdated) {
+      await emitLocation(null);
+    }
+
   }
+    
+  } catch (error) {
+    console.error('Error in background location task:', error); 
+
+    
+  }
+
+  
 });
 }else{
   console.warn('TaskManager is not available. Background location tracking will not work.');

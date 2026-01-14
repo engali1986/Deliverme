@@ -114,35 +114,72 @@ export async function initSocket() {
 export async function emitLocation(coords) {
   try {
     const now = Date.now();
+    const isHeartbeat=coords===null
 
     // Throttle emission
-    if (now - lastEmitTime < LOCATION_EMIT_INTERVAL) {
+    if (!isHeartbeat && now - lastEmitTime < LOCATION_EMIT_INTERVAL) {
       return;
     }
 
-    lastEmitTime = now;
+
+    if (!isHeartbeat) {
+      lastEmitTime = now;
+    }
   //  check socket
     if (!socket) {
     await initSocket();
     }
+    if (!socket?.connected) {
+      if (!isHeartbeat) {
+        await bufferLocation(coords);
+      }
+      return;
+    }
 
-    if (socket?.connected) {
-      socket.emit("driverLocation", coords, (ack) => {
-        console.log("Location ACK received:", ack);
+    socket.emit(
+      isHeartbeat ? "driverHeartbeat" : "driverLocation",
+      coords || {},
+      (ack) => {
+        console.log("Socket ACK:", ack);
+
         if (!ack?.ok) {
           if (ack?.reason === "TOKEN_EXPIRED") {
             handleTokenExpired();
             return;
           }
-          console.warn("⚠️ Location not acknowledged, buffering");
-          bufferLocation(coords);
-        }
-      });
 
-      addLog(`Location emitted: ${JSON.stringify(coords)}`, "info");
-    } else {
-      await bufferLocation(coords);
-    }
+          if (!isHeartbeat) {
+            console.warn("⚠️ Location not acknowledged, buffering");
+            bufferLocation(coords);
+          }
+        }
+      }
+    );
+
+    addLog(
+      isHeartbeat
+        ? "Heartbeat emitted"
+        : `Location emitted: ${JSON.stringify(coords)}`,
+      "info"
+    );
+
+    // if (socket?.connected) {
+    //   socket.emit("driverLocation", coords, (ack) => {
+    //     console.log("Location ACK received:", ack);
+    //     if (!ack?.ok) {
+    //       if (ack?.reason === "TOKEN_EXPIRED") {
+    //         handleTokenExpired();
+    //         return;
+    //       }
+    //       console.warn("⚠️ Location not acknowledged, buffering");
+    //       bufferLocation(coords);
+    //     }
+    //   });
+
+    //   addLog(`Location emitted: ${JSON.stringify(coords)}`, "info");
+    // } else {
+    //   await bufferLocation(coords);
+    // }
   } catch (err) {
     console.error("emitLocation error:", err);
   }
