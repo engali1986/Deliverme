@@ -115,6 +115,7 @@ export async function emitLocation(coords) {
   try {
     const now = Date.now();
     const isHeartbeat=coords===null
+    console.log('emitLocation called. isHeartbeat:', isHeartbeat, 'coords:', coords);
 
     // Throttle emission
     if (!isHeartbeat && now - lastEmitTime < LOCATION_EMIT_INTERVAL) {

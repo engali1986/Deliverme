@@ -6,24 +6,6 @@ import { emitLocation } from './DriverSocket.js';
 const LOCATION_TASK_NAME = 'background-location-task';
 const DISTANCE_THRESHOLD = 2000; // 2000 meters
 
-const LAST_LOCATION_KEY = 'lastEmittedLocation';
-
-function getDistanceInMeters(lat1, lon1, lat2, lon2) {
-  const R = 6371000; // Earth radius in meters
-  const toRad = (v) => (v * Math.PI) / 180;
-
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) ** 2;
-
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
 // Define background task
 if(TaskManager && TaskManager.defineTask ){
 TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
@@ -33,61 +15,45 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   }
 
   try {
+    if (data) {
+    const { locations } = data;
+    
     const isAvailable = await AsyncStorage.getItem('driverAvailable');
     if (isAvailable !== 'true') {
       console.log('Driver not available, skipping location update');
       return;
     }
+    let locationUpdated=false
 
-    if (!data?.locations?.length) {
-      await emitLocation(null);
-      return;
+    if (locations && locations.length > 0) {
+      const location = locations[0];
+       if (location) {
+        const coords = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          accuracy: location.coords.accuracy,
+        };
+
+        console.log('Background task: location update', coords);
+        addLog(`Background location update: ${JSON.stringify(coords)}`, 'info');
+        // Emit location via socket
+        await emitLocation(coords);
+        locationUpdated=true         
+      }
+
     }
 
-    const location = data.locations[0];
-    const currentCoords = {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      accuracy: location.coords.accuracy,
-    };
-
-    const lastLocationRaw = await AsyncStorage.getItem(LAST_LOCATION_KEY);
-
-    // First ever update → emit immediately
-    if (!lastLocationRaw) {
-      await emitLocation(currentCoords);
-      await AsyncStorage.setItem(
-        LAST_LOCATION_KEY,
-        JSON.stringify(currentCoords)
-      );
-      return;
-    }
-
-    const lastCoords = JSON.parse(lastLocationRaw);
-
-    const distance = getDistanceInMeters(
-      lastCoords.latitude,
-      lastCoords.longitude,
-      currentCoords.latitude,
-      currentCoords.longitude
-    );
-
-    console.log(`Moved distance: ${distance.toFixed(2)} meters`);
-
-    if (distance >= DISTANCE_THRESHOLD) {
-      console.log('Distance threshold reached, emitting location');
-      await emitLocation(currentCoords);
-
-      await AsyncStorage.setItem(
-        LAST_LOCATION_KEY,
-        JSON.stringify(currentCoords)
-      );
-    } else {
-      console.log('No significant movement, sending heartbeat, distance:', distance);
+    // 🔁 Heartbeat fallback (no movement)
+    if (!locationUpdated) {
       await emitLocation(null);
     }
-  } catch (err) {
-    console.error('Error in background location task:', err);
+
+  }
+    
+  } catch (error) {
+    console.error('Error in background location task:', error); 
+
+    
   }
 
   

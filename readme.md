@@ -202,35 +202,107 @@ API_BASE_URL=http://your_backend_ip:5000/api
   - Make sure you request location permissions in your code.
   - On Android, check device settings for location permissions.
   - On iOS, ensure location permissions are enabled for the app.
+# DeliverMe — Ride Sharing App (Updated)
 
-#### 4. **Driver Document Upload Fails**
-- **Symptom:** Driver cannot upload documents or verification fails.
-- **Solution:**  
-  - Check Google Drive API credentials in `backend/.env`.
-  - Ensure the service account has access to the target Drive folder.
-  - Review backend logs (`app.log`) for error details.
-
-#### 5. **MongoDB Connection Issues**
-- **Symptom:** Backend cannot connect to MongoDB.
-- **Solution:**  
-  - Verify `MONGO_URI` in `backend/.env`.
-  - Ensure MongoDB is running and accessible from your backend server.
-  - Check for network/firewall issues.
-
-#### 6. **Environment Variables Not Loaded**
-- **Symptom:** API keys or secrets are undefined in code.
-- **Solution:**  
-  - Make sure `.env` files exist and are correctly formatted (no extra quotes or spaces).
-  - Restart your servers after editing `.env` files.
-  - For React Native, ensure Babel is configured for environment variables.
-
-#### 7. **Frontend/Backend Out of Sync**
-- **Symptom:** API endpoints return 404 or unexpected errors.
-- **Solution:**  
-  - Make sure both frontend and backend are using the same API endpoint paths.
-  - Update `API_BASE_URL` in frontend `.env` to match backend server address.
+DeliverMe is a mobile ride-hailing project with a React Native frontend and a Node.js backend using MongoDB. This README was updated to reflect the repository's current state (excluding files in the `Drafts` folder).
 
 ---
 
-**If you encounter other issues, check the logs in `/backend/app.log` and use browser/Expo console for frontend errors. For further help, review the comments in the source files or contact the project maintainer.**
+## Key Features (Current)
+
+- **Authentication**: JWT-based sign up / sign in flows for both Clients and Drivers, including email verification.
+- **Driver Document Upload**: Drivers can upload required documents (license, registration, criminal record, personal photo). Files are integrated with Google Drive via a service account.
+- **Map-Based Ride Requests**: Clients pick pickup and destination using an interactive map.
+- **Background Location Tracking**: Driver location tracking service is available in the frontend for background updates.
+- **Real-time Updates**: Socket.IO integration in backend and frontend enables real-time ride messages and driver notifications.
+- **Internationalization**: English / Arabic UI support with a language toggle.
+- **Toast & UX Helpers**: Toast notifications and a side menu for navigation, settings, and logout.
+- **Logging**: Winston-style logger utilities exist in the backend for structured logs.
+
+---
+
+## Project Layout (high-level)
+
+- Backend: [backend](backend)
+  - Entry: `server.mjs` / `src/app.mjs`
+  - API routes: `src/routes/*`
+  - Auth: `src/controllers/authController.mjs`
+  - DB: `src/db/connect.mjs`
+  - Socket code: `src/socket/*` (Socket.IO handlers)
+  - Middleware: `src/middlewares/*`
+
+- Frontend: [frontend](frontend)
+  - Entry: `App.js`, `index.js`
+  - Screens: `src/screens/*` (Client and Driver screens)
+  - Services: `src/services/api.js`, `src/services/backgroundLocationService.js`, `src/services/DriverSocket.js`
+  - Components / i18n / hooks: `src/components`, `src/i18n`, `src/hooks`
+
+Note: The `Drafts` folder contains experimental and copy files — those were excluded from this summary.
+
+---
+
+## Installation & Quick Start
+
+Backend (from project root):
+```powershell
+cd backend
+npm install
+npm run dev
+```
+
+Frontend (from project root):
+```powershell
+cd frontend
+npm install
+npx expo start
+```
+
+Environment files:
+- Backend: create `backend/.env` with `MONGO_URI`, `JWT_SECRET`, Gmail/Google Drive credentials, and `DRIVE_PARENT_FOLDER_ID`.
+- Frontend: create `frontend/.env` with `API_BASE_URL` pointing to your backend (example: `http://<host>:5000/api`).
+
+---
+
+## Current Progress / Status
+
+- Authentication: implemented ✅
+- Email verification: implemented ✅
+- Driver document upload (Google Drive): implemented ✅
+- Map / Ride request flow: implemented ✅
+- Background location: implemented ✅
+- Real-time socket updates: implemented ✅
+- Multi-language (EN/AR): implemented ✅
+- Logging and basic middleware: implemented ✅
+
+Remaining / In progress
+- Driver-side navigation guidance (turn-by-turn) — not yet integrated
+- End-to-end automated tests — not present
+
+---
+
+## Troubleshooting (common issues)
+
+- Backend unreachable: ensure `backend` server is running (`npm run dev`) and `MONGO_URI` is correct.
+- Expo / Maps: confirm your Google Maps API key and billing settings.
+- Location permissions: ensure the app requests and is granted location permissions on device/emulator.
+- Google Drive uploads: verify `DriveServiceAccount.json` and that the service account has access to the destination folder.
+
+If you see errors, check backend logs and the Expo / browser console for useful traces.
+
+---
+
+## Next Recommended Actions
+
+1. Add or enable end-to-end and unit tests for core backend endpoints and critical frontend flows.
+2. Verify and harden production env variables and secrets handling (avoid committing credentials).
+3. Implement driver navigation (turn-by-turn) if required, and add more robust error handling around socket reconnection and background location failures.
+
+---
+
+If you want, I can:
+- run the app locally and fix immediate runtime errors,
+- add an example `.env.example` for both frontend and backend,
+- or open a PR with the README changes and a short CHANGELOG entry.
+
+**Updated file:** [readme.md](readme.md)
 

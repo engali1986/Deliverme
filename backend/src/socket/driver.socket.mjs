@@ -27,9 +27,8 @@ export function registerDriverSocket(io, socket) {
       socket.disconnect(true);
     }
   });
-}
 
-/* =========================
+  /* =========================
      DRIVER HEARTBEAT (STATIONARY)
   ========================= */
   socket.on("driverHeartbeat", async (_, ack) => {
@@ -43,11 +42,15 @@ export function registerDriverSocket(io, socket) {
       await redis.set(`driver:${driverId}:alive`, 1, { EX: 120 });
 
       ack?.({ ok: true });
+      console.log("Driver heartbeat ACK:", ack);
     } catch (err) {
       logger.warn(`driverHeartbeat auth failed for ${socket.user?.id}`);
       ack?.({ ok: false, reason: "TOKEN_EXPIRED" });
       socket.disconnect(true);
     }
   });
+
+}
+
 
 
