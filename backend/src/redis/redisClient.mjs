@@ -88,9 +88,16 @@ export async function removeDriverFromGeo(driverId) {
   await redis.zRem('drivers:geo', driverId.toString());
 }
 
-export async function findNearbyDrivers(longitude, latitude, radiusKm = 5, limit = 20) {
+export async function findNearbyDrivers(
+  longitude,
+  latitude,
+  radiusKm = 5,
+  limit = 20
+) {
   const redis = await initRedis();
-  const drivers = await redis.sendCommand([
+
+  // 1️⃣ GEO search (single fast command)
+ const drivers = await redis.sendCommand([
   'GEORADIUS',
   'drivers:geo',
   longitude.toString(),
@@ -102,21 +109,51 @@ export async function findNearbyDrivers(longitude, latitude, radiusKm = 5, limit
   limit.toString(),
   'ASC',
 ]);
-  console.log('Nearby drivers from Redis:', drivers);
-  const aliveDrivers = [];
 
-    for (const [driverId, distance] of drivers) {
-      const alive = await redis.exists(`driver:${driverId}:alive`);
-      console.log(`Driver ${driverId} alive status:`, alive);
-      if (alive) {
-        aliveDrivers.push([driverId, distance]);
-      } else {
-        // cleanup stale driver
-        await redis.zRem('drivers:geo', driverId);
-      }
+  logger.info(`Found ${drivers.length} drivers near (${latitude}, ${longitude})`);
+  logger.info(`Drivers from GEO search: ${JSON.stringify(drivers)}`);
+  console.log('Drivers from GEO search:', JSON.stringify(drivers));
+
+  if (!drivers.length) return [];
+
+  // 2️⃣ Pipeline: check alive status
+  const alivePipeline = redis.multi();
+  drivers.forEach((driver) => {
+    console.log('Checking alive for driver:', driver);
+    alivePipeline.exists(`driver:${driver}:alive`);
+  });
+
+  const aliveResults = await alivePipeline.exec();
+  logger.info(`Alive check results: ${JSON.stringify(aliveResults)}`);
+  console.log('Alive check results:', aliveResults);
+
+  // 3️⃣ Filter + collect stale drivers
+  const aliveDrivers = [];
+  const staleDrivers = [];
+
+  drivers.forEach(([driverId, distance], index) => {
+    const [err, isAlive] = aliveResults[index];
+
+    if (err || !isAlive) {
+      staleDrivers.push(driverId);
+    } else {
+      aliveDrivers.push([driverId, distance]);
     }
+  });
+
+  // 4️⃣ Cleanup stale drivers (pipeline)
+  if (staleDrivers.length) {
+    const cleanupPipeline = redis.multi();
+    staleDrivers.forEach(id =>
+      cleanupPipeline.zRem("drivers:geo", id)
+    );
+    await cleanupPipeline.exec();
+  }
+  logger.info(`Returning ${aliveDrivers.length} alive drivers after cleanup, ${aliveDrivers}`);
+
   return aliveDrivers;
 }
+
 
 /**
  * Graceful shutdown

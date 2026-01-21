@@ -122,4 +122,25 @@ router.get("/drivers/full", async (req, res) => {
   }
 });
 
+/* =========================
+   CHECK DRIVER ALIVE STATUS
+========================= */
+router.get("/driver/:driverId/alive", async (req, res) => {
+  try {
+    const redis = await getRedis();
+    const { driverId } = req.params;
+
+    const exists = await redis.exists(`driver:${driverId}:alive`);
+    const ttl = await redis.ttl(`driver:${driverId}:alive`);
+
+    res.json({
+      driverId,
+      alive: Boolean(exists),
+      ttlSeconds: ttl, // -1 = no TTL, -2 = key does not exist
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default router;
