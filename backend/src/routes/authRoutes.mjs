@@ -118,7 +118,7 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
       5,   // km
       20   // max drivers
     );
-    console.log(`Found aliveDrivers ${drivers.length} nearby drivers`, drivers);
+    console.log(`authRoutes.mjs Found aliveDrivers ${drivers.length} nearby drivers`, drivers);
 
 
 

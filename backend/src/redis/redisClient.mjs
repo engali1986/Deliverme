@@ -94,9 +94,10 @@ export async function findNearbyDrivers(
   radiusKm = 5,
   limit = 20
 ) {
-  const redis = await initRedis();
-
-  // 1️⃣ GEO search (single fast command)
+  
+  try {
+    const redis = await initRedis();
+    // 1️⃣ GEO search (single fast command)
  const drivers = await redis.sendCommand([
   'GEORADIUS',
   'drivers:geo',
@@ -118,9 +119,9 @@ export async function findNearbyDrivers(
 
   // 2️⃣ Pipeline: check alive status
   const alivePipeline = redis.multi();
-  drivers.forEach((driver) => {
-    console.log('Checking alive for driver:', driver);
-    alivePipeline.exists(`driver:${driver}:alive`);
+  drivers.forEach(([driverId,distance]) => {
+    console.log('Checking alive for driver:', driverId);
+    alivePipeline.exists(`driver:${driverId}:alive`);
   });
 
   const aliveResults = await alivePipeline.exec();
@@ -131,15 +132,28 @@ export async function findNearbyDrivers(
   const aliveDrivers = [];
   const staleDrivers = [];
 
-  drivers.forEach(([driverId, distance], index) => {
-    const [err, isAlive] = aliveResults[index];
+  if (!Array.isArray(aliveResults) || aliveResults.length === 0) {
+  console.warn(
+    "⚠️ aliveResults is empty or invalid — marking all drivers as stale",
+    aliveResults
+  );
 
-    if (err || !isAlive) {
-      staleDrivers.push(driverId);
-    } else {
-      aliveDrivers.push([driverId, distance]);
-    }
-  });
+  drivers.forEach(([driverId,distance]) => staleDrivers.push(driverId));
+  return [];
+  }
+
+ drivers.forEach(([driverId, distance], index) => {
+  const isAlive = aliveResults[index]; // 1 or 0
+  console.log(`Driver ${driverId} alive status:`, isAlive);
+
+  if (isAlive === 1) {
+    aliveDrivers.push([driverId, distance]);
+  } else {
+    staleDrivers.push(driverId);
+  }
+});
+
+  console.log(`Alive drivers: ${aliveDrivers.length}, Stale drivers: ${staleDrivers.length}`);
 
   // 4️⃣ Cleanup stale drivers (pipeline)
   if (staleDrivers.length) {
@@ -150,9 +164,16 @@ export async function findNearbyDrivers(
     await cleanupPipeline.exec();
   }
   logger.info(`Returning ${aliveDrivers.length} alive drivers after cleanup, ${aliveDrivers}`);
+  console.log(`Returning ${aliveDrivers.length} alive drivers after cleanup`, aliveDrivers);
 
   return aliveDrivers;
+    
+  } catch (error) {
+    logger.error('Error finding nearby drivers:', JSON.stringify(error));
+    
+  }
 }
+
 
 
 /**
