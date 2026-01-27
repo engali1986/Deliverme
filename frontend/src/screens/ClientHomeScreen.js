@@ -262,6 +262,7 @@ const ClientHomeScreen = () => {
         pickup: pickupCoords, 
         destination: destinationCoords, 
         fare: parseFloat(fare),
+        routeDistance:routeDistance
       }); 
       console.log('ClientHomeScreen.js: Ride requested successfully', response);
       Toast.show({

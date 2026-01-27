@@ -29,7 +29,7 @@
  *   - Adjust timeout and error handling as needed for production
 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const BASE_URL = "http://10.62.112.200:5000/api/auth"; // Replace with your backend's deployed URL if applicable
+const BASE_URL = "http://10.209.189.200:5000/api/auth"; // Replace with your backend's deployed URL if applicable
 
 // Utility fetch with timeout
 export async function fetchWithTimeout(resource, options = {}, timeout = 10000) {
@@ -232,10 +232,10 @@ export async function verifyDriver(data) {
  * @param {Object} param0 - The ride request details (pickup, destination, fare). 
  * Requires Authorization header with Bearer token.
  */
-export async function requestRide({ pickup, destination, fare }) {  
+export async function requestRide({ pickup, destination, fare, routeDistance }) {  
   try {
     const token = await AsyncStorage.getItem("userToken");
-    console.log("api.js requestRide pickup, destination, fare:", pickup, destination, fare)
+    console.log("api.js requestRide pickup, destination, fare, routeDistance:", pickup, destination, fare, routeDistance)
     console.log("api.js requestRide token:", token)
     const response = await fetchWithTimeout(`${BASE_URL}/client/request-ride`, {
       method: "POST",
@@ -243,7 +243,7 @@ export async function requestRide({ pickup, destination, fare }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ pickup, destination, fare }),
+      body: JSON.stringify({ pickup, destination, fare, routeDistance }),
     }, 15000); // 15 seconds timeout
     console.log("api.js requestRide response:",response)
     console.log("api.js requestRide response.ok:",response.ok || "cannot read response.ok")

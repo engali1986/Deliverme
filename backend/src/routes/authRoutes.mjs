@@ -85,9 +85,9 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
     const db = req.app.locals.db;  // Access the db instance from app.locals
     const io= req.app.locals.io; // Access the Socket.io instance from app.locals
     const ClientId= req.user.id
-    const { pickup, destination, fare } = req.body;
+    const { pickup, destination, fare, routeDistance } = req.body;
     console.log("Request ride by client:", ClientId, "with data:", req.body);
-    console.log("Ride Request type of data:", typeof pickup, typeof destination, typeof fare);
+    console.log("Ride Request type of data:", typeof pickup, typeof destination, typeof fare, typeof routeDistance);
     if(!pickup || !destination || !fare || !ClientId || fare<=0 || typeof fare!=="number" || typeof pickup!=="object" || typeof destination!=="object" ){
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -119,10 +119,17 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
       20   // max drivers
     );
     console.log(`authRoutes.mjs Found aliveDrivers ${drivers.length} nearby drivers`, drivers);
-
-
-
-
+    // 3️⃣ Notify drivers via Socket.io
+    drivers.forEach(driver => {
+      console.log(`Notifying driver ${driver[0]} about new ride request ${rideId}`);  
+      io.to(driver[0]).emit('newRideRequest', {
+        rideId,
+        pickup,
+        destination,
+        fare,
+        routeDistance
+      });
+    });
     res.status(501).send({ message: "Not implemented" }); // Placeholder response
 
   }catch{

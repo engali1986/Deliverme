@@ -296,6 +296,22 @@ const DriverHomeScreen = () => {
   const driverIdRef = useRef(null);
   const locationPermissionGranted = useRef(false);
 
+  // Listen to ride requests
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;    
+    const handleRideRequest = (data) => {
+      console.log('DriverHomeScreen.js: New ride request received:', data);
+      setRequests((prev) => [...prev, data]);
+    };
+
+    socket.on('newRideRequest', handleRideRequest);
+
+    return () => {
+      socket.off('newRideRequest', handleRideRequest);
+    };
+  }, []);
+
   /* ------------------------------------------------------------------ */
   /* Initialization                                                     */
   /* ------------------------------------------------------------------ */
