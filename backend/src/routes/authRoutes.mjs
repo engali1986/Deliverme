@@ -174,16 +174,29 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
     );
     console.log(`authRoutes.mjs Found aliveDrivers ${drivers.length} nearby drivers`, drivers);
     // 3️⃣ Notify drivers via Socket.io
-    drivers.forEach(driver => {
-      console.log(`Notifying driver ${driver[0]} about new ride request ${rideId}`);  
-      io.to(driver[0]).emit('newRideRequest', {
-        rideId,
-        pickup,
-        destination,
-        fare,
-        routeDistance
-      });
-    });
+    if (!io) {
+      console.warn('Socket.io instance missing on app.locals.io — skipping driver notifications for ride', rideId);
+    } else {
+      for (const driver of drivers) {
+        try {
+          const driverId = Array.isArray(driver) ? driver[0] : (driver?.id || driver?.socketId);
+          if (!driverId) {
+            console.warn('Skipping notify: no driverId found for', driver);
+            continue;
+          }
+          console.log(`Notifying driver ${driverId} about new ride request ${rideId}`);
+          io.to(driverId).emit('newRideRequest', {
+            rideId,
+            pickup,
+            destination,
+            fare,
+            routeDistance
+          });
+        } catch (emitErr) {
+          console.error('Error emitting newRideRequest to driver', driver, emitErr);
+        }
+      }
+    }
     if (drivers.length === 0) {
       console.log('No drivers found nearby for ride request', rideId);
       return res.status(200).json({ message: 'No drivers available nearby' });
