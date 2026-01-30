@@ -184,13 +184,19 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
         routeDistance
       });
     });
-    res.status(501).send({ message: "Not implemented" }); // Placeholder response
+    if (drivers.length === 0) {
+      console.log('No drivers found nearby for ride request', rideId);
+      return res.status(200).json({ message: 'No drivers available nearby' });
+    }
+    res.status(200).json({ message: 'Ride requested successfully', rideId });
 
-  }catch{
-
+  }catch(err){
+    console.error('Error in /requestRide route:', err);
+    res.status(500).json({ message: err.message || 'Server error' });
+  }
   }
   
-});
+);
 
 // Protected route: update driver availability + optional location
 router.patch('/driver/availability', authenticateToken, async (req, res) => {

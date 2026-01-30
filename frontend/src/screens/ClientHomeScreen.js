@@ -264,12 +264,21 @@ const ClientHomeScreen = () => {
         fare: parseFloat(fare),
         routeDistance:routeDistance
       }); 
-      console.log('ClientHomeScreen.js: Ride requested successfully', response);
+      console.log('ClientHomeScreen.js: Ride request response', response);
+      if (response.message === 'No drivers available nearby') {
+        Toast.show({
+          type: 'info', 
+          text1: 'No Drivers Available',
+          text2: 'There are no drivers available nearby. Please try again later.',
+        });
+        return;
+      }
       Toast.show({
         type: 'success',
         text1: 'Ride Requested',
-        text2: 'Your ride request has been sent successfully.',
-      });
+        text2: 'Your ride has been requested successfully.',
+      }); 
+      
       // Optionally, navigate to another screen or reset fields here
     } catch (error) {
       console.log('ClientHomeScreen.js: Ride request failed', error);
