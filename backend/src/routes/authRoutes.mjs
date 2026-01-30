@@ -110,7 +110,61 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
     console.log("Ride insertion result:", result);
     const rideId = result.insertedId.toString();
     console.log("New ride created with ID:", rideId);
+    // Find drive route distance between pickup and destination using google directions api
+    let distance = null; // meters
+    try {
+      const origin = `${pickup.latitude},${pickup.longitude}`;
+      const dest = `${destination.latitude},${destination.longitude}`;
+      const apiKey = process.env.DIRECTIONS_API_KEY;
+      console.log('Computing route distance from', origin, 'to', dest);
+      // Try Google Directions API first
+      if (apiKey) {
+        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&key=${apiKey}&mode=driving`;
+        const resp = await fetch(url);
+        console.log('Directions API response:', resp);
+        if (resp.ok) {
+          const data = await resp.json();
+          console.log('Directions API data:', data);
+          if (data.routes && data.routes.length > 0 && data.routes[0].legs && data.routes[0].legs.length > 0) {
+            distance = data.routes[0].legs[0].distance?.value ?? null; // meters
+          }
+        } else {
+          console.warn('Directions API non-OK response', resp.status);
+        }
+      }
 
+      // Fallback to haversine (straight-line) if no API key or request failed
+      if (!distance) {
+        console.log('Falling back to haversine formula for distance calculation');
+        const toRad = (v) => (v * Math.PI) / 180;
+        const R = 6371000; // Earth radius in meters
+        const dLat = toRad(destination.latitude - pickup.latitude);
+        const dLon = toRad(destination.longitude - pickup.longitude);
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(toRad(pickup.latitude)) *
+            Math.cos(toRad(destination.latitude)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        distance = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))); // meters
+      }
+      console.log('Computed route distance (meters):', distance, 'type:', typeof distance);
+      // store routeDistance on the ride document
+      if (distance !== null && distance> routeDistance*1000*0.8 && distance< routeDistance*1000*1.2) {
+        console.log('Storing computed route distance to ride document');
+        await db.collection('rides').updateOne(
+          { _id: result.insertedId },
+          { $set: { routeDistance: distance } }
+        );
+      }else{
+        throw new Error("Computed distance is not within acceptable range of provided routeDistance");
+      }
+    } catch (err) {
+      await db.collection('rides').deleteOne({ _id: result.insertedId });
+      console.error('Error computing route distance', err);
+      res.status(500).json({ message: err.message || 'Server error' });
+      return;
+    }
     // 2️⃣ Find nearby drivers (Redis GEO)
     const drivers = await findNearbyDrivers(
       pickup.longitude,
