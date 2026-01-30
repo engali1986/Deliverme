@@ -169,6 +169,7 @@ export async function findNearbyDrivers(
   return aliveDrivers;
     
   } catch (error) {
+    console.log('Error finding nearby drivers:', error);
     logger.error('Error finding nearby drivers:', JSON.stringify(error));
     
   }
