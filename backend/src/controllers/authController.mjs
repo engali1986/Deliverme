@@ -163,7 +163,7 @@ function generateToken(user, role) {
   return jwt.sign(
     { id: user._id, mobile: user.mobile, name: user.name, role },
     process.env.JWT_SECRET,
-    { expiresIn: 60*2 } // Token expires in 2 minutes
+    { expiresIn: 60*10 } // Token expires in 10 minutes
   );
 }
 

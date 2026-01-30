@@ -169,7 +169,7 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
     const drivers = await findNearbyDrivers(
       pickup.longitude,
       pickup.latitude,
-      5,   // km
+      0.2,   // km
       20   // max drivers
     );
     console.log(`authRoutes.mjs Found aliveDrivers ${drivers.length} nearby drivers`, drivers);
