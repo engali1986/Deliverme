@@ -28,7 +28,7 @@ async function start() {
     });
 
     // Make io available to routes/middlewares
-    app.set('io', io);
+    app.locals.io = io
 
    // 🔥 Initialize socket logic
     initSocket(io);
