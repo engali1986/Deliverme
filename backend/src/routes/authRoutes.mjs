@@ -106,10 +106,7 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
       status: 'SEARCHING',
       createdAt: new Date(),
     };
-    const result = await db.collection('rides').insertOne(ride);
-    console.log("Ride insertion result:", result);
-    const rideId = result.insertedId.toString();
-    console.log("New ride created with ID:", rideId);
+    let rideId = '';
     // Find drive route distance between pickup and destination using google directions api
     let distance = null; // meters
     try {
@@ -151,16 +148,16 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
       console.log('Computed route distance (meters):', distance, 'type:', typeof distance);
       // store routeDistance on the ride document
       if (distance !== null && distance> routeDistance*1000*0.8 && distance< routeDistance*1000*1.2) {
-        console.log('Storing computed route distance to ride document');
-        await db.collection('rides').updateOne(
-          { _id: result.insertedId },
-          { $set: { routeDistance: distance } }
-        );
+        console.log('Computed distance is within acceptable range of provided routeDistance, proceeding to create ride');
+        ride.routeDistance = distance; // Add routeDistance to ride object
+        const result = await db.collection('rides').insertOne(ride);
+        console.log("Ride insertion result:", result);
+        rideId = result.insertedId.toString();
+        console.log("New ride created with ID:", rideId);
       }else{
         throw new Error("Computed distance is not within acceptable range of provided routeDistance");
       }
     } catch (err) {
-      await db.collection('rides').deleteOne({ _id: result.insertedId });
       console.error('Error computing route distance', err);
       res.status(500).json({ message: err.message || 'Server error' });
       return;
