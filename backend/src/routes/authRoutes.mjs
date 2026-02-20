@@ -112,26 +112,10 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
     try {
       const origin = `${pickup.latitude},${pickup.longitude}`;
       const dest = `${destination.latitude},${destination.longitude}`;
-      const apiKey = process.env.DIRECTIONS_API_KEY;
-      console.log('Computing route distance from', origin, 'to', dest);
-      // Try Google Directions API first
-      if (apiKey) {
-        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&key=${apiKey}&mode=driving`;
-        const resp = await fetch(url);
-        console.log('Directions API response:', resp);
-        if (resp.ok) {
-          const data = await resp.json();
-          console.log('Directions API data:', data);
-          if (data.routes && data.routes.length > 0 && data.routes[0].legs && data.routes[0].legs.length > 0) {
-            distance = data.routes[0].legs[0].distance?.value ?? null; // meters
-          }
-        } else {
-          console.warn('Directions API non-OK response', resp.status);
-        }
-      }
-
-      // Fallback to haversine (straight-line) if no API key or request failed
-      if (!distance) {
+      
+      console.log('Computing route distance from', origin, 'to', dest)
+      // Get distance from Haversine formula
+      if (pickup.latitude && pickup.longitude && destination.latitude && destination.longitude) {
         console.log('Falling back to haversine formula for distance calculation');
         const toRad = (v) => (v * Math.PI) / 180;
         const R = 6371000; // Earth radius in meters
@@ -144,8 +128,12 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
             Math.sin(dLon / 2) *
             Math.sin(dLon / 2);
         distance = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))); // meters
-      }
       console.log('Computed route distance (meters):', distance, 'type:', typeof distance);
+
+      } else {
+        throw new Error('Invalid pickup or destination coordinates for distance calculation');
+      }
+      
       // store routeDistance on the ride document
       if (distance !== null && distance> routeDistance*1000*0.8 && distance< routeDistance*1000*1.2) {
         console.log('Computed distance is within acceptable range of provided routeDistance, proceeding to create ride');
