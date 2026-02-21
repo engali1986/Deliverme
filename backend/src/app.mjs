@@ -96,6 +96,9 @@ app.use(express.urlencoded({ extended: true, limit: process.env.BODY_LIMIT || '1
 /* ======================================================
    Health & readiness endpoints
 ====================================================== */
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Welcome to DeliverMe API' });
+});
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
