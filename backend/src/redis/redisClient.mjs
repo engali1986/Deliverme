@@ -96,6 +96,7 @@ export async function findNearbyDrivers(
 ) {
   
   try {
+    console.log(`Finding nearby drivers for location (${latitude}, ${longitude}) with radius ${radiusKm} km and limit ${limit}`);
     const redis = await initRedis();
     // 1️⃣ GEO search (single fast command)
  const drivers = await redis.sendCommand([

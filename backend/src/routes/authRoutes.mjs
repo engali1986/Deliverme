@@ -135,7 +135,7 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
       }
       
       // store routeDistance on the ride document
-      if (distance !== null && distance> routeDistance*1000*0.8 && distance< routeDistance*1000*1.2) {
+      if (distance !== null &&  distance< routeDistance*1000*1.2) {
         console.log('Computed distance is within acceptable range of provided routeDistance, proceeding to create ride');
         ride.routeDistance = distance; // Add routeDistance to ride object
         const result = await db.collection('rides').insertOne(ride);
@@ -143,6 +143,15 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
         rideId = result.insertedId.toString();
         console.log("New ride created with ID:", rideId);
         res.status(201).json({ message: 'Ride requested successfully', rideId });
+        // now use process.nextTick to find nearby drivers and emit socket event to them
+        process.nextTick(async () => {
+          try {
+            console.log('Finding nearby drivers for ride ID:', rideId);
+            const nearbyDrivers = await findNearbyDrivers(pickup.longitude, pickup.latitude); // 5 km radius
+            console.log('Nearby drivers found:', nearbyDrivers);  
+          } catch (err) {
+            console.error('Error in process.nextTick for finding nearby drivers', err);
+          }})
       }else{
         throw new Error("Computed distance is not within acceptable range of provided routeDistance");
       }
