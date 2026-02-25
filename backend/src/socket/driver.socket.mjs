@@ -40,7 +40,7 @@ export function registerDriverSocket(io, socket) {
       const driverId = socket.user.id;
 
       // Refresh TTL ONLY
-      await redis.set(`driver:${driverId}:alive`, 1, { EX: 120 });
+      await redis.set(`driver:${driverId}:alive`, 1, "EX", 120);
 
       ack?.({ ok: true });
       console.log("Driver heartbeat ACK:", ack);
