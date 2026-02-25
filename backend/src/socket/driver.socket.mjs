@@ -34,6 +34,7 @@ export function registerDriverSocket(io, socket) {
   socket.on("driverHeartbeat", async (_, ack) => {
     try {
       jwt.verify(socket.token, process.env.JWT_SECRET);
+      console.log(`jwt verified for driver ${socket.user?.id}`);
 
       const redis = await getRedis();
       const driverId = socket.user.id;
@@ -44,6 +45,7 @@ export function registerDriverSocket(io, socket) {
       ack?.({ ok: true });
       console.log("Driver heartbeat ACK:", ack);
     } catch (err) {
+      console.log("Driver heartbeat auth error:", err);
       logger.warn(`driverHeartbeat auth failed for ${socket.user?.id}`);
       ack?.({ ok: false, reason: "TOKEN_EXPIRED" });
       socket.disconnect(true);
