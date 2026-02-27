@@ -6,6 +6,7 @@ import authenticateToken from '../middlewares/auth.mjs';
 import logger from '../utils/logger.mjs';
 import {ObjectId} from "mongodb"
 import { findNearbyDrivers } from '../redis/redisClient.mjs';
+import { assign } from 'nodemailer/lib/shared';
 
 dotenv.config()
 const router = express.Router();
@@ -92,6 +93,7 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
      // 1️⃣ Create ride record
+     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // Ride request expires in 5 minutes
     const ride = {
       clientId: new ObjectId(ClientId),
       pickup: {
@@ -103,8 +105,10 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
         coordinates: [destination.longitude, destination.latitude],
       },
       fare,
-      status: 'SEARCHING',
+      status: 'pending',
+      assignedDriverId: null,
       createdAt: new Date(),
+      expiresAt, // Add expiration time to ride document
     };
     let rideId = '';
     // Find drive route distance between pickup and destination using google directions api

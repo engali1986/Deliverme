@@ -18,6 +18,14 @@ export default async function ensureIndexes(db) {
     await db.collection('clients').createIndex({ mobile: 1 }, { unique: true });
     await db.collection('clients').createIndex({ mobile: 1, verificationCode: 1 });
     console.log('Ensured clients indexes');
+
+    // 🚕 RIDES collection
+    await db.collection('rides').createIndex({ status: 1, expiresAt: 1 });
+    await db.collection('rides').createIndex({ clientId: 1 });
+    await db.collection('rides').createIndex({ assignedDriver: 1 });
+
+    console.log('Ensured rides indexes');
+
   } catch (error) {
     console.error('ensureIndexes error', error);
   }
