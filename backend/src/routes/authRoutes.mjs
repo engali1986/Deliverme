@@ -6,7 +6,7 @@ import authenticateToken from '../middlewares/auth.mjs';
 import logger from '../utils/logger.mjs';
 import {ObjectId} from "mongodb"
 import { findNearbyDrivers } from '../redis/redisClient.mjs';
-import { assign } from 'nodemailer/lib/shared';
+
 
 dotenv.config()
 const router = express.Router();
