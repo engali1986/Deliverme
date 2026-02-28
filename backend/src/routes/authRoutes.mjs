@@ -93,7 +93,7 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
      // 1️⃣ Create ride record
-     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // Ride request expires in 5 minutes
+     const expiresAt = new Date(Date.now() + 1 * 60 * 1000); // Ride request expires in 5 minutes
     const ride = {
       clientId: new ObjectId(ClientId),
       pickup: {

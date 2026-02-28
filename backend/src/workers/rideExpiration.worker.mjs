@@ -6,7 +6,8 @@ const BATCH_LIMIT = 50;       // Process 50 expired rides per cycle
 
 async function processExpiredRides() {
   try {
-    const db = await connectDB();
+    const dbClient = await connectDB();
+    const db = dbClient.db(); // Use default database from connection URI
     const ridesCollection = db.collection("rides");
 
     const now = new Date();
@@ -19,6 +20,7 @@ async function processExpiredRides() {
       })
       .limit(BATCH_LIMIT)
       .toArray();
+      console.log(`Found ${expiredRides.length} expired rides to process.`);
 
     if (!expiredRides.length) return;
 
@@ -64,8 +66,10 @@ async function processExpiredRides() {
   }
 }
 
+
 export function startRideExpirationWorker() {
   console.log("Ride Expiration Worker Started");
 
   setInterval(processExpiredRides, CHECK_INTERVAL);
 }
+startRideExpirationWorker();
