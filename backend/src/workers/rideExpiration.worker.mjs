@@ -7,7 +7,7 @@ const BATCH_LIMIT = 50;       // Process 50 expired rides per cycle
 async function processExpiredRides() {
   try {
     const dbClient = await connectDB();
-    const db = dbClient.db(); // Use default database from connection URI
+    const db = dbClient.db('deliverme'); // Use default database from connection URI
     const ridesCollection = db.collection("rides");
 
     const now = new Date();

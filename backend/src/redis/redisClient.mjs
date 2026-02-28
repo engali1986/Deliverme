@@ -163,7 +163,7 @@ export async function findNearbyDrivers(
 
 // Reemove ride from redis geo
 export async function removeRideFromGeo(rideId) {
-  const redis = getRedis
+  const redis = getRedis()
   await redis.zrem("rides:geo", rideId.toString());
 }
 
