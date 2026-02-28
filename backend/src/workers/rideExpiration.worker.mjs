@@ -11,6 +11,7 @@ async function processExpiredRides() {
     const ridesCollection = db.collection("rides");
 
     const now = new Date();
+    console.log(`Checking for expired rides at ${now.toISOString()}`);
 
     // Find expired pending rides (batch limited)
     const expiredRides = await ridesCollection
