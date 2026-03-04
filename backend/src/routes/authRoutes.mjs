@@ -150,9 +150,12 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
         console.log("Ride insertion result:", result);
         rideId = result.insertedId.toString();
         console.log("New ride created with ID:", rideId);
-        await rideQueue.add("matchRide", {
-          rideId,
-          });
+        // Fire-and-forget
+        rideQueue.add("matchRide", { rideId })
+        .then(() => console.log("Ride added to queue"))
+        .catch(err => console.error("Failed to add ride to queue", err));
+
+        // Send response immediately
         res.status(201).json({ message: 'Ride requested successfully', rideId });
         
         // now use process.nextTick to find nearby drivers and emit socket event to them

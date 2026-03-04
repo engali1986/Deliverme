@@ -37,7 +37,11 @@ console.log("✅ Worker Socket.IO Redis adapter ready");
    BULLMQ CONNECTION
 ========================= */
 
-const connection = new IORedis(process.env.REDIS_URL);
+const connection = new IORedis(process.env.REDIS_URL, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+});
+
 
 
 /* =========================
