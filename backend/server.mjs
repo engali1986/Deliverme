@@ -31,7 +31,7 @@ async function start() {
     app.locals.io = io
 
    // 🔥 Initialize socket logic
-    initSocket(io);
+    await initSocket(io);
 
     // Start listening
     server.listen(PORT, HOST, () => {

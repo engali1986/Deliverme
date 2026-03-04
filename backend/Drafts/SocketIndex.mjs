@@ -3,24 +3,7 @@ import jwt from "jsonwebtoken";
 import logger from "../utils/logger.mjs";
 import { registerDriverSocket } from "./driver.socket.mjs";
 
-import { createAdapter } from "@socket.io/redis-adapter";
-import { createClient } from "redis";
-
-export async function initSocket(io) {
-
-  /* =========================
-     REDIS ADAPTER SETUP
-  ========================= */
-
-  const pubClient = createClient({ url: process.env.REDIS_URL });
-  const subClient = pubClient.duplicate();
-
-  await pubClient.connect();
-  await subClient.connect();
-
-  io.adapter(createAdapter(pubClient, subClient));
-
-  logger.info("✅ Socket.IO Redis adapter connected");
+export function initSocket(io) {
 
   /* =========================
      AUTH MIDDLEWARE (ON CONNECT)
