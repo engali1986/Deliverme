@@ -25,6 +25,9 @@ const io = new Server(httpServer, {
 const pubClient = createClient({ url: process.env.REDIS_URL });
 const subClient = pubClient.duplicate();
 
+pubClient.on('error', (err) => console.error('PubClient Error:', err));
+subClient.on('error', (err) => console.error('SubClient Error:', err));
+
 await pubClient.connect();
 await subClient.connect();
 
@@ -42,7 +45,7 @@ const connection = new IORedis(process.env.REDIS_URL, {
   enableReadyCheck: false,
 });
 
-
+connection.on('error', (err) => console.error('IORedis Error:', err));
 
 /* =========================
    MONGO CONNECTION
@@ -62,6 +65,7 @@ const worker = new Worker(
   "rideMatching",
   async (job) => {
     const { rideId } = job.data;
+    console.log('job', job.data )
 
     try {
 

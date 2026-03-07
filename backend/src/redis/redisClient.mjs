@@ -103,6 +103,7 @@ export async function findNearbyDrivers(
 ) {
   try {
     const redis = initRedis();
+    console.log(`Finding nearby drivers for location (${latitude}, ${longitude}) within ${radiusKm} km`);
 
     const drivers = await redis.georadius(
       "drivers:geo",
