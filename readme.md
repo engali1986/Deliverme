@@ -33,103 +33,117 @@ DeliverMe is a ride-sharing mobile application built using **React Native** (fro
 
 ---
 
-## 📂 Project Structure
+## 📂 Project Structure (current)
 
-### **Frontend**
-```
 DeliverMe/
-│
 ├── backend/
-│   ├── server.mjs                # Main server file for backend
-│   ├── .env                      # Environment variables for backend
-│   ├── DriveServiceAccount.json  # Google Drive API credentials
-│   ├── package.json              # Backend dependencies and scripts
-│   ├── Drafts/                   # Draft files for development
-│   │   ├── api.js                # Draft API implementation
-│   │   ├── app.config.json       # Draft app configuration
-│   │   ├── ClientHomeScreen.js   # Draft client home screen logic
-│   │   ├── DriverHomeScreen.js   # Draft driver home screen logic
-│   │   └── ...other files        # Additional draft files
-│   └── src/                      # Main backend source code
-│       ├── app.mjs               # Backend app entry point
-│       ├── controllers/          # Controllers for handling requests
-│       │   ├── authController.mjs # Authentication logic
-│       ├── db/                   # Database connection and setup
-│       │   ├── connect.mjs       # MongoDB connection setup
-│       ├── middlewares/          # Middleware functions
-│       │   ├── auth.mjs          # Authentication middleware
-│       ├── routes/               # API routes
-│       │   ├── authRoutes.mjs    # Authentication routes
-│       └── utils/                # Utility functions
-│           ├── logger.mjs        # Logging utility
-│
-├── frontend/
-│   ├── App.js                    # Main entry point for React Native app
-│   ├── app.json                  # App configuration for Expo
-│   ├── babel.config.js           # Babel configuration
-│   ├── index.js                  # App initialization
-│   ├── .env                      # Environment variables for frontend
-│   ├── assets/                   # Static assets like images and fonts
-│   └── src/                      # Main frontend source code
-│       ├── screens/              # Screens for the app
-│       │   ├── ClientHomeScreen.js # Client home screen UI
-# DeliverMe — Ride Sharing App
-
-DeliverMe is a mobile ride-hailing project with a React Native frontend and a Node.js backend using MongoDB. This README summarizes the repository's current status, technologies, and how to run the project locally.
-
----
-
-## Quick summary
-
-- Frontend: React Native (Expo) app with Socket.IO client, maps, background location, and i18n (English / Arabic).
-- Backend: Node.js (ESM) with Express, Socket.IO, MongoDB (native driver), Redis + BullMQ for queues, and Google Drive integration for driver documents.
-
----
-
-## Technologies
-
-- Frontend
-  - React Native (Expo)
-  - socket.io-client
-  - react-navigation
-  - react-native-maps
-  - expo-location / expo-task-manager (background location)
-
-- Backend
-  - Node.js (ESM), Express
-  - MongoDB (mongodb native driver)
-  - Socket.IO + @socket.io/redis-adapter
-  - Redis (ioredis / redis), BullMQ (queues)
-  - Google Drive API (service account)
-  - Winston (logging)
-
----
-
-## Project tree (high-level)
-
-DeliverMe/
-
-- backend/
-  - server.mjs
-  - DriveServiceAccount.json
-  - package.json
-  - src/
-    - app.mjs
-    - controllers/
-    - db/
-    - middlewares/
-    - routes/
-    - socket/
-    - workers/ (rideMatching.worker.mjs, rideExpiration.worker.mjs)
-
-- frontend/
-  - App.js / index.js
-  - app.json
-  - package.json
-  - src/
-    - screens/ (ClientHomeScreen.js, DriverHomeScreen.js, etc.)
-    - services/ (api.js, DriverSocket.js, backgroundLocationService.js)
-    - components/, i18n/, hooks/
+│   ├── .env
+│   ├── DriveServiceAccount.json
+│   ├── package.json
+│   ├── server.mjs
+│   ├── Drafts/
+│   │   ├── App.js
+│   │   ├── app.mjs
+│   │   ├── app.config.json
+│   │   ├── app.json
+│   │   ├── api.js
+│   │   ├── api copy.js
+│   │   ├── authController copy.mjs
+│   │   ├── authController.mjs
+│   │   ├── authRoutes copy.mjs
+│   │   ├── authRoutes.mjs
+│   │   ├── backgroundLocationService.js
+│   │   ├── ClientHomeScreen*.js (many copies)
+│   │   ├── DriverHomeScreen*.js (many copies)
+│   │   ├── DriverSigninScreen*.js
+│   │   ├── DriverSignupScreen*.js
+│   │   ├── HomeScreen.js
+│   │   ├── Logger.js
+│   │   ├── LogViewer.js
+│   │   ├── MapPickerScreen.js
+│   │   ├── package copy.json
+│   │   ├── package.json
+│   │   ├── readme.md
+│   │   ├── redisClient copy.mjs
+│   │   ├── redisClient.mjs
+│   │   ├── server copy.mjs
+│   │   ├── server.mjs
+│   │   ├── socket.js
+│   │   ├── SocketIndex.mjs
+│   │   ├── uploadMiddleware copy.mjs
+│   │   └── uploadMiddleware.mjs
+│   └── src/
+│       ├── app.mjs
+│       ├── controllers/
+│       │   ├── aa.mjs
+│       │   └── authController.mjs
+│       ├── db/
+│       │   ├── connect.mjs
+│       │   └── ensureIndexes.mjs
+│       ├── matching/
+│       ├── middlewares/
+│       │   ├── auth.mjs
+│       │   └── uploadMiddleware.mjs
+│       ├── queues/
+│       │   └── rideQueue.mjs
+│       ├── redis/
+│       │   └── redisClient.mjs
+│       ├── routes/
+│       │   ├── authRoutes.mjs
+│       │   └── redisDebugRoutes.mjs
+│       ├── socket/
+│       │   ├── driver.socket.mjs
+│       │   └── SocketIndex.mjs
+│       ├── utils/
+│       │   └── logger.mjs
+│       └── workers/
+│           ├── rideExpiration.worker.mjs
+│           └── rideMatching.worker.mjs
+└── frontend/
+    ├── .env
+    ├── app.config.js
+    ├── App.js
+    ├── app.json
+    ├── babel.config.js
+    ├── eas.json
+    ├── index.js
+    ├── package.json
+    ├── .expo/ (expo build metadata)
+    ├── assets/
+    │   └── fonts/
+    └── src/
+        ├── components/
+        │   ├── LanguageToggle.js
+        │   ├── LogViewer.js
+        │   ├── NavigationLogger.js
+        │   └── toastConfig.js
+        ├── context/
+        │   └── LanguageContext.js
+        ├── hooks/
+        │   └── usefonts.js
+        ├── i18n/
+        │   ├── i18n.js
+        │   └── translations.json
+        ├── navigation/
+        │   └── AppNavigator.js
+        ├── screens/
+        │   ├── ClientHomeScreen.js
+        │   ├── ClientSigninScreen.js
+        │   ├── ClientSignupScreen.js
+        │   ├── DriverHomeScreen.js
+        │   ├── DriverSigninScreen.js
+        │   ├── DriverSignupScreen.js
+        │   ├── HomeScreen.js
+        │   └── MapPickerScreen.js
+        ├── services/
+        │   ├── api.js
+        │   ├── backgroundLocationService.js
+        │   └── DriverSocket.js
+        └── utils/
+            ├── AppEvents.js
+            ├── auth.js
+            ├── localization.js
+            └── Logger.js
 
 ---
 
