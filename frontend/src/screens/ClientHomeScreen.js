@@ -265,18 +265,16 @@ const ClientHomeScreen = () => {
         routeDistance:routeDistance
       }); 
       console.log('ClientHomeScreen.js: Ride request response', response);
-      if (response.message === 'No drivers available nearby') {
-        Toast.show({
-          type: 'info', 
-          text1: 'No Drivers Available',
-          text2: 'There are no drivers available nearby. Please try again later.',
+      if (response.message === 'Ride requested successfully') {
+        navigation.navigate("SearchingDriver", {
+          rideId: response.rideId
         });
         return;
       }
       Toast.show({
-        type: 'success',
-        text1: 'Ride Requested',
-        text2: 'Your ride has been requested successfully.',
+        type: 'error',
+        text1: 'Ride Request Failed',
+        text2: 'Failed to request ride.' || response.message,
       }); 
       
       // Optionally, navigate to another screen or reset fields here

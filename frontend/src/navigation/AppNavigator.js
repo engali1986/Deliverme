@@ -8,6 +8,7 @@ import ClientSignupScreen from '../screens/ClientSignupScreen';
 import DriverSignupScreen from '../screens/DriverSignupScreen';
 import DriverHomeScreen from '../screens/DriverHomeScreen';
 import ClientHomeScreen from '../screens/ClientHomeScreen';
+import SearchingDriverScreen from '../screens/SearchingDriverScreen';
 import MapPickerScreen from '../screens/MapPickerScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppEvents, { EVENTS } from '../utils/AppEvents';
@@ -55,6 +56,7 @@ export default function AppNavigator({ initialRouteName }) {
         <Stack.Screen name="DriverSignup" component={DriverSignupScreen} />
         <Stack.Screen name="DriverHome" component={DriverHomeScreen} />
         <Stack.Screen name="ClientHome" component={ClientHomeScreen} />
+        <Stack.Screen name="SearchingDriver" component={SearchingDriverScreen} />
         <Stack.Screen name="MapPicker" component={MapPickerScreen} options={{ title: 'Select Location' }} />
       </Stack.Navigator>
     </NavigationContainer>

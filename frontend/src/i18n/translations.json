@@ -32,7 +32,11 @@
       "logout":"Logout",
       "logout_success":"Logout successfully",
       "logout_message":"Have a nice day!",
-      "Invalid_Fare":"Invalid Fare"
+      "Invalid_Fare":"Invalid Fare",
+      "searching_driver" : "Searching for driver...",
+      "looking_for_drivers" : "Looking for drivers near you",
+      "cancel_ride" : "Cancel Ride",
+      "ride_cancelled" : "Ride cancelled"
     },
     "ar": {
       "home_title": "مرحبًا بك في Deliverme",
@@ -67,7 +71,11 @@
       "logout":"تسجيل الخروج",
       "logout_success":"تم تسجيل الخروج بنجاح",
       "logout_message":"نتمنى لك يوماً سعيداً!",
-      "Invalid_Fare":"أجرة غير صالحة"
+      "Invalid_Fare":"أجرة غير صالحة",
+      "searching_driver" : "جاري البحث عن سائق...",
+      "looking_for_drivers" : "نبحث عن سائقين بالقرب منك",
+      "cancel_ride" : "إلغاء الرحلة",
+      "ride_cancelled" : "تم إلغاء الرحلة"
   
     }
   }
