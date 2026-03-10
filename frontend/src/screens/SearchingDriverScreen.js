@@ -81,12 +81,13 @@ const SearchingDriverScreen = () => {
         <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
           <Ionicons name="menu" size={28} color="#004080" />
         </TouchableOpacity>
-        <LogViewer /> {/* Add LogViewer here */}  
+        
 
         {/* Searching Content */}
         <View style={styles.searchContainer}>
 
           <Ionicons name="car-sport" size={80} color="#004080" />
+            <LogViewer /> {/* Add LogViewer here */}
 
           <Text style={styles.searchTitle}>
             {i18n.t("searching_driver")}
