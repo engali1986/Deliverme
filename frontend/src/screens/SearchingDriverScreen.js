@@ -18,6 +18,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LanguageContext } from "../context/LanguageContext.js";
 import LanguageToggle from "../components/LanguageToggle.js";
 import i18n from "../i18n/i18n";
+import LogViewer from "../components/LogViewer.js";
+import { addLog } from "../utils/Logger.js";
+
 
 const { height } = Dimensions.get("window");
 
@@ -25,6 +28,7 @@ const SearchingDriverScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { rideId } = route.params;
+  addLog(`SearchingDriverScreen mounted for rideId: ${rideId}`, "info");
 
   const { language } = useContext(LanguageContext);
 
@@ -77,6 +81,7 @@ const SearchingDriverScreen = () => {
         <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
           <Ionicons name="menu" size={28} color="#004080" />
         </TouchableOpacity>
+        <LogViewer /> {/* Add LogViewer here */}  
 
         {/* Searching Content */}
         <View style={styles.searchContainer}>
