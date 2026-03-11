@@ -14,8 +14,8 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-  DeviceEventEmitter,
 } from "react-native";
+import { DeviceEventEmitter } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as Clipboard from "expo-clipboard";
 
@@ -83,6 +83,7 @@ const LogViewer = forwardRef((props, ref) => {
     addLog: (message, level = "info") => {
       const timestamp = new Date().toLocaleTimeString();
       const entry = { text: `[${timestamp}] ${message}`, level };
+      console.log('typeof entry.text:', typeof entry.text); // Debug log
       setLogs((prevLogs) => [...prevLogs, entry]);
     },
     clearLogs: async () => {
@@ -137,13 +138,22 @@ const LogViewer = forwardRef((props, ref) => {
 
       {/* Collapsible filter row */}
       {showFilters && (
-        <View style={styles.filterRow}>
-          <Button title="All" onPress={() => setFilter("all")} />
-          <Button title="Info" onPress={() => setFilter("info")} />
-          <Button title="Warn" onPress={() => setFilter("warn")} />
-          <Button title="Error" onPress={() => setFilter("error")} />
-        </View>
-      )}
+  <View style={styles.filterRow}>
+    <TouchableOpacity onPress={() => setFilter("all")}>
+      <Text style={styles.toggleText}>All</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => setFilter("info")}>
+      <Text style={styles.toggleText}>Info</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => setFilter("warn")}>
+      <Text style={styles.toggleText}>Warn</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => setFilter("error")}>
+      <Text style={styles.toggleText}>Error</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
 
       {/* Search bar */}
       <TextInput
@@ -161,11 +171,18 @@ const LogViewer = forwardRef((props, ref) => {
 
       {/* Log display */}
       <ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContent}>
-        {filteredLogs.map((log, index) => (
-          <Text key={index} style={getTextStyle(log.level)}>
-            {log.text}
-          </Text>
-        ))}
+        {filteredLogs.map((log, index) => {
+  if (typeof log.text !== "string") {
+    console.warn("Non-string log detected:", log.text);
+    return null;
+  }
+  return (
+    <Text key={index} style={getTextStyle(log.level)}>
+      {log.text}
+    </Text>
+  );
+})}
+
       </ScrollView>
     </View>
   );
