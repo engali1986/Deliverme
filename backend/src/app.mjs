@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 
 import authRoutes from './routes/authRoutes.mjs';
 import redisDebugRoutes from './routes/redisDebugRoutes.mjs';
+import ridesRoutes from './routes/ridesRoutes.mjs';
 import { connectDB } from './db/connect.mjs';
 import ensureIndexes from './db/ensureIndexes.mjs';
 import logger from './utils/logger.mjs';
@@ -121,6 +122,7 @@ app.get('/ready', async (req, res) => {
 ====================================================== */
 app.use('/api/auth', authRoutes);
 app.use('/api/debug/redis', redisDebugRoutes);
+app.use('/api/rides', ridesRoutes);
 /* ======================================================
    Database initialization (non-blocking)
 ====================================================== */

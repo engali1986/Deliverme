@@ -30,6 +30,7 @@
 */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const BASE_URL = "https://deliverme-el2x.onrender.com/api/auth"; // Replace with your backend's deployed URL if applicable
+const API_ROOT = BASE_URL.replace('/api/auth', '/api');
 
 // Utility fetch with timeout
 export async function fetchWithTimeout(resource, options = {}, timeout = 10000) {
@@ -291,6 +292,36 @@ export async function updateDriverAvailability(available, coords) {
   }
 }
 
+/**
+ * Fetch nearby drivers for a ride.
+ * @param {string} rideId
+ * @param {number} radiusKm
+ * @param {number} limit
+ */
+export async function getNearbyDrivers(rideId, radiusKm = 5, limit = 20) {
+  try {
+    const token = await AsyncStorage.getItem("userToken");
+    const url = `${API_ROOT}/rides/${rideId}/nearby-drivers?radiusKm=${radiusKm}&limit=${limit}`;
+    const response = await fetchWithTimeout(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }, 15000);
+
+    if (!response.ok) {
+      let message = "Failed to load nearby drivers";
+      try {
+        const errorData = await response.json();
+        message = errorData.message || message;
+      } catch {}
+      throw new Error(message);
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw new Error(error.message || "Network error");
+  }
+}
 
 
 

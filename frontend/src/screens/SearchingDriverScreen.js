@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   ActivityIndicator,
   Dimensions,
+  FlatList,
 } from "react-native";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -20,6 +21,7 @@ import LanguageToggle from "../components/LanguageToggle.js";
 import i18n from "../i18n/i18n";
 import LogViewer from "../components/LogViewer.js";
 import { addLog } from "../utils/Logger.js";
+import { getNearbyDrivers } from "../services/api.js";
 
 
 const { height } = Dimensions.get("window");
@@ -34,6 +36,30 @@ const SearchingDriverScreen = () => {
 
   const [menuVisible, setMenuVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(-250));
+  const [drivers, setDrivers] = useState([]);
+  const [driversLoading, setDriversLoading] = useState(true);
+  const [driversError, setDriversError] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+
+    (async () => {
+      try {
+        const data = await getNearbyDrivers(rideId, 5, 20);
+        if (!active) return;
+        setDrivers(data.drivers || []);
+      } catch (err) {
+        if (!active) return;
+        setDriversError(err.message || "Failed to load drivers");
+      } finally {
+        if (active) setDriversLoading(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [rideId]);
 
   const toggleMenu = () => {
     if (menuVisible) {
@@ -102,6 +128,35 @@ const SearchingDriverScreen = () => {
           <Text style={styles.searchText}>
             {i18n.t("looking_for_drivers")}
           </Text>
+
+          {!driversLoading && (
+            <View style={styles.driverList}>
+              <Text style={styles.driverListTitle}>
+                Available drivers within 5 km
+              </Text>
+
+              {driversError ? (
+                <Text style={styles.driverListEmpty}>{driversError}</Text>
+              ) : drivers.length === 0 ? (
+                <Text style={styles.driverListEmpty}>
+                  No available drivers yet.
+                </Text>
+              ) : (
+                <FlatList
+                  data={drivers}
+                  keyExtractor={(item) => item.driverId}
+                  renderItem={({ item }) => (
+                    <View style={styles.driverRow}>
+                      <Text style={styles.driverId}>{item.driverId}</Text>
+                      <Text style={styles.driverDistance}>
+                        {Number(item.distanceKm).toFixed(2)} km
+                      </Text>
+                    </View>
+                  )}
+                />
+              )}
+            </View>
+          )}
 
           <TouchableOpacity style={styles.cancelButton} onPress={cancelRide}>
             <Text style={styles.cancelText}>
@@ -186,6 +241,39 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#004080",
     marginTop: 10,
+  },
+  driverList: {
+    marginTop: 24,
+    width: "88%",
+    backgroundColor: "#ffffff",
+    padding: 12,
+    borderRadius: 10,
+    elevation: 3,
+  },
+  driverListTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#003366",
+    marginBottom: 8,
+  },
+  driverRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e6eef8",
+  },
+  driverId: {
+    color: "#003366",
+    fontSize: 13,
+  },
+  driverDistance: {
+    color: "#1565C0",
+    fontSize: 13,
+  },
+  driverListEmpty: {
+    color: "#004080",
+    fontSize: 13,
   },
 
   cancelButton: {
