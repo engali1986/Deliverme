@@ -80,7 +80,7 @@
  *
  * ┌────────────────────────────┐
  * │ Socket.IO                  │
- * │ ride:request event         │
+ * │ ride_request event         │
  * └──────────┬─────────────────┘
  *            │
  *            ▼
@@ -172,7 +172,7 @@
  * - Events used:
  *   • driver:register       → initial driver registration
  *   • driver:availability   → availability updates
- *   • ride:request          → incoming ride requests
+ *   • ride_request          → incoming ride requests
  * - Socket listeners are cleaned up on unmount.
  *
  *
@@ -410,7 +410,7 @@ const DriverHomeScreen = () => {
     return  () => {
       mounted = false
       const socket = getSocket();
-      socket?.off('ride:request');
+      socket?.off('ride_request');
       stopBackgroundLocationTracking().catch(() => {});
     };
   }, []);
