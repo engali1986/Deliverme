@@ -24,7 +24,7 @@ let lastEmitTime = 0;
 ========================= */
 
 export async function initSocket() {
-  if (socket && socket?.connected) return socket;
+  if (socket) return socket;
 
   const token = await AsyncStorage.getItem("userToken");
   const userType = await AsyncStorage.getItem("userType");
