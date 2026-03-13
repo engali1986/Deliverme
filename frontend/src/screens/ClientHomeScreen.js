@@ -119,7 +119,7 @@ import LanguageToggle from '../components/LanguageToggle.js';
 import MapViewDirections from 'react-native-maps-directions';
 import { API_KEY, KM_RATE } from '@env';
 import { requestRide } from '../services/api.js';
-import {initSocket, getSocketId} from '../services/ClientSocket.js';
+import {initSocket} from '../services/SocketManager.js';
 
 const { height } = Dimensions.get('window');
 
@@ -146,9 +146,6 @@ const ClientHomeScreen = () => {
   useEffect(() => {
     (async () => {
       await initSocket();
-      console.log('ClientHomeScreen.js: Socket initialized with ID', await getSocketId());
-      const socketID = await getSocketId(); // Log the socket ID for debugging
-      console.log('ClientHomeScreen.js: Current Socket ID:', socketID);
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         console.log('ClientHomeScreen.js: Location permission not granted');

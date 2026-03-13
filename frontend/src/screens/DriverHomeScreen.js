@@ -305,10 +305,10 @@ const DriverHomeScreen = () => {
       setRequests((prev) => [...prev, data]);
     };
 
-    socket?.on('newRideRequest', handleRideRequest);
+    socket?.on('ride_request', handleRideRequest);
 
     return () => {
-      socket?.off('newRideRequest', handleRideRequest);
+      socket?.off('ride_request', handleRideRequest);
     };
   }, []);
 

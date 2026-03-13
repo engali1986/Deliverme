@@ -46,7 +46,7 @@ import { initSocket, getSocket, closeSocket } from "./SocketManager";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addLog } from "../utils/Logger.js";
 import { stopBackgroundLocationTracking } from "./backgroundLocationService.js";
-import { AppEvents, EVENTS } from "../utils/AppEvents.js";
+import AppEvents, { EVENTS } from "../utils/AppEvents.js";
 
 /* =========================
    EMIT DRIVER LOCATION
@@ -166,8 +166,9 @@ async function bufferLocation(coords) {
    FLUSH BUFFERED LOCATIONS
 ========================= */
 
-async function flushBufferedLocations() {
+export async function flushBufferedLocations() {
   try {
+    let socket = getSocket();
     const stored = await AsyncStorage.getItem("pendingLocations");
     let pending = [];
 
