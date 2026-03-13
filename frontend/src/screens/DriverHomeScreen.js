@@ -277,7 +277,7 @@ import {
   startBackgroundLocationTracking,
   stopBackgroundLocationTracking,
 } from '../services/backgroundLocationService';
-import { initSocket, getSocket, closeSocket } from '../services/DriverSocket';
+import { initSocket, getSocket, closeSocket } from '../services/SocketManager';
 
 const COOLDOWN_MS = 10000;
 
@@ -297,18 +297,18 @@ const DriverHomeScreen = () => {
   const locationPermissionGranted = useRef(false);
 
   // Listen to ride requests
-  useEffect(() => {
-    const socket = getSocket();
+  useEffect( () => {
+    const socket =  getSocket();
     if (!socket) return;    
     const handleRideRequest = (data) => {
       console.log('DriverHomeScreen.js: New ride request received:', data);
       setRequests((prev) => [...prev, data]);
     };
 
-    socket.on('newRideRequest', handleRideRequest);
+    socket?.on('newRideRequest', handleRideRequest);
 
     return () => {
-      socket.off('newRideRequest', handleRideRequest);
+      socket?.off('newRideRequest', handleRideRequest);
     };
   }, []);
 
@@ -343,7 +343,7 @@ const DriverHomeScreen = () => {
           // log all AsyncStorage items
             await logAllAsyncStorage();
            // Initialize socket connection
-           await initSocket();
+           let socket = await initSocket();
            // Foreground permission
             const { status: fgStatus } =
               await Location.requestForegroundPermissionsAsync();
@@ -407,8 +407,8 @@ const DriverHomeScreen = () => {
          }
        })();
 
-    return () => {
-      mounted = false;
+    return  () => {
+      mounted = false
       const socket = getSocket();
       socket?.off('ride:request');
       stopBackgroundLocationTracking().catch(() => {});

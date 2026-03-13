@@ -31,6 +31,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
     console.error('Background location error:', error);
     return;
   }
+  console.log('Background location task triggered with data:', data);
 
   try {
     const isAvailable = await AsyncStorage.getItem('driverAvailable');

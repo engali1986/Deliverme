@@ -42,80 +42,25 @@
  *    - connect_error
  */
 
-import io from "socket.io-client";
+import { initSocket, getSocket, closeSocket } from "./SocketManager";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { addLog } from "../utils/Logger";
-import AppEvents, { EVENTS } from "../utils/AppEvents";
-import { stopBackgroundLocationTracking } from "./backgroundLocationService";
-
-/* =========================
-   CONFIGURATION
-========================= */
-
-const SOCKET_URL = "https://deliverme-el2x.onrender.com";
-
-const LOCATION_EMIT_INTERVAL = 3000; // ms (3 seconds)
-const MAX_BUFFERED_LOCATIONS = 50;
-const BATCH_SIZE = 20;
-
-let socket = null;
-let lastEmitTime = 0;
-
-/* =========================
-   INITIALIZE SOCKET
-========================= */
-
-export async function initSocket() {
-  if (socket && socket?.connected) return socket;
-
-  const token = await AsyncStorage.getItem("userToken");
-
-  socket = io(SOCKET_URL, {
-    transports: ["websocket"],
-    auth: token ? { token } : undefined,
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    upgrade: false,
-  });
-
-  /* ---------- CONNECTION ---------- */
-  socket.on("connect", async () => {
-    console.log("🟢 Socket connected:", socket.id);
-    addLog(`Socket connected: ${socket.id}`, "info");
-
-    await flushBufferedLocations();
-  });
-
-  /* ---------- DISCONNECTION ---------- */
-  socket.on("disconnect", (reason) => {
-    console.log("🔴 Socket disconnected:", reason);
-    addLog(`Socket disconnected: ${reason}`, "warn");
-  });
-
-  /* ---------- CONNECTION ERROR ---------- */
-  socket.on("connect_error", async (err) => {
-    console.error("❌ Socket connect error:", err.message);
-    addLog(`Socket connect error: ${err.message}`, "error");
-    if (err.message === "Unauthorized") {
-      await AsyncStorage.removeItem("userToken");
-      socket.disconnect(); // stop infinite retries
-      alert("Session expired. Please login again.");
-    }
-  });
-
-  return socket;
-}
+import { addLog } from "../utils/Logger.js";
+import { stopBackgroundLocationTracking } from "./backgroundLocationService.js";
+import { AppEvents, EVENTS } from "../utils/AppEvents.js";
 
 /* =========================
    EMIT DRIVER LOCATION
 ========================= */
-
+const LOCATION_EMIT_INTERVAL = 3000; // ms (3 seconds)
+const MAX_BUFFERED_LOCATIONS = 50;
+const BATCH_SIZE = 20;
+let lastEmitTime = 0;
 export async function emitLocation(coords) {
   try {
     const now = Date.now();
     const isHeartbeat=coords===null
     console.log('emitLocation called. isHeartbeat:', isHeartbeat, 'coords:', coords);
+    let socket = await getSocket();
 
     // Throttle emission
     if (!isHeartbeat && now - lastEmitTime < LOCATION_EMIT_INTERVAL) {
@@ -262,18 +207,3 @@ export async function handleTokenExpired() {
   AppEvents.emit(EVENTS.SESSION_EXPIRED);
 }
 
-/* =========================
-   HELPERS
-========================= */
-
-export function getSocket() {
-  return socket;
-}
-
-export function closeSocket() {
-  if (socket) {
-    socket.removeAllListeners();
-    socket.disconnect();
-    socket = null;
-  }
-}
