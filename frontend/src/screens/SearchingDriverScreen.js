@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   ActivityIndicator,
   Dimensions,
-  FlatList,
+  ScrollView,
 } from "react-native";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -109,8 +109,12 @@ const SearchingDriverScreen = () => {
         </TouchableOpacity>
         
 
-        {/* Searching Content */}
-        <View style={styles.searchContainer}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Searching Content */}
+          <View style={styles.searchContainer}>
 
           <Ionicons name="car-sport" size={80} color="#004080" />
             <LogViewer /> {/* Add LogViewer here */}
@@ -142,18 +146,14 @@ const SearchingDriverScreen = () => {
                   No available drivers yet.
                 </Text>
               ) : (
-                <FlatList
-                  data={drivers}
-                  keyExtractor={(item) => item.driverId}
-                  renderItem={({ item }) => (
-                    <View style={styles.driverRow}>
-                      <Text style={styles.driverId}>{item.driverId}</Text>
-                      <Text style={styles.driverDistance}>
-                        {Number(item.distanceKm).toFixed(2)} km
-                      </Text>
-                    </View>
-                  )}
-                />
+                drivers.map((item) => (
+                  <View key={item.driverId} style={styles.driverRow}>
+                    <Text style={styles.driverId}>{item.driverId}</Text>
+                    <Text style={styles.driverDistance}>
+                      {Number(item.distanceKm).toFixed(2)} km
+                    </Text>
+                  </View>
+                ))
               )}
             </View>
           )}
@@ -164,7 +164,8 @@ const SearchingDriverScreen = () => {
             </Text>
           </TouchableOpacity>
 
-        </View>
+          </View>
+        </ScrollView>
 
         {/* Side Menu Overlay */}
         {menuVisible && (
@@ -209,8 +210,13 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    height: height * 0.9,
+    flex: 1,
     width: "100%",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 40,
   },
 
   menuButton: {
