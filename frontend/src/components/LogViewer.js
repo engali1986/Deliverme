@@ -170,7 +170,11 @@ const LogViewer = forwardRef((props, ref) => {
       </View> */}
 
       {/* Log display */}
-      <ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.scrollContent}
+        nestedScrollEnabled
+      >
         {filteredLogs.map((log, index) => {
   if (typeof log.text !== "string") {
     console.warn("Non-string log detected:", log.text);

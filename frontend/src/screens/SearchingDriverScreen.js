@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     paddingBottom: 40,
   },
 
@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
   },
 
   searchContainer: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
