@@ -56,7 +56,7 @@ export async function initSocket() {
   if (socket && socket.connected) return socket;
 
   const token = await AsyncStorage.getItem("userToken");
-  socket = io("https://deliverme-el2x.onrender.com", {
+  socket = io("http://10.158.117.200", {
     transports: ["websocket"],
     auth: token ? { token } : undefined,
     reconnection: true,
