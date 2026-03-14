@@ -2,6 +2,7 @@
 import jwt from "jsonwebtoken";
 import logger from "../utils/logger.mjs";
 import { registerDriverSocket } from "./driver.socket.mjs";
+import { registerClientSocket } from "./client.socket.mjs";
 
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
@@ -60,15 +61,23 @@ export async function initSocket(io) {
       if(socket.user.id){
         logger.info(`🟢 Driver connected: ${socket.user.id}`);
         socket.join(socket.user.id); // Join room with driver ID
+      }else{
+        logger.warn(`Driver connected without ID: ${socket.id}`);
       }
-      logger.info(`🟢 Driver connected: ${socket.user.id}`);
+      
       registerDriverSocket(io, socket);
     } else {
-      logger.info(`🟢 Client connected: ${socket.user.id}`);
+      if(socket.user.id){
+        logger.info(`🟢 Client connected: ${socket.user.id}`);
+        socket.join(socket.user.id); // Join room with client ID
+      }else{
+        logger.warn(`Client connected without ID: ${socket.id}`);
+      }
+      registerClientSocket(io, socket);
     }
     socket.on("disconnect", (reason) => {
       logger.info(
-        `🔴 Driver disconnected: ${socket.user.id} (${reason})`
+        `🔴 ${socket.user.role } disconnected: ${socket.user.id} (${reason})`
       );
     });
   });
