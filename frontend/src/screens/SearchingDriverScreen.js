@@ -110,6 +110,7 @@ const SearchingDriverScreen = () => {
         
 
         <ScrollView
+          style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
@@ -217,6 +218,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "flex-start",
     paddingBottom: 40,
+  },
+  scrollView: {
+    flex: 1,
   },
 
   menuButton: {
