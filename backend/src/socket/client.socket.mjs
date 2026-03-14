@@ -7,5 +7,4 @@ export function registerClientSocket(io, socket) {
         logger.info(`Client ${socket.user.id} joined room ${socket.user.id}`);
     })
     socket.to(socket.user.id).emit('ClientID', { clientId: socket.user.id });
-    
 } 
