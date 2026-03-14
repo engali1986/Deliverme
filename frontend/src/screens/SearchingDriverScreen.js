@@ -108,16 +108,18 @@ const SearchingDriverScreen = () => {
           <Ionicons name="menu" size={28} color="#004080" />
         </TouchableOpacity>
         
+        <View style={styles.header}>
+            <Ionicons name="car-sport" size={80} color="#004080" />
+        </View>
 
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
           {/* Searching Content */}
           <View style={styles.searchContainer}>
-
-          <Ionicons name="car-sport" size={80} color="#004080" />
             <LogViewer /> {/* Add LogViewer here */}
 
           <Text style={styles.searchTitle}>
@@ -215,13 +217,18 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   scrollContent: {
-    flexGrow: 1,
-    justifyContent: "flex-start",
-    paddingBottom: 40,
-  },
+  flexGrow: 1,
+  paddingBottom: 40,
+},
   scrollView: {
     flex: 1,
   },
+
+  header: {
+  alignItems: "center",
+  paddingTop: 90,
+  paddingBottom: 10,
+},
 
   menuButton: {
     position: "absolute",
@@ -235,9 +242,10 @@ const styles = StyleSheet.create({
   },
 
   searchContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  alignItems: "center",
+  paddingTop: 100, // keeps nice spacing under menu button
+  paddingBottom: 40,
+},
 
   searchTitle: {
     fontSize: 22,

@@ -22,6 +22,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STORAGE_KEY = "DEV_LOGS";
 
+const SafeView = ({ children, ...props }) => {
+  const safeChildren = React.Children.toArray(children).filter(
+    (child) => typeof child !== "string" && typeof child !== "number"
+  );
+  return <View {...props}>{safeChildren}</View>;
+};
+
 const LogViewer = forwardRef((props, ref) => {
   const [logs, setLogs] = useState([]);
   const [filter, setFilter] = useState("all");
@@ -108,7 +115,28 @@ const LogViewer = forwardRef((props, ref) => {
   };
 
   // Apply filter + search
-  const filteredLogs = logs.filter((log) => {
+  const normalizedLogs = Array.isArray(logs)
+    ? logs
+        .map((log) => {
+          if (log && typeof log === "object") {
+            const text =
+              typeof log.text === "string" ? log.text : String(log.text ?? "");
+            const level = typeof log.level === "string" ? log.level : "info";
+            return { text, level };
+          }
+          if (
+            typeof log === "string" ||
+            typeof log === "number" ||
+            typeof log === "boolean"
+          ) {
+            return { text: String(log), level: "info" };
+          }
+          return null;
+        })
+        .filter(Boolean)
+    : [];
+
+  const filteredLogs = normalizedLogs.filter((log) => {
     const matchesLevel = filter === "all" || log.level === filter;
     const matchesSearch =
       searchTerm === "" ||
@@ -125,33 +153,33 @@ const LogViewer = forwardRef((props, ref) => {
 
  
   return (
-    <View style={styles.container}>
+    <SafeView style={styles.container}>
       {/* Toggle button */}
       <TouchableOpacity
         style={styles.toggleButton}
         onPress={() => setShowFilters((prev) => !prev)}
       >
         <Text style={styles.toggleText}>
-          {showFilters ? "Hide Filters ▲" : "Show Filters ▼"}
+          {showFilters ? "Hide Filters ^" : "Show Filters v"}
         </Text>
       </TouchableOpacity>
 
       {/* Collapsible filter row */}
       {showFilters && (
-  <View style={styles.filterRow}>
-    <TouchableOpacity onPress={() => setFilter("all")}>
-      <Text style={styles.toggleText}>All</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => setFilter("info")}>
-      <Text style={styles.toggleText}>Info</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => setFilter("warn")}>
-      <Text style={styles.toggleText}>Warn</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => setFilter("error")}>
-      <Text style={styles.toggleText}>Error</Text>
-    </TouchableOpacity>
-  </View>
+        <SafeView style={styles.filterRow}>
+          <TouchableOpacity onPress={() => setFilter("all")}>
+            <Text style={styles.toggleText}>All</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setFilter("info")}>
+            <Text style={styles.toggleText}>Info</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setFilter("warn")}>
+            <Text style={styles.toggleText}>Warn</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setFilter("error")}>
+            <Text style={styles.toggleText}>Error</Text>
+          </TouchableOpacity>
+        </SafeView>
 )}
 
 
@@ -175,20 +203,15 @@ const LogViewer = forwardRef((props, ref) => {
         contentContainerStyle={styles.scrollContent}
         nestedScrollEnabled
       >
-        {filteredLogs.map((log, index) => {
-  if (typeof log.text !== "string") {
-    console.warn("Non-string log detected:", log.text);
-    return null;
-  }
-  return (
-    <Text key={index} style={getTextStyle(log.level)}>
-      {log.text}
-    </Text>
-  );
-})}
-
+        <SafeView>
+          {filteredLogs.map((log, index) => (
+            <Text key={`${log.level}-${index}`} style={getTextStyle(log.level)}>
+              {log.text}
+            </Text>
+          ))}
+        </SafeView>
       </ScrollView>
-    </View>
+    </SafeView>
   );
 });
 
@@ -250,3 +273,4 @@ const styles = StyleSheet.create({
 });
 
 export default LogViewer;
+
