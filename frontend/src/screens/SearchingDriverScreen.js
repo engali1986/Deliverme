@@ -122,10 +122,13 @@ const SearchingDriverScreen = () => {
           {/* Searching Content */}
           <View style={styles.searchContainer}>
             <LogViewer /> {/* Add LogViewer here */}
-
-          <Text style={styles.searchTitle}>
+            {driversLoading && (
+              <Text style={styles.searchTitle}>
             {i18n.t("searching_driver")}
           </Text>
+            )}
+
+          
           {!driversLoading && Array.isArray(drivers) && drivers.length > 0 ?(
                 drivers.map((item) => (
                   <View key={item.driverId} style={styles.driverRow}>
