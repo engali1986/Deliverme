@@ -46,6 +46,7 @@ const SearchingDriverScreen = () => {
     (async () => {
       try {
         const data = await getNearbyDrivers(rideId, 5, 20);
+        console.log("Nearby drivers data:", data);
         if (!active) return;
         setDrivers(data.drivers || []);
       } catch (err) {
@@ -125,30 +126,7 @@ const SearchingDriverScreen = () => {
           <Text style={styles.searchTitle}>
             {i18n.t("searching_driver")}
           </Text>
-
-          <ActivityIndicator
-            size="large"
-            color="#004080"
-            style={{ marginTop: 20 }}
-          />
-
-          <Text style={styles.searchText}>
-            {i18n.t("looking_for_drivers")}
-          </Text>
-
-          {!driversLoading && (
-            <View style={styles.driverList}>
-              <Text style={styles.driverListTitle}>
-                Available drivers within 5 km
-              </Text>
-
-              {driversError ? (
-                <Text style={styles.driverListEmpty}>{driversError}</Text>
-              ) : drivers.length === 0 ? (
-                <Text style={styles.driverListEmpty}>
-                  No available drivers yet.
-                </Text>
-              ) : (
+          {!driversLoading && Array.isArray(drivers) && drivers.length > 0 ?(
                 drivers.map((item) => (
                   <View key={item.driverId} style={styles.driverRow}>
                     <Text style={styles.driverId}>{item.driverId}</Text>
@@ -157,10 +135,25 @@ const SearchingDriverScreen = () => {
                     </Text>
                   </View>
                 ))
-              )}
-            </View>
-          )}
+              ) : driversError? (<Text style={styles.driverListEmpty}>{driversError}</Text>) :
+              !driversLoading && Array.isArray(drivers) && drivers.length === 0 ? (
+                <Text style={styles.driverListEmpty}>
+                  No available drivers yet.
+                </Text>
+              ) :
+               (<ActivityIndicator
+            size="large"
+            color="#004080"
+            style={{ marginTop: 20 }}
+          />)}
 
+          
+
+          <Text style={styles.searchText}>
+            {i18n.t("looking_for_drivers")}
+          </Text>
+
+          
           <TouchableOpacity style={styles.cancelButton} onPress={cancelRide}>
             <Text style={styles.cancelText}>
               {i18n.t("cancel_ride")}
