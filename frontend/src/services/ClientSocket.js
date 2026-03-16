@@ -35,11 +35,15 @@ export function confirmClientOnline() {
 
   if (socket.connected) {
     console.log("Emitting clientOnline event");
-    socket.emit("clientOnline", { message: "Client is online" });
+    socket.emit("clientOnline", { message: "Client is online" }, (ack) => {
+  console.log("clientOnline ack:", ack);
+});
   } else {
     socket.on("connect", () => {
       console.log("Socket connected, emitting clientOnline event");
-      socket.emit("clientOnline", { message: "Client is online" });
+      socket.emit("clientOnline", { message: "Client is online" }, (ack) => {
+  console.log("clientOnline ack:", ack);
+});
     });
   }
 }
