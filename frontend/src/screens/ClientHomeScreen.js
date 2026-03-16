@@ -120,7 +120,7 @@ import MapViewDirections from 'react-native-maps-directions';
 import { API_KEY, KM_RATE } from '@env';
 import { requestRide } from '../services/api.js';
 import {initSocket} from '../services/SocketManager.js';
-import { getClientSocketID } from '../services/ClientSocket.js';
+import { getClientSocketID, confirmClientOnline } from '../services/ClientSocket.js';
 
 const { height } = Dimensions.get('window');
 
@@ -147,8 +147,17 @@ const ClientHomeScreen = () => {
   useEffect(() => {
     (async () => {
       await initSocket();
-      const ClientID = await getClientSocketID();
-      console.log('ClientHomeScreen.js: Client Socket ID:', ClientID);
+      confirmClientOnline();
+      async function loadClientID() {
+    try {
+      const id = await getClientSocketID();
+      console.log("Client ID:", id);
+    } catch (err) {
+      console.error(`Error getting client ID: ${err}`);
+    }
+  }
+
+  loadClientID();
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         console.log('ClientHomeScreen.js: Location permission not granted');
