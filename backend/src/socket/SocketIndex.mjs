@@ -34,15 +34,12 @@ export async function initSocket(io) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       console.log("SocketIndex Decoded JWT:", decoded);
 
-      // if (decoded.role !== "driver") {
-      //   throw new Error("Forbidden");
-      // }
-
       socket.user = {
         id: decoded.id,
         name: decoded.name,
         mobile: decoded.mobile,
         role: decoded.role,
+        exp: decoded.exp,
       };
 
       socket.token = token;

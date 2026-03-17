@@ -47,6 +47,22 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { addLog } from "../utils/Logger.js";
 import { stopBackgroundLocationTracking } from "./backgroundLocationService.js";
 import AppEvents, { EVENTS } from "../utils/AppEvents.js";
+/* =========================
+   EMIT DRIVER ONLINE
+========================= */
+export async function emitDriverOnline(coords) {
+  try {
+    const socket = await getSocket();
+    if (!socket) {
+      await initSocket();
+    } 
+    socket.emit("driverOnline", coords, (ack) => {
+      console.log("driverOnline ACK:", ack);
+    });
+  } catch (err) {
+    console.error("emitDriverOnline error:", err);
+  } 
+}
 
 /* =========================
    EMIT DRIVER LOCATION

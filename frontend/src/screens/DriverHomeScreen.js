@@ -278,6 +278,7 @@ import {
   stopBackgroundLocationTracking,
 } from '../services/backgroundLocationService';
 import { initSocket, getSocket, closeSocket } from '../services/SocketManager';
+import { emitDriverOnline } from '../services/DriverSocket';
 
 const COOLDOWN_MS = 10000;
 
@@ -490,6 +491,7 @@ const DriverHomeScreen = () => {
       }
 
       await updateDriverAvailability(newValue, coords);
+      await emitDriverOnline(coords);
 
       if (newValue) {
         const started = await startBackgroundLocationTracking();
