@@ -32,11 +32,17 @@ export function registerClientSocket(io, socket) {
       if (reason === "TOKEN_EXPIRED") socket.disconnect(true);
     }
   });
-  
-  if (socket.user?.id) {
-    io.to(`client:${socket.user.id}`).emit("ClientID", {
-      clientId: socket.user.id,
-      message: "Welcome to the client socket!",
-    });
-  }
+
+  // ClientID request-response to avoid race with listener registration
+  socket.on("client:getId", (_, cb) => {
+    try {
+      assertTokenValid(socket);
+      cb?.({ ok: true, clientId: socket.user?.id });
+    } catch (err) {
+      logger.warn(`client:getId auth failed for ${socket.user?.id}`);
+      const reason = err?.message === "TOKEN_EXPIRED" ? "TOKEN_EXPIRED" : "SERVER_ERROR";
+      cb?.({ ok: false, reason });
+      if (reason === "TOKEN_EXPIRED") socket.disconnect(true);
+    }
+  });
 } 

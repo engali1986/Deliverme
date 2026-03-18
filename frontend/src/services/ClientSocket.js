@@ -11,18 +11,22 @@ export function getClientSocketID() {
       return;
     }
 
-    const listenForClientID = () => {
-      socket.once("ClientID", (data) => {
-        console.log("Received ClientID:", data);
-        resolve(data.clientId);
+    const requestClientID = () => {
+      socket.emit("client:getId", null, (ack) => {
+        if (ack?.ok && ack?.clientId) {
+          console.log("Received ClientID:", ack);
+          resolve(ack.clientId);
+          return;
+        }
+        reject(ack?.reason || "CLIENT_ID_UNAVAILABLE");
       });
     };
 
     if (socket.connected) {
-      listenForClientID();
+      requestClientID();
     } else {
       socket.once("connect", () => {
-        listenForClientID();
+        requestClientID();
       });
     }
   });

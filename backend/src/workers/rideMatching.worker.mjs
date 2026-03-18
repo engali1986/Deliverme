@@ -86,7 +86,7 @@ const worker = new Worker(
 
       for (const [driverId] of drivers) {
 
-        io.to(driverId.toString()).emit("ride_request", {
+        io.to(`driver:${driverId.toString()}`).emit("ride_request", {
           rideId,
           pickup: ride.pickup,
           fare: ride.fare,

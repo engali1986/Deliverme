@@ -11,7 +11,7 @@
     - Presence keys (`driver:{id}:online`, `driver:{id}:socket`, `driver:{id}:alive`)
   - Logs via `../utils/logger.mjs`.
 */
-import { addDriverToGeo, getRedis } from "../redis/redisClient.mjs";
+import { addDriverToGeo, getRedis, removeDriverFromGeo } from "../redis/redisClient.mjs";
 import logger from "../utils/logger.mjs";
 
 const DRIVER_TTL_SECONDS = 120;
@@ -45,6 +45,21 @@ async function refreshDriverOnline(redis, driverId, socketId) {
   }
 }
 
+async function refreshDriverPresence(redis, driverId, socketId, includeAlive = false) {
+  const pipeline = redis.pipeline();
+  pipeline.set(`driver:${driverId}:online`, 1, "EX", DRIVER_TTL_SECONDS);
+  pipeline.set(`driver:${driverId}:socket`, socketId, "EX", DRIVER_TTL_SECONDS);
+  if (includeAlive) {
+    pipeline.set(`driver:${driverId}:alive`, 1, "EX", DRIVER_TTL_SECONDS);
+  }
+
+  const results = await pipeline.exec();
+  const hasError = results?.some(([err]) => err);
+  if (hasError) {
+    logger.warn(`Redis pipeline error refreshing presence for driver ${driverId}`, results);
+  }
+}
+
 export function registerDriverSocket(io, socket) {
 
    /* =========================
@@ -58,7 +73,7 @@ export function registerDriverSocket(io, socket) {
       const redis = await getRedis();
       const driverId = socket.user.id;
 
-      await refreshDriverOnline(redis, driverId, socket.id);
+      await refreshDriverPresence(redis, driverId, socket.id, true);
 
       ack?.({ ok: true });
 
@@ -117,17 +132,61 @@ export function registerDriverSocket(io, socket) {
       const driverId = socket.user.id;
 
       // Refresh TTLs
-      const pipeline = redis.pipeline();
-      pipeline.set(`driver:${driverId}:online`, 1, "EX", DRIVER_TTL_SECONDS);
-      pipeline.set(`driver:${driverId}:socket`, socket.id, "EX", DRIVER_TTL_SECONDS);
-      pipeline.set(`driver:${driverId}:alive`, 1, "EX", DRIVER_TTL_SECONDS);
-      await pipeline.exec();
+      await refreshDriverPresence(redis, driverId, socket.id, true);
 
       ack?.({ ok: true });
       console.log("Driver heartbeat ACK:", ack);
     } catch (err) {
       console.log("Driver heartbeat auth error:", err);
       logger.warn(`driverHeartbeat auth failed for ${socket.user?.id}`);
+      const reason = err?.message === "TOKEN_EXPIRED" ? "TOKEN_EXPIRED" : "SERVER_ERROR";
+      ack?.({ ok: false, reason });
+      if (reason === "TOKEN_EXPIRED") socket.disconnect(true);
+    }
+  });
+
+  /* =========================
+     DRIVER REGISTER (CLIENT EVENT)
+  ========================= */
+  socket.on("driver:register", async (_payload, ack) => {
+    try {
+      assertTokenValid(socket);
+      const redis = await getRedis();
+      const driverId = socket.user.id;
+      await refreshDriverPresence(redis, driverId, socket.id, true);
+      ack?.({ ok: true });
+    } catch (err) {
+      logger.warn(`driver:register auth failed for ${socket.user?.id}`);
+      const reason = err?.message === "TOKEN_EXPIRED" ? "TOKEN_EXPIRED" : "SERVER_ERROR";
+      ack?.({ ok: false, reason });
+      if (reason === "TOKEN_EXPIRED") socket.disconnect(true);
+    }
+  });
+
+  /* =========================
+     DRIVER AVAILABILITY (CLIENT EVENT)
+  ========================= */
+  socket.on("driver:availability", async (payload, ack) => {
+    try {
+      assertTokenValid(socket);
+      const isAvailable = payload?.isAvailable === true;
+      const redis = await getRedis();
+      const driverId = socket.user.id;
+
+      if (isAvailable) {
+        await refreshDriverPresence(redis, driverId, socket.id, true);
+      } else {
+        await removeDriverFromGeo(driverId);
+        await redis.del(
+          `driver:${driverId}:online`,
+          `driver:${driverId}:socket`,
+          `driver:${driverId}:alive`
+        );
+      }
+
+      ack?.({ ok: true });
+    } catch (err) {
+      logger.warn(`driver:availability auth failed for ${socket.user?.id}`);
       const reason = err?.message === "TOKEN_EXPIRED" ? "TOKEN_EXPIRED" : "SERVER_ERROR";
       ack?.({ ok: false, reason });
       if (reason === "TOKEN_EXPIRED") socket.disconnect(true);
