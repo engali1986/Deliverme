@@ -59,7 +59,7 @@ export async function initSocket(io) {
       };
 
       socket.token = token;
-      // Avoid logging full socket object (may include sensitive data)
+      console.log("SocketIndex User:", socket);
       next();
     } catch (err) {
       next(new Error("Unauthorized"));
@@ -73,7 +73,7 @@ export async function initSocket(io) {
     if (socket.user.role === "driver") {
       if(socket.user.id){
         logger.info(`🟢 Driver connected: ${socket.user.id}`);
-        socket.join(`driver:${socket.user.id}`); // Role-scoped room
+        socket.join(socket.user.id); // Join room with driver ID
       }else{
         logger.warn(`Driver connected without ID: ${socket.id}`);
       }
@@ -82,7 +82,7 @@ export async function initSocket(io) {
     } else {
       if(socket.user.id){
         logger.info(`🟢 Client connected: ${socket.user.id}`);
-        socket.join(`client:${socket.user.id}`); // Role-scoped room
+        socket.join(socket.user.id); // Join room with client ID
       }else{
         logger.warn(`Client connected without ID: ${socket.id}`);
       }
@@ -95,4 +95,3 @@ export async function initSocket(io) {
     });
   });
 }
-
