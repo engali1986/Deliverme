@@ -1,4 +1,20 @@
 // src/socket/SocketIndex.mjs
+/*
+  Purpose
+  - Initializes Socket.IO with Redis adapter for scaling.
+  - Authenticates socket connections using JWT and attaches user info to the socket.
+  - Routes connections to driver/client socket handlers and manages room joins.
+
+  Integration Points
+  - Called from the backend server startup (e.g., where the Socket.IO server is created).
+  - Uses `../utils/logger.mjs` for structured logging.
+  - Delegates event handling to:
+    - `./driver.socket.mjs` for driver-specific events
+    - `./client.socket.mjs` for client-specific events
+  - Relies on environment variables:
+    - `REDIS_URL` for Redis adapter connectivity
+    - `JWT_SECRET` to verify auth tokens
+*/
 import jwt from "jsonwebtoken";
 import logger from "../utils/logger.mjs";
 import { registerDriverSocket } from "./driver.socket.mjs";
