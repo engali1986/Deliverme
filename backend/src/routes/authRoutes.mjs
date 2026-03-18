@@ -158,15 +158,7 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
         // Send response immediately
         res.status(201).json({ message: 'Ride requested successfully', rideId });
         
-        // now use process.nextTick to find nearby drivers and emit socket event to them
-        // process.nextTick(async () => {
-        //   try {
-        //     console.log('Finding nearby drivers for ride ID:', rideId);
-        //     const nearbyDrivers = await findNearbyDrivers(pickup.longitude, pickup.latitude); // 5 km radius
-        //     console.log('Nearby drivers found:', nearbyDrivers);  
-        //   } catch (err) {
-        //     console.error('Error in process.nextTick for finding nearby drivers', err);
-        //   }})
+        
       }else{
         throw new Error("Computed distance is not within acceptable range of provided routeDistance");
       }
