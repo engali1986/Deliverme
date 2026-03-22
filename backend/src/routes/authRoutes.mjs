@@ -5,48 +5,41 @@ import dotenv from "dotenv"
 import authenticateToken from '../middlewares/auth.mjs';
 import logger from '../utils/logger.mjs';
 import {ObjectId} from "mongodb"
-import { findNearbyDrivers } from '../redis/redisClient.mjs';
+import { findNearbyDrivers, addRideToGeo } from '../redis/redisClient.mjs';
 import { rideQueue } from '../queues/rideQueue.mjs';
-
 
 dotenv.config()
 const router = express.Router();
 
 /*
-This file defines the authentication-related routes for the application. Below is an overview of how these routes interact with other parts of the backend:
+authRoutes.mjs
+==============
+Purpose:
+- Defines authentication and client/driver lifecycle routes.
+- Provides the client ride request entry point used to create rides and trigger matching.
 
-1. **Controllers**:
-   - Each route delegates its core logic to functions in `authController.mjs`.
-     - Example: `clientSignUp`, `driverSignIn`, etc., handle the business logic for user authentication and database operations.
+Key integrations:
+- Controllers in authController.mjs for sign-up/sign-in/verification/availability updates.
+- JWT auth middleware (authenticateToken) for protected routes.
+- Upload middleware for driver signup documents.
+- MongoDB via req.app.locals.db.
+- Redis geo index for ride discovery (addRideToGeo).
+- BullMQ ride matching queue (rideQueue).
 
-2. **Middlewares**:
-   - `uploadMiddleware.mjs`: Used in the `/driver/signup` route to handle file uploads (e.g., driver documents).
-   - `auth.mjs`: Used in the `/driver/availability` route to verify JWT tokens for protected routes.
+Routes:
+- POST /client/signup
+- POST /client/verify
+- POST /client/signin
+- POST /driver/signup
+- POST /driver/verify
+- POST /driver/signin
+- PATCH /driver/availability (protected)
+- POST /client/request-ride (protected)
+- GET / (health check)
 
-3. **Database**:
-   - The `db` instance is accessed via `req.app.locals.db` and passed to controllers for database operations.
-
-4. **Utilities**:
-   - `logger.mjs`: Used to log important events, such as driver availability updates.
-
-5. **Environment Variables**:
-   - Loaded using `dotenv` to configure sensitive data like `JWT_SECRET`.
-
-6. **Routes Overview**:
-   - **Client Routes**:
-     - `POST /client/signup`: Registers a new client.
-     - `POST /client/verify`: Verifies client email.
-     - `POST /client/signin`: Authenticates client login.
-   - **Driver Routes**:
-     - `POST /driver/signup`: Registers a new driver (with document upload).
-     - `POST /driver/verify`: Verifies driver email.
-     - `POST /driver/signin`: Authenticates driver login.
-     - `PATCH /driver/availability`: Updates driver availability (protected route).
-   - **Miscellaneous**:
-     - `POST /client/request-ride`: Placeholder for ride request logic.
-     - `GET /`: Health check route to verify server status.
-
-This modular structure ensures that routes remain clean and delegate their logic to appropriate controllers and middlewares, making the codebase easier to maintain and extend.
+Notes:
+- Ride requests insert a ride into MongoDB, add it to Redis geo for fast lookup,
+  and enqueue a matching job. Redis failures are logged but do not block the request.
 */
 
 // Client Routes
@@ -150,6 +143,18 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
         console.log("Ride insertion result:", result);
         rideId = result.insertedId.toString();
         console.log("New ride created with ID:", rideId);
+        // Add ride to Redis geo index for quick nearby lookup
+        const redisResult = await addRideToGeo(
+          rideId,
+          pickup,
+          destination,
+          fare,
+          "pending",
+          expiresAt
+        );
+        if (!redisResult?.ok) {
+          logger.warn("Failed to add ride to Redis: %s", redisResult?.reason);
+        }
         // Fire-and-forget
         rideQueue.add("matchRide", { rideId })
         .then(() => console.log("Ride added to queue"))
