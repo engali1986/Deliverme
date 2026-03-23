@@ -82,7 +82,7 @@ export async function getRedis() {
 
 export async function addDriverToGeo(driverId, longitude, latitude, ack) {
   try {
-    const redis = initRedis();
+    const redis = await getRedis();
 
     const pipeline = redis.pipeline();
 
@@ -112,7 +112,7 @@ export async function addDriverToGeo(driverId, longitude, latitude, ack) {
 }
 
 export async function removeDriverFromGeo(driverId) {
-  const redis = initRedis();
+  const redis = await getRedis();
   await redis.zrem("drivers:geo", driverId.toString());
 }
 
@@ -123,7 +123,7 @@ export async function findNearbyDrivers(
   limit = 20
 ) {
   try {
-    const redis = initRedis();
+    const redis = await getRedis();
     console.log(`Finding nearby drivers for location (${latitude}, ${longitude}) within ${radiusKm} km`);
 
     const drivers = await redis.georadius(
@@ -189,6 +189,7 @@ export async function findNearbyDrivers(
 
 export async function addRideToGeo(
   rideId,
+  ClientId,
   pickup,
   destination,
   fare,
@@ -196,19 +197,46 @@ export async function addRideToGeo(
   expiresAt
 ) {
   try {
-    const redis = initRedis();
+    // ================================
+    // STEP 1: Get Redis instance
+    // ================================
+    const redis = await getRedis();
 
+    console.log(
+      `Adding ride ${rideId} to geo with pickup (${pickup.latitude}, ${pickup.longitude}) and destination (${destination.latitude}, ${destination.longitude})`
+    );
+
+    // ================================
+    // STEP 2: Validate required inputs
+    // ================================
     if (!rideId || !pickup || !destination) {
       throw new Error("Missing rideId or coordinates");
     }
 
+    // ================================
+    // STEP 3: Calculate TTL (expiration time)
+    // Convert expiresAt → milliseconds → seconds
+    // Redis EXPIRE works in seconds
+    // ================================
     const ttlMs = new Date(expiresAt).getTime() - Date.now();
     const ttlSeconds = Math.max(1, Math.ceil(ttlMs / 1000));
 
+    // Redis key for ride data
     const key = `ride:${rideId}`;
 
+    // ================================
+    // STEP 4: Create pipeline (batch commands)
+    // This improves performance (1 round-trip instead of many)
+    // ================================
     const pipeline = redis.pipeline();
 
+    // ================================
+    // STEP 5: Add ride location to GEO index
+    // This allows searching nearby rides later
+    // Key: "rides:geo"
+    // Member: rideId
+    // Value: (longitude, latitude)
+    // ================================
     pipeline.geoadd(
       "rides:geo",
       pickup.longitude,
@@ -216,20 +244,45 @@ export async function addRideToGeo(
       rideId.toString()
     );
 
+    // ================================
+    // STEP 6: Store ride details as HASH
+    // HSET = store structured data (like object)
+    // Key: "ride:{rideId}"
+    // ================================
     pipeline.hset(key, {
       rideId: rideId.toString(),
+      ClientId: String(ClientId),
+
+      // Pickup location
       pickupLat: String(pickup.latitude),
       pickupLon: String(pickup.longitude),
+
+      // Destination location
       destinationLat: String(destination.latitude),
       destinationLon: String(destination.longitude),
+
+      // Ride info
       fare: String(fare),
       status: String(status),
+
+      // Expiration timestamp
       expiresAt: new Date(expiresAt).toISOString(),
     });
 
+    // ================================
+    // STEP 7: Set expiration (TTL)
+    // Ride will be automatically deleted after TTL
+    // ================================
     pipeline.expire(key, ttlSeconds);
 
+    // ================================
+    // STEP 8: Execute all Redis commands
+    // ================================
     const results = await pipeline.exec();
+
+    // ================================
+    // STEP 9: Check for errors in pipeline
+    // ================================
     const hasError = results.some(([err]) => err);
 
     if (hasError) {
@@ -237,8 +290,15 @@ export async function addRideToGeo(
       return { ok: false, reason: "REDIS_ERROR" };
     }
 
+    // ================================
+    // STEP 10: Success response
+    // ================================
     return { ok: true, reason: "SUCCESS" };
+
   } catch (error) {
+    // ================================
+    // STEP 11: Handle unexpected errors
+    // ================================
     logger.error("addRideToGeo error:", error.message);
     return { ok: false, reason: "SERVER_ERROR" };
   }
@@ -251,7 +311,15 @@ export async function findNearbyRides(
   limit = 20
 ) {
   try {
-    const redis = initRedis();
+    // ================================
+    // STEP 1: Get Redis instance
+    // ================================
+    const redis = await getRedis();
+
+    // ================================
+    // STEP 2: Search for nearby rides using GEO
+    // This returns rideIds within radius
+    // ================================
     const rideIds = await redis.georadius(
       "rides:geo",
       longitude,
@@ -263,20 +331,34 @@ export async function findNearbyRides(
       "ASC"
     );
 
+    // ================================
+    // STEP 3: If no rides found → return empty array
+    // ================================
     if (!rideIds.length) return [];
 
-    // Check existence of ride hashes
+    // ================================
+    // STEP 4: Check which rides still exist (not expired)
+    // Because HASH keys may expire but GEO may still contain old IDs
+    // ================================
     const existsPipeline = redis.pipeline();
+
     rideIds.forEach((rideId) => {
       existsPipeline.exists(`ride:${rideId}`);
     });
+
     const existsResults = await existsPipeline.exec();
 
+    // ================================
+    // STEP 5: Separate valid rides from stale rides
+    // ================================
+    console.log('Exsists results for nearby rides:', existsResults);
     const liveIds = [];
     const staleIds = [];
 
     rideIds.forEach((rideId, index) => {
       const [err, exists] = existsResults[index];
+
+      // If error OR ride hash does not exist → stale
       if (err || exists !== 1) {
         staleIds.push(rideId);
       } else {
@@ -284,49 +366,83 @@ export async function findNearbyRides(
       }
     });
 
+    // ================================
+    // STEP 6: Cleanup stale rides from GEO
+    // Remove rides that no longer exist in Redis
+    // ================================
     if (staleIds.length) {
       const cleanup = redis.pipeline();
+
       staleIds.forEach((id) => cleanup.zrem("rides:geo", id));
+
       await cleanup.exec();
     }
 
+    // ================================
+    // STEP 7: If no valid rides remain → return empty
+    // ================================
     if (!liveIds.length) return [];
 
+    // ================================
+    // STEP 8: Fetch ride details from HASH
+    // Using pipeline for performance
+    // ================================
     const dataPipeline = redis.pipeline();
-    liveIds.forEach((rideId) => dataPipeline.hgetall(`ride:${rideId}`));
+
+    liveIds.forEach((rideId) => {
+      dataPipeline.hgetall(`ride:${rideId}`);
+    });
+
     const dataResults = await dataPipeline.exec();
 
+    // ================================
+    // STEP 9: Build final rides array
+    // Convert Redis strings → proper JS types
+    // ================================
     const rides = [];
+
     liveIds.forEach((rideId, index) => {
       const [err, hash] = dataResults[index];
+
+      // Skip if error or empty data
       if (err || !hash || Object.keys(hash).length === 0) return;
 
       rides.push({
         rideId: hash.rideId || rideId.toString(),
+
         pickup: {
           latitude: Number(hash.pickupLat),
           longitude: Number(hash.pickupLon),
         },
+
         destination: {
           latitude: Number(hash.destinationLat),
           longitude: Number(hash.destinationLon),
         },
+
         fare: Number(hash.fare),
         status: hash.status,
         expiresAt: hash.expiresAt,
       });
     });
 
+    // ================================
+    // STEP 10: Return final rides list
+    // ================================
     return rides;
+
   } catch (error) {
+    // ================================
+    // STEP 11: Handle unexpected errors
+    // ================================
     logger.error("Error finding nearby rides:", error.message);
     return [];
   }
 }
 
-// Reemove ride from redis geo
+// Remove ride from redis geo
 export async function removeRideFromGeo(rideId) {
-  const redis = initRedis();
+  const redis = await getRedis();
   await redis.zrem("rides:geo", rideId.toString());
 }
 

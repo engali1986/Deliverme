@@ -146,6 +146,7 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
         // Add ride to Redis geo index for quick nearby lookup
         const redisResult = await addRideToGeo(
           rideId,
+          ClientId,
           pickup,
           destination,
           fare,
