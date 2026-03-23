@@ -47,7 +47,7 @@
  */
  
 
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -96,33 +96,20 @@ const DriverHomeScreen = () => {
   const driverIdRef = useRef(null);
   const locationPermissionGranted = useRef(false);
 
-  // Listen to ride requests
-  useEffect(() => {
-    let socket;
-
-    const handleRideRequest = (data) => {
-      console.log('DriverHomeScreen.js: New ride request received:', data);
-      setRequests((prev) => [...prev, data]);
-    };
-
-    (async () => {
-      try {
-        // Load saved availability
-           const saved = await AsyncStorage.getItem('driverAvailable');
-           if (saved === 'true') {
-             setIsAvailable(true);
-             socket = await initSocket();
-             socket.on('ride_request', handleRideRequest);
-           }
-      } catch (error) {
-        console.warn('Failed to load saved availability:', error);
-      }
-    })();
-
-    return () => {
-      if (socket) socket.off('ride_request', handleRideRequest);
-    };
+  /* ------------------------------------------------------------------ */
+  /* Ride Request Listener                                               */
+  /* ------------------------------------------------------------------ */
+  const handleRideRequest = useCallback((data) => {
+    console.log('DriverHomeScreen.js: New ride request received:', data);
+    setRequests((prev) => [...prev, data]);
   }, []);
+
+  const attachRideRequestListener = (socket) => {
+    if (!socket) return;
+    // Ensure we don't attach the same listener multiple times
+    socket.off('ride_request', handleRideRequest);
+    socket.on('ride_request', handleRideRequest);
+  };
 
   /* ------------------------------------------------------------------ */
   /* Initialization                                                     */
@@ -148,11 +135,40 @@ const DriverHomeScreen = () => {
   }
 };
   useEffect(() => {
-    let mounted = true;
-
     (async () => {
          try {
-          // log all AsyncStorage items
+          /* Step 1: Validate session token before doing anything else */
+           const token = await AsyncStorage.getItem('userToken');
+           if (!token) {
+             console.warn('DriverHomeScreen: No user token found');
+             Toast.show({
+               type: 'error',
+               text1: 'Session expired',
+               text2: 'Please log in again',
+             });
+
+             await AsyncStorage.clear();
+             navigation.replace('Home');
+             return;
+           }
+
+           const decoded = jwtDecode(token);
+           const nowMs = Date.now();
+           const expMs = decoded?.exp ? decoded.exp * 1000 : 0;
+           if (!expMs || expMs <= nowMs) {
+             console.warn('DriverHomeScreen: Token expired');
+             Toast.show({
+               type: 'error',
+               text1: 'Session expired',
+               text2: 'Please log in again',
+             });
+
+             await AsyncStorage.clear();
+             navigation.replace('Home');
+             return;
+           }
+
+           /* Step 2: Log storage (debug) and request location permissions */
             await logAllAsyncStorage();
            // Foreground permission
             const { status: fgStatus } =
@@ -178,39 +194,26 @@ const DriverHomeScreen = () => {
              console.warn('DriverHomeScreen Location permissions not granted');
            }
    
-           // Get driver ID from token
-           const token = await AsyncStorage.getItem('userToken');
-           if (token) {
-             const decoded = jwtDecode(token);
-             const driverId = decoded.id || decoded.sub;
-             driverIdRef.current = driverId;
-             console.log('DriverHomeScreen: driverId:', driverId);
-   
-             
-           }else{
-             console.warn('DriverHomeScreen: No user token found');
-             Toast.show({
-                type: 'error',
-                text1: 'Session expired',
-                text2: 'Please log in again',
-              });
+           /* Step 3: Cache driver ID for later socket events */
+           const driverId = decoded.id || decoded.sub;
+           driverIdRef.current = driverId;
+           console.log('DriverHomeScreen: driverId:', driverId);
 
-              
-              await AsyncStorage.clear();
-              navigation.replace('Home');
-              return;
-           }
-   
-           // Load saved availability
+           /* Step 4: Restore availability from AsyncStorage */
            const saved = await AsyncStorage.getItem('driverAvailable');
-           if (saved === 'true') {
-             setIsAvailable(true);
-            //  init socket and register driver
-              const socket = await initSocket();
-             // Start background tracking if was available
+           const shouldBeOnline = saved === 'true';
+           setIsAvailable(shouldBeOnline);
+
+           /* Step 5: Only connect socket + tracking if saved availability is true */
+           if (shouldBeOnline) {
+             const socket = await initSocket();
+             attachRideRequestListener(socket);
              await startBackgroundLocationTracking();
              if (socket && driverIdRef.current) {
-               socket.emit('driver:register', { driverId: driverIdRef.current, isAvailable: true });
+               socket.emit('driver:register', {
+                 driverId: driverIdRef.current,
+                 isAvailable: true,
+               });
              }
            }
          } catch (e) {
@@ -219,12 +222,11 @@ const DriverHomeScreen = () => {
        })();
 
     return  () => {
-      mounted = false
       const socket = getSocket();
-      socket?.off('ride_request');
+      socket?.off('ride_request', handleRideRequest);
       stopBackgroundLocationTracking().catch(() => {});
     };
-  }, []);
+  }, [handleRideRequest]);
 
   /* ------------------------------------------------------------------ */
   /* Menu                                                               */
@@ -281,8 +283,8 @@ const DriverHomeScreen = () => {
     setUpdating(true);
 
     try {
+      /* Step 1: Collect GPS only when going online */
       let coords = null;
-
       if (newValue) {
         const pos = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
@@ -294,24 +296,41 @@ const DriverHomeScreen = () => {
         };
       }
 
+      /* Step 2: Update backend availability (MongoDB) */
       await updateDriverAvailability(newValue, coords);
-      await emitDriverOnline(coords);
 
+      /* Step 3: Only when going online, connect socket + start tracking */
       if (newValue) {
+        const socket = await initSocket();
+        attachRideRequestListener(socket);
+
         const started = await startBackgroundLocationTracking();
         if (!started) throw new Error('Tracking failed');
+
+        if (socket && driverIdRef.current) {
+          socket.emit('driver:register', {
+            driverId: driverIdRef.current,
+            isAvailable: true,
+          });
+        }
+
+        await emitDriverOnline(coords);
       } else {
         await stopBackgroundLocationTracking();
+        closeSocket();
       }
 
+      /* Step 4: Persist availability state locally */
       setIsAvailable(newValue);
       await AsyncStorage.setItem('driverAvailable', newValue ? 'true' : 'false');
 
+      /* Step 5: Notify socket about availability (if connected) */
       const socket = getSocket();
       socket?.emit('driver:availability', {
         isAvailable: newValue,
       });
 
+      /* Step 6: Cooldown and UI reset */
       setCooldownActive(true);
       setTimeout(() => setCooldownActive(false), COOLDOWN_MS);
       setRequests([]);
