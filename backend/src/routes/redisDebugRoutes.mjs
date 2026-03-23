@@ -33,7 +33,7 @@ const router = express.Router();
 router.get("/drivers", async (req, res) => {
   try {
     const redis = await getRedis();
-    const drivers = await redis.zRange("drivers:geo", 0, -1);
+    const drivers = await redis.zrange("drivers:geo", 0, -1);
 
     console.log('redisDebugRoutes - drivers:', drivers);
 
@@ -64,16 +64,16 @@ router.get("/driver/:driverId", async (req, res) => {
     const redis = await getRedis();
     const { driverId } = req.params;
 
-    const pos = await redis.geoPos("drivers:geo", driverId);
+    const pos = await redis.geopos("drivers:geo", driverId);
 
-    if (!pos[0]) {
+    if (!pos || !pos[0]) {
       return res.status(404).json({ message: "Driver not found in Redis" });
     }
 
     res.json({
       driverId,
-      longitude: pos[0].longitude,
-      latitude: pos[0].latitude,
+      longitude: Number(pos[0][0]),
+      latitude: Number(pos[0][1]),
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -103,16 +103,12 @@ router.get("/nearby", async (req, res) => {
     const redis = await getRedis();
     const { lat, lng, radius = 5 } = req.query;
 
-    const drivers = await redis.geoSearch(
+    const drivers = await redis.georadius(
       "drivers:geo",
-      {
-        longitude: Number(lng),
-        latitude: Number(lat),
-      },
-      {
-        radius: Number(radius),
-        unit: "km",
-      }
+      Number(lng),
+      Number(lat),
+      Number(radius),
+      "km"
     );
 
     res.json({
@@ -146,7 +142,7 @@ router.get("/drivers/full", async (req, res) => {
   try {
     const redis = await getRedis();
 
-    const driverIds = await redis.zRange("drivers:geo", 0, -1);
+    const driverIds = await redis.zrange("drivers:geo", 0, -1);
 
     if (!driverIds.length) {
       return res.json({
@@ -155,16 +151,21 @@ router.get("/drivers/full", async (req, res) => {
       });
     }
 
-    const positions = await redis.geoPos("drivers:geo", driverIds);
+    const pipeline = redis.pipeline();
+    driverIds.forEach((driverId) => {
+      pipeline.geopos("drivers:geo", driverId);
+    });
+
+    const pipelineResults = await pipeline.exec();
 
     const drivers = driverIds.map((driverId, index) => {
-      const pos = positions[index];
-      if (!pos) return null;
+      const [err, pos] = pipelineResults[index];
+      if (err || !pos || !pos[0]) return null;
 
       return {
         driverId,
-        latitude: pos.latitude,
-        longitude: pos.longitude,
+        latitude: Number(pos[0][1]),
+        longitude: Number(pos[0][0]),
       };
     }).filter(Boolean);
 
@@ -200,6 +201,7 @@ router.get("/driver/:driverId/alive", async (req, res) => {
   try {
     const redis = await getRedis();
     const { driverId } = req.params;
+    console.log(`Checking alive status for driverId: ${driverId}`);
 
     const exists = await redis.exists(`driver:${driverId}:alive`);
     const ttl = await redis.ttl(`driver:${driverId}:alive`);
@@ -247,7 +249,7 @@ router.get("/rides/geo", async (req, res) => {
 
       return {
         rideId,
-        position: pos ? {
+        position: pos && pos[0] ? {
           longitude: Number(pos[0][0]),
           latitude: Number(pos[0][1])
         } : null
@@ -360,13 +362,13 @@ router.get("/rides/full", async (req, res) => {
 
       rides.push({
         rideId: rideIds[i],
-        position: geoPos ? {
+        position: geoPos && geoPos[0] ? {
           longitude: Number(geoPos[0][0]),
           latitude: Number(geoPos[0][1])
         } : null,
         data,
         exists: exists === 1,
-        isStale: exists !== 1 // 🔥 very important
+        isStale: exists !== 1
       });
     }
 

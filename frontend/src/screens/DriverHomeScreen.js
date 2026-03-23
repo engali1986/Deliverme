@@ -98,7 +98,6 @@ const DriverHomeScreen = () => {
 
   // Listen to ride requests
   useEffect(() => {
-    let active = true;
     let socket;
 
     const handleRideRequest = (data) => {
@@ -107,13 +106,20 @@ const DriverHomeScreen = () => {
     };
 
     (async () => {
-      socket = await initSocket();
-      if (!active || !socket) return;
-      socket.on('ride_request', handleRideRequest);
+      try {
+        // Load saved availability
+           const saved = await AsyncStorage.getItem('driverAvailable');
+           if (saved === 'true') {
+             setIsAvailable(true);
+             socket = await initSocket();
+             socket.on('ride_request', handleRideRequest);
+           }
+      } catch (error) {
+        console.warn('Failed to load saved availability:', error);
+      }
     })();
 
     return () => {
-      active = false;
       if (socket) socket.off('ride_request', handleRideRequest);
     };
   }, []);
@@ -148,8 +154,6 @@ const DriverHomeScreen = () => {
          try {
           // log all AsyncStorage items
             await logAllAsyncStorage();
-           // Initialize socket connection
-           let socket = await initSocket();
            // Foreground permission
             const { status: fgStatus } =
               await Location.requestForegroundPermissionsAsync();
@@ -191,7 +195,7 @@ const DriverHomeScreen = () => {
                 text2: 'Please log in again',
               });
 
-              closeSocket();
+              
               await AsyncStorage.clear();
               navigation.replace('Home');
               return;
@@ -201,9 +205,10 @@ const DriverHomeScreen = () => {
            const saved = await AsyncStorage.getItem('driverAvailable');
            if (saved === 'true') {
              setIsAvailable(true);
+            //  init socket and register driver
+              const socket = await initSocket();
              // Start background tracking if was available
              await startBackgroundLocationTracking();
-             const socket = getSocket();
              if (socket && driverIdRef.current) {
                socket.emit('driver:register', { driverId: driverIdRef.current, isAvailable: true });
              }
