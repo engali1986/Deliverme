@@ -139,6 +139,7 @@ const DriverHomeScreen = () => {
          try {
           /* Step 1: Validate session token before doing anything else */
            const token = await AsyncStorage.getItem('userToken');
+           console.log('DriverHomeScreen: Retrieved token from AsyncStorage:', token);
            if (!token) {
              console.warn('DriverHomeScreen: No user token found');
              Toast.show({
@@ -153,6 +154,7 @@ const DriverHomeScreen = () => {
            }
 
            const decoded = jwtDecode(token);
+           console.log('DriverHomeScreen: Decoded JWT:', decoded);
            const nowMs = Date.now();
            const expMs = decoded?.exp ? decoded.exp * 1000 : 0;
            if (!expMs || expMs <= nowMs) {
