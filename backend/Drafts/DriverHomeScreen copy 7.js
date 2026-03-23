@@ -1,47 +1,248 @@
 /**
  * ============================================================================
- * DRIVER HOME SCREEN - FUNCTION MAP AND INTEGRATIONS
+ * DRIVER HOME SCREEN – LOGIC FLOW DIAGRAM
  * ============================================================================
  *
- * PURPOSE
- * - Main driver hub for availability, live requests, background tracking,
- *   and session safety.
+ * ┌───────────────────────┐
+ * │   App / Screen Load   │
+ * └───────────┬───────────┘
+ *             │
+ *             ▼
+ * ┌────────────────────────────┐
+ * │ Initialize Socket.IO        │
+ * │ Request Location Permissions│
+ * │ Decode JWT → driverId       │
+ * └───────────┬────────────────┘
+ *             │
+ *             ▼
+ * ┌────────────────────────────┐
+ * │ Read AsyncStorage           │
+ * │ driverAvailable ?           │
+ * └───────────┬────────────────┘
+ *     YES     │      NO
+ *             │
+ *     ▼       ▼
+ * ┌───────────────┐     ┌──────────────────┐
+ * │ Set ONLINE     │     │ Stay OFFLINE     │
+ * │ Start BG Track │     │ Idle State       │
+ * │ Register Socket│     │ Waiting Action   │
+ * └───────────────┘     └──────────────────┘
  *
- * MAIN HOOKS AND FUNCTIONS
- * - useEffect (ride requests): init socket and listen to `ride_request`,
- *   push into `requests`, clean up on unmount.
- * - logAllAsyncStorage: debug helper to dump AsyncStorage keys and values.
- * - useEffect (initialization): request permissions, decode JWT to `driverId`,
- *   restore `driverAvailable`, start tracking if needed, register driver.
- * - toggleMenu: animate side menu open or close.
- * - handleLogout: if online set offline and stop tracking, close socket,
- *   clear storage, toast, navigate to Home.
- * - onToggleAvailability: guard cooldown and permissions, fetch GPS when
- *   going online, call backend, emit socket events, start or stop tracking,
- *   persist availability, reset requests.
- * - renderRequestItem: render ride request UI card.
- * - WideToggle: animated availability toggle component.
  *
- * STATE AND REFS
- * - isAvailable, updating, cooldownActive, requests
- * - driverIdRef, locationPermissionGranted
+ * ──────────────────────────────────────────────────────────────────────────
+ * DRIVER TOGGLES AVAILABILITY
+ * ──────────────────────────────────────────────────────────────────────────
  *
- * INTEGRATIONS
- * - AsyncStorage: `userToken` for JWT, `driverAvailable` for persistence.
- * - REST API: `updateDriverAvailability` in `../services/api`.
- * - Socket.IO: `initSocket`, `getSocket`, `closeSocket`,
- *   `emitDriverOnline`, and `ride_request` listener.
- * - Background tracking: `startBackgroundLocationTracking`,
- *   `stopBackgroundLocationTracking`.
- * - Location permissions: `expo-location` foreground and background.
- * - Navigation: `navigation.replace('Home')` on logout or session failure.
- * - Localization and UI: `i18n`, `LanguageContext`, `LanguageToggle`,
- *   `LogViewer`, `Toast`, `Ionicons`.
+ *            ┌──────────────────────┐
+ *            │ Toggle Pressed        │
+ *            └──────────┬───────────┘
+ *                       │
+ *        ┌──────────────▼──────────────┐
+ *        │ Permission Check             │
+ *        │ Cooldown / Updating Check   │
+ *        └──────────┬─────────────────┘
+ *                   │
+ *        ┌──────────▼──────────┐
+ *        │  Toggle BLOCKED     │◄───── Missing permission
+ *        └────────────────────┘
  *
- * SAFETY RULES
- * - Background tracking must not run when offline.
- * - Socket listeners must be cleaned up on unmount.
- * - Cooldown prevents rapid availability toggles.
+ *                   │ OK
+ *                   ▼
+ *        ┌────────────────────────────┐
+ *        │ Get Current Location (GPS) │  ← if going ONLINE
+ *        └──────────┬─────────────────┘
+ *                   │
+ *                   ▼
+ *        ┌────────────────────────────┐
+ *        │ REST API                    │
+ *        │ updateDriverAvailability   │
+ *        └──────────┬─────────────────┘
+ *                   │
+ *        ┌──────────▼──────────┐
+ *        │ Socket.IO Emit       │
+ *        │ driver:availability │
+ *        └──────────┬──────────┘
+ *                   │
+ *        ┌──────────▼──────────┐
+ *        │ Background Tracking │
+ *        │ START / STOP        │
+ *        └──────────┬──────────┘
+ *                   │
+ *        ┌──────────▼──────────┐
+ *        │ Save State           │
+ *        │ AsyncStorage        │
+ *        └─────────────────────┘
+ *
+ *
+ * ──────────────────────────────────────────────────────────────────────────
+ * REAL-TIME RIDE FLOW
+ * ──────────────────────────────────────────────────────────────────────────
+ *
+ * ┌────────────────────────────┐
+ * │ Socket.IO                  │
+ * │ ride_request event         │
+ * └──────────┬─────────────────┘
+ *            │
+ *            ▼
+ * ┌────────────────────────────┐
+ * │ Add request to UI state    │
+ * │ Show request card          │
+ * └────────────────────────────┘
+ *
+ *
+ * ──────────────────────────────────────────────────────────────────────────
+ * LOGOUT FLOW
+ * ──────────────────────────────────────────────────────────────────────────
+ *
+ * ┌──────────────────────┐
+ * │ Logout Pressed       │
+ * └──────────┬───────────┘
+ *            │
+ *            ▼
+ * ┌────────────────────────────┐
+ * │ If ONLINE → Set OFFLINE    │
+ * │ Stop BG Tracking           │
+ * └──────────┬─────────────────┘
+ *            │
+ *            ▼
+ * ┌────────────────────────────┐
+ * │ Close Socket               │
+ * │ Clear AsyncStorage         │
+ * └──────────┬─────────────────┘
+ *            │
+ *            ▼
+ * ┌────────────────────────────┐
+ * │ Navigate → Home Screen     │
+ * └────────────────────────────┘
+ *
+ * * PURPOSE
+ * -------
+ * Main home screen for the Driver in the ride-hailing application.
+ * This screen is responsible for:
+ * - Managing driver online/offline availability
+ * - Handling background & foreground location tracking
+ * - Syncing driver state with backend and Socket.IO
+ * - Displaying ride requests (real-time)
+ * - Providing logout, language switching, and side menu navigation
+ *
+ *
+ * CORE FEATURES
+ * -------------
+ *
+ * 1️⃣ Driver Availability (ONLINE / OFFLINE)
+ * -----------------------------------------
+ * - Driver can toggle availability using a custom WideToggle component.
+ * - When ONLINE:
+ *   • Current GPS location is captured.
+ *   • Availability is sent to backend via REST API.
+ *   • Background location tracking is started.
+ *   • Driver is registered on Socket.IO for real-time events.
+ * - When OFFLINE:
+ *   • Background tracking is stopped.
+ *   • Backend is notified.
+ *   • Socket availability is updated.
+ *
+ *
+ * 2️⃣ Location Permissions & Safety
+ * --------------------------------
+ * - Requests BOTH foreground and background location permissions.
+ * - Availability toggle is blocked if permissions are missing.
+ * - Prevents driver from going online without proper permissions.
+ *
+ *
+ * 3️⃣ Background Location Tracking
+ * -------------------------------
+ * - Uses Expo background tasks.
+ * - Runs only when driver is ONLINE.
+ * - Sends location updates based on movement (not time-based).
+ * - Automatically stopped when driver goes OFFLINE or logs out.
+ *
+ *
+ * 4️⃣ Backend Synchronization (REST)
+ * ---------------------------------
+ * - REST API is the single source of truth for:
+ *   • Driver availability state
+ *   • Initial location when going ONLINE
+ * - Ensures backend consistency even if socket disconnects.
+ *
+ *
+ * 5️⃣ Real-Time Updates (Socket.IO)
+ * --------------------------------
+ * - Socket initialized once when screen loads.
+ * - Events used:
+ *   • driver:register       → initial driver registration
+ *   • driver:availability   → availability updates
+ *   • ride_request          → incoming ride requests
+ * - Socket listeners are cleaned up on unmount.
+ *
+ *
+ * 6️⃣ Cooldown & Spam Protection
+ * ------------------------------
+ * - Prevents rapid ON/OFF toggling.
+ * - Cooldown duration: 10 seconds.
+ * - Protects backend, Redis, and socket events from spamming.
+ *
+ *
+ * 7️⃣ Persistent Driver State
+ * ---------------------------
+ * - Driver availability is saved in AsyncStorage.
+ * - On app restart:
+ *   • Availability is restored.
+ *   • Background tracking resumes automatically if driver was ONLINE.
+ *
+ *
+ * 8️⃣ Session Safety & Auto Logout
+ * -------------------------------
+ * - JWT token is decoded to extract driverId.
+ * - If token is missing or invalid:
+ *   • Socket is closed
+ *   • AsyncStorage is cleared
+ *   • User is redirected to Home screen
+ *
+ *
+ * 9️⃣ Side Menu & UI Controls
+ * ---------------------------
+ * - Animated side menu with overlay.
+ * - Menu items:
+ *   • Completed rides (placeholder)
+ *   • Settings (placeholder)
+ *   • Language switch (Arabic / English)
+ *   • Logout
+ *
+ *
+ * 🔟 Logging & Debugging
+ * ---------------------
+ * - Dumps all AsyncStorage keys on screen load (DEBUG only).
+ * - Integrated LogViewer component for runtime logs.
+ *
+ *
+ * COMPONENT STRUCTURE
+ * -------------------
+ * - DriverHomeScreen (main container)
+ * - WideToggle (custom animated availability switch)
+ * - LanguageToggle
+ * - LogViewer
+ *
+ *
+ * ARCHITECTURE RULES
+ * ------------------
+ * - REST API:
+ *   • Availability state
+ *   • Initial location
+ *
+ * - Socket.IO:
+ *   • Real-time availability
+ *   • Ride requests
+ *
+ * - Background Task:
+ *   • Continuous driver location updates
+ *
+ *
+ * IMPORTANT NOTES
+ * ---------------
+ * - Background tracking MUST NEVER run when driver is OFFLINE.
+ * - Socket lifecycle must be cleanly handled on logout/unmount.
+ * - Cooldown logic is critical for system stability.
  *
  * ============================================================================
  */
@@ -579,4 +780,3 @@ switchWrapper: {
 });
 
 export default DriverHomeScreen;
-
