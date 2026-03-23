@@ -76,6 +76,14 @@ const worker = new Worker(
       console.log("Ride found:", ride);
 
       if (!ride) return;
+      if (ride.expiresAt && new Date(ride.expiresAt) <= new Date()) {
+        await db.collection("rides").updateOne(
+          { _id: ride._id, status: "pending" },
+          { $set: { status: "expired" } }
+        );
+        console.log("Ride expired, skipping matching:", rideId);
+        return;
+      }
 
       const drivers = await findNearbyDrivers(
         ride.pickup.coordinates[0],
