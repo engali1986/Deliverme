@@ -73,6 +73,7 @@ const worker = new Worker(
         _id: new ObjectId(rideId),
         status: "pending",
       });
+      console.log("Ride found:", ride);
 
       if (!ride) return;
 
