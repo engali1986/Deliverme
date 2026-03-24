@@ -1,4 +1,4 @@
-# DeliverMe - Ride Sharing App
+﻿# DeliverMe - Ride Sharing App
 
 DeliverMe is a ride-sharing mobile application built using **React Native** (frontend) and **Node.js with Express and MongoDB** (backend). The app supports **driver and client accounts**, allows users to **sign up, verify their email, request rides**, and integrates **Google Drive API for storing driver documents**. It also includes **background location tracking** for drivers and real-time ride updates using **Socket.IO**.
 
@@ -33,73 +33,74 @@ DeliverMe is a ride-sharing mobile application built using **React Native** (fro
 
 ---
 
-## 📂 Project Structure (current)
+## Ride request flow (current implementation)
 
+1. Client calls POST /api/auth/client/request-ride.
+   - File: ackend/src/routes/authRoutes.mjs
+   - Creates a ride in MongoDB (ides collection) with status: "pending" and expiresAt.
+2. The API enqueues a BullMQ job for matching.
+   - Queue: ackend/src/queues/rideQueue.mjs
+   - Job name: matchRide with { rideId }
+3. ideMatching.worker.mjs consumes the job.
+   - File: ackend/src/workers/rideMatching.worker.mjs
+   - Loads the ride from MongoDB and checks expiration.
+4. Worker finds nearby drivers via Redis GEO.
+   - Helper: ackend/src/redis/redisClient.mjs (indNearbyDrivers)
+5. Worker emits socket event to drivers.
+   - Event: ide_request
+   - Room: driver:{driverId}
+6. Driver app listens and displays request.
+   - UI listener: rontend/src/screens/DriverHomeScreen.js
+
+Note: The worker is a separate process and must be running:
+
+pm run ride-matching-worker
+
+---
+## 📂 Project Structure (current)
 DeliverMe/
-├── backend/
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── readme.md
+├── structure.txt
+├── backend
 │   ├── .env
+│   ├── app.log
 │   ├── DriveServiceAccount.json
 │   ├── package.json
+│   ├── package-lock.json
 │   ├── server.mjs
-│   ├── Drafts/
-│   │   ├── App.js
-│   │   ├── app.mjs
-│   │   ├── app.config.json
-│   │   ├── app.json
-│   │   ├── api.js
-│   │   ├── api copy.js
-│   │   ├── authController copy.mjs
-│   │   ├── authController.mjs
-│   │   ├── authRoutes copy.mjs
-│   │   ├── authRoutes.mjs
-│   │   ├── backgroundLocationService.js
-│   │   ├── ClientHomeScreen*.js (many copies)
-│   │   ├── DriverHomeScreen*.js (many copies)
-│   │   ├── DriverSigninScreen*.js
-│   │   ├── DriverSignupScreen*.js
-│   │   ├── HomeScreen.js
-│   │   ├── Logger.js
-│   │   ├── LogViewer.js
-│   │   ├── MapPickerScreen.js
-│   │   ├── package copy.json
-│   │   ├── package.json
-│   │   ├── readme.md
-│   │   ├── redisClient copy.mjs
-│   │   ├── redisClient.mjs
-│   │   ├── server copy.mjs
-│   │   ├── server.mjs
-│   │   ├── socket.js
-│   │   ├── SocketIndex.mjs
-│   │   ├── uploadMiddleware copy.mjs
-│   │   └── uploadMiddleware.mjs
-│   └── src/
+│   └── src
 │       ├── app.mjs
-│       ├── controllers/
+│       ├── controllers
 │       │   ├── aa.mjs
 │       │   └── authController.mjs
-│       ├── db/
+│       ├── db
 │       │   ├── connect.mjs
 │       │   └── ensureIndexes.mjs
-│       ├── matching/
-│       ├── middlewares/
+│       ├── matching
+│       ├── middlewares
 │       │   ├── auth.mjs
 │       │   └── uploadMiddleware.mjs
-│       ├── queues/
+│       ├── queues
 │       │   └── rideQueue.mjs
-│       ├── redis/
+│       ├── redis
 │       │   └── redisClient.mjs
-│       ├── routes/
+│       ├── routes
 │       │   ├── authRoutes.mjs
-│       │   └── redisDebugRoutes.mjs
-│       ├── socket/
+│       │   ├── redisDebugRoutes.mjs
+│       │   └── ridesRoutes.mjs
+│       ├── socket
+│       │   ├── client.socket.mjs
 │       │   ├── driver.socket.mjs
 │       │   └── SocketIndex.mjs
-│       ├── utils/
+│       ├── utils
 │       │   └── logger.mjs
-│       └── workers/
+│       └── workers
 │           ├── rideExpiration.worker.mjs
 │           └── rideMatching.worker.mjs
-└── frontend/
+└── frontend
     ├── .env
     ├── app.config.js
     ├── App.js
@@ -108,25 +109,31 @@ DeliverMe/
     ├── eas.json
     ├── index.js
     ├── package.json
-    ├── .expo/ (expo build metadata)
-    ├── assets/
-    │   └── fonts/
-    └── src/
-        ├── components/
+    ├── package-lock.json
+    ├── assets
+    │   ├── adaptive-icon.png
+    │   ├── favicon.png
+    │   ├── icon.png
+    │   ├── splash-icon.png
+    │   └── fonts
+    │       ├── Poppins-Bold.ttf
+    │       └── Poppins-Regular.ttf
+    └── src
+        ├── components
         │   ├── LanguageToggle.js
         │   ├── LogViewer.js
         │   ├── NavigationLogger.js
         │   └── toastConfig.js
-        ├── context/
+        ├── context
         │   └── LanguageContext.js
-        ├── hooks/
+        ├── hooks
         │   └── usefonts.js
-        ├── i18n/
+        ├── i18n
         │   ├── i18n.js
         │   └── translations.json
-        ├── navigation/
+        ├── navigation
         │   └── AppNavigator.js
-        ├── screens/
+        ├── screens
         │   ├── ClientHomeScreen.js
         │   ├── ClientSigninScreen.js
         │   ├── ClientSignupScreen.js
@@ -134,17 +141,19 @@ DeliverMe/
         │   ├── DriverSigninScreen.js
         │   ├── DriverSignupScreen.js
         │   ├── HomeScreen.js
-        │   └── MapPickerScreen.js
-        ├── services/
+        │   ├── MapPickerScreen.js
+        │   └── SearchingDriverScreen.js
+        ├── services
         │   ├── api.js
         │   ├── backgroundLocationService.js
-        │   └── DriverSocket.js
-        └── utils/
+        │   ├── ClientSocket.js
+        │   ├── DriverSocket.js
+        │   └── SocketManager.js
+        └── utils
             ├── AppEvents.js
             ├── auth.js
             ├── localization.js
             └── Logger.js
-
 ---
 
 ## How to run (local)
@@ -201,4 +210,6 @@ If you'd like, I can now:
 
 File updated: [readme.md](readme.md)
   - Make sure your backend port (default: 5000) is not blocked by a firewall.
+
+
 
