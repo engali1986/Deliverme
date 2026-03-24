@@ -57,7 +57,46 @@ Note: The worker is a separate process and must be running:
 pm run ride-matching-worker
 
 ---
-## 📂 Project Structure (current)
+
+## Driver signup flow (current implementation)
+
+1. Driver fills signup form and selects documents.
+   - UI: rontend/src/screens/DriverSignupScreen.js
+   - Required fields: email, mobile, 
+ame, password.
+   - Required documents: license, egistration, criminal, personal.
+2. App sends multipart request to the backend.
+   - API: rontend/src/services/api.js → POST /api/auth/driver/signup
+3. Backend validates and processes uploads.
+   - Route: ackend/src/routes/authRoutes.mjs
+   - Middleware: ackend/src/middlewares/uploadMiddleware.mjs (multer memory storage, jpg/jpeg/png/pdf, max 5MB per file)
+4. Backend creates Google Drive folder and uploads docs.
+   - Controller: ackend/src/controllers/authController.mjs (createDriverFolder, uploadFileToDrive)
+5. Driver record saved in MongoDB with driverVerified: false and erificationCode.
+6. Verification email is sent.
+   - Driver enters code in the app, which calls POST /api/auth/driver/verify.
+   - If verified, JWT token is returned and stored in AsyncStorage.
+   - UI navigates to DriverHome.
+
+---
+
+## Driver sign-in flow (current implementation)
+
+1. Driver enters mobile + password.
+   - UI: rontend/src/screens/DriverSigninScreen.js
+2. App sends login request.
+   - API: rontend/src/services/api.js → POST /api/auth/driver/signin
+3. Backend validates credentials.
+   - Controller: ackend/src/controllers/authController.mjs
+4. If driverVerified: true:
+   - Backend returns JWT token.
+   - App stores token in AsyncStorage and navigates to DriverHome.
+5. If driverVerified: false:
+   - Backend responds with Verification required and re-sends email.
+   - App shows verification input and calls POST /api/auth/driver/verify.
+   - On success, token is stored and user is navigated to DriverHome.
+
+---## 📂 Project Structure (current)
 DeliverMe/
 ├── .gitignore
 ├── package.json
@@ -210,6 +249,7 @@ If you'd like, I can now:
 
 File updated: [readme.md](readme.md)
   - Make sure your backend port (default: 5000) is not blocked by a firewall.
+
 
 
 
