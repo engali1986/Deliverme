@@ -41,6 +41,7 @@ router.get('/:rideId/nearby-drivers', authenticateToken, async (req, res) => {
       driverId: driverId?.toString?.() ?? String(driverId),
       distanceKm: Number(distance),
     }));
+    console.log(`Nearby drivers for ride ${rideId}:`, payload);
 
     return res.json({ count: payload.length, drivers: payload });
   } catch (err) {

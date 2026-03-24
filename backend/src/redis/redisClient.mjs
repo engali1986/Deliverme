@@ -174,6 +174,7 @@ export async function findNearbyDrivers(
       staleDrivers.forEach(id => cleanup.zrem("drivers:geo", id));
       await cleanup.exec();
     }
+    console.log(`Found ${aliveDrivers.length} alive drivers, removed ${staleDrivers.length} stale drivers`);
 
     return aliveDrivers;
 
