@@ -300,6 +300,8 @@ const DriverHomeScreen = () => {
   const handleLogout = async () => {
     try {
       if (isAvailable) {
+        const socket = getSocket();
+        socket?.emit('driver:availability', { isAvailable: false });
         await updateDriverAvailability(false, null);
         await stopBackgroundLocationTracking();
       }
@@ -352,12 +354,18 @@ const DriverHomeScreen = () => {
       }
 
       /* Step 2: Update backend availability (MongoDB) */
-      await updateDriverAvailability(newValue, coords);
+      const updateResult = await updateDriverAvailability(newValue, coords);
+      console.log('DriverHomeScreen: Backend availability updated:', updateResult);
 
       /* Step 3: Only when going online, connect socket + start tracking */
-      if (newValue) {
+      if (newValue ) {
+        if (updateResult.message !== 'Availability updated successfully') {
+          throw new Error('Backend did not confirm availability');
+        }
         const socket = await initSocket();
         attachRideRequestListener(socket);
+        
+
 
         const started = await startBackgroundLocationTracking();
         if (!started) throw new Error('Tracking failed');
@@ -370,31 +378,29 @@ const DriverHomeScreen = () => {
         }
 
         await emitDriverOnline(coords);
+        socket?.emit('driver:availability', { isAvailable: true });
       } else {
+        const socket = getSocket();
+        socket?.emit('driver:availability', { isAvailable: false });
         await stopBackgroundLocationTracking();
         closeSocket();
       }
-
       /* Step 4: Persist availability state locally */
-      setIsAvailable(newValue);
-      await AsyncStorage.setItem('driverAvailable', newValue ? 'true' : 'false');
+          setIsAvailable(newValue);
+          await AsyncStorage.setItem('driverAvailable', newValue ? 'true' : 'false');
 
-      /* Step 5: Notify socket about availability (if connected) */
-      const socket = getSocket();
-      socket?.emit('driver:availability', {
-        isAvailable: newValue,
-      });
-
-      /* Step 6: Cooldown and UI reset */
+      
+      /* Step 5: Cooldown and UI reset */
       setCooldownActive(true);
       setTimeout(() => setCooldownActive(false), COOLDOWN_MS);
       setRequests([]);
     } catch (err) {
+      console.error('DriverHomeScreen availability toggle error:', err);
       Toast.show({
         type: 'error',
         text1: 'Availability update failed',
       });
-      handleLogout()
+      // handleLogout()
     } finally {
       setUpdating(false);
     }

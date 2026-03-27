@@ -285,7 +285,7 @@ export async function updateDriverAvailability(available, coords) {
       console.log("api.js updateDriverAvailability errorData:",errorData)
       throw new Error(errorData.message || "Failed to update availability");
     }
-    return await response;
+    return await response.json();
   } catch (error) {
     console.error('updateDriverAvailability error', error);
     throw error;
