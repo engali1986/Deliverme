@@ -1,7 +1,60 @@
 /**
  * ============================================================================
- * DRIVER HOME SCREEN - FUNCTION MAP AND INTEGRATIONS
+ * DRIVER HOME SCREEN - SEQUENCE DIAGRAM + FUNCTION MAP
  * ============================================================================
+ *
+ * VISUAL SEQUENCE DIAGRAM (Online -> Active -> Offline)
+ * --------------------------------------------------------------------------
+ * mermaid
+ * sequenceDiagram
+ *   participant D as "DriverHomeScreen"
+ *   participant AS as "AsyncStorage"
+ *   participant LOC as "Expo Location"
+ *   participant API as "REST API (backend)"
+ *   participant SM as "SocketManager"
+ *   participant DS as "DriverSocket"
+ *   participant BG as "BackgroundLocationService"
+ *   participant BE as "Socket.IO Server"
+ *   participant R as "Redis"
+ *   participant W as "RideMatching Worker"
+ *
+ *   Note over D: App start / restore
+ *   D->>AS: Read userToken + driverAvailable
+ *   D->>LOC: Request foreground + background permissions
+ *   D->>SM: initSocket() if driverAvailable=true
+ *   SM->>BE: WebSocket connect (JWT in handshake)
+ *   BE->>R: Join room "driver:{id}" and register events
+ *   D->>BG: startBackgroundLocationTracking()
+ *   D->>BE: socket.emit("driver:register")
+ *
+ *   Note over D: Toggle ONLINE
+ *   D->>LOC: getCurrentPositionAsync()
+ *   D->>API: PATCH /api/auth/driver/availability {available:true, location}
+ *   D->>SM: initSocket()
+ *   SM->>BE: connect -> emit "driverOnline"
+ *   D->>BE: emit "driver:register"
+ *   D->>DS: emitDriverOnline(coords)
+ *   DS->>BE: emit "driverOnline" (coords)
+ *   D->>BE: emit "driver:availability" {isAvailable:true}
+ *   D->>BG: startBackgroundLocationTracking()
+ *
+ *   Note over BG: Background updates
+ *   BG->>DS: emitLocation(coords)
+ *   DS->>BE: emit "driverLocation" or "driverHeartbeat"
+ *   BE->>R: Update GEO + presence TTL keys
+ *
+ *   Note over W: Ride matching
+ *   W->>R: findNearbyDrivers()
+ *   W->>BE: emit "ride_request" to room driver:{id}
+ *   BE->>D: ride_request event
+ *
+ *   Note over D: Toggle OFFLINE / Logout
+ *   D->>API: PATCH /api/auth/driver/availability {available:false}
+ *   D->>BG: stopBackgroundLocationTracking()
+ *   D->>SM: closeSocket()
+ *   D->>BE: emit "driver:availability" {isAvailable:false} (if connected)
+ *   BE->>R: remove from GEO + delete presence keys
+ * --------------------------------------------------------------------------
  *
  * PURPOSE
  * - Main driver hub for availability, live requests, background tracking,
