@@ -404,7 +404,15 @@ export async function clientSignIn(req, res,db) {
 
 // Driver Sign-Up
 export async function driverSignUp(req, res,db) {
-  const { email, mobile, name, password } = req.body;
+  const {
+    email,
+    mobile,
+    name,
+    password,
+    vehicleModel,
+    vehicleColor,
+    vehiclePlateNumber,
+  } = req.body;
   logger.info("Driver Sign-Up db %s", db);
   console.log(req.body)
   const client = db.client; // MongoClient instance
@@ -421,11 +429,10 @@ export async function driverSignUp(req, res,db) {
     
 
     
-    if (!email || !mobile || !name || !password) {
+    if (!mobile) {
       logger.warn("Missing required fields.");
       return res.status(400).json({ message: "All fields are required." });
     }
-
 
     // Check if the Driver already exists
     const existingDriver = await db.collection("drivers").findOne({ mobile }, { session });
@@ -465,6 +472,11 @@ export async function driverSignUp(req, res,db) {
       });
     }
 
+    if (!email || !name || !password || !vehicleModel || !vehicleColor || !vehiclePlateNumber) {
+      logger.warn("Missing required fields.");
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -497,6 +509,11 @@ for (const [key, fileArray] of Object.entries(req.files)) {
         password: hashedPassword,
         driverVerified: false,
         verificationCode,
+        vehicle: {
+          model: vehicleModel,
+          color: vehicleColor,
+          plateNumber: vehiclePlateNumber,
+        },
         driverPhotos: {
           folderId,
           ...uploadedFiles,

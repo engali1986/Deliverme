@@ -21,6 +21,9 @@ const DriverSignupScreen = () => {
     mobile: "",
     name: "",
     password: "",
+    vehicleModel: "",
+    vehicleColor: "",
+    vehiclePlateNumber: "",
     license: null,
     registration: null,
     criminal: null,
@@ -32,7 +35,7 @@ const DriverSignupScreen = () => {
   // Function to handle input validation and form state update
   const validateInputs = () => {
       // Check if all fields are filled
-      if (!form.email || !form.mobile || !form.name || !form.password || !form.license || !form.registration || !form.criminal || !form.personal) {
+      if (!form.email || !form.mobile || !form.name || !form.password || !form.vehicleModel || !form.vehicleColor || !form.vehiclePlateNumber || !form.license || !form.registration || !form.criminal || !form.personal) {
         console.log("ValidateInputs function, missing fields")
         // Alert.alert'Error', 'All fields are mandatory!';
         Toast.show({
@@ -264,6 +267,9 @@ const DriverSignupScreen = () => {
       <TextInput style={styles.input} placeholder={i18n.t("mobile_number")} value={form.mobile} onChangeText={(text)=>{setForm({...form,mobile:text})}} />
       <TextInput style={styles.input} placeholder={i18n.t("name")} value={form.name} onChangeText={(text)=>{setForm({...form,name:text})}} />
       <TextInput style={styles.input} placeholder={i18n.t("password")} secureTextEntry value={form.password} onChangeText={(text)=>{setForm({...form,password:text})}} />
+      <TextInput style={styles.input} placeholder={i18n.t("car_model")} value={form.vehicleModel} onChangeText={(text)=>{setForm({...form,vehicleModel:text})}} />
+      <TextInput style={styles.input} placeholder={i18n.t("car_color")} value={form.vehicleColor} onChangeText={(text)=>{setForm({...form,vehicleColor:text})}} />
+      <TextInput style={styles.input} placeholder={i18n.t("plate_number")} value={form.vehiclePlateNumber} onChangeText={(text)=>{setForm({...form,vehiclePlateNumber:text})}} />
       
       {/* File upload buttons for driver documents */}
       {["license", "registration", "criminal", "personal"].map((field) => (

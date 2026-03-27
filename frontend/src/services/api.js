@@ -130,7 +130,7 @@ export async function verifyClient(data) {
 
 /**
  * Handles user signup for drivers.
- * @param {Object} data - The driver signup details (email, mobile, name, password).
+ * @param {Object} data - The driver signup details (email, mobile, name, password, vehicleModel, vehicleColor, vehiclePlateNumber).
  */
 export async function driverSignup(data) {
   console.log("api.js driverignup data",data)
@@ -155,7 +155,7 @@ export async function driverSignup(data) {
   const response = await fetchWithTimeout(`${BASE_URL}/driver/signup`, {
       method: "POST",
       body: formData,
-    }, 15000); // 15 seconds timeout
+    }, 30000); // 30 seconds timeout
   console.log("api.js driver signup response.ok:", response.ok || "cannot find response.ok" )
   if (!response.ok) {
   const errorData = await response.json();

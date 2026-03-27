@@ -1,4 +1,4 @@
-{
+﻿{
     "en": {
       "home_title": "Welcome to Deliverme",
       "client_signup": "Client Signup",
@@ -12,6 +12,9 @@
       "email": "Email",
       "name": "Name",
       "password": "Password",
+      "car_model": "Car Model",
+      "car_color": "Car Color",
+      "plate_number": "Plate Number",
       "mobile_number": "Mobile Number",
       "license": "Driver’s License Photo",
       "registration": "Car Registration Photo",
@@ -51,6 +54,9 @@
       "email": "البريد الإلكتروني",
       "name": "الاسم",
       "password": "كلمة المرور",
+      "car_model": "موديل السيارة",
+      "car_color": "لون السيارة",
+      "plate_number": "رقم اللوحة",
       "mobile_number": "رقم الهاتف",
       "license": "صورة رخصة القيادة",
       "registration": "صورة تسجيل السيارة",
@@ -80,3 +86,5 @@
     }
   }
   
+
+
