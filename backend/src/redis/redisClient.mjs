@@ -116,6 +116,62 @@ export async function removeDriverFromGeo(driverId) {
   await redis.zrem("drivers:geo", driverId.toString());
 }
 
+export async function addDriverData(driverId, data) {
+  try {
+    const redis = await getRedis();
+    const key = `driver:${driverId}`;
+    console.log(`Adding data for driver ${driverId}:`, data);
+
+    await redis.hset(key, {
+      name: data.name || "",
+      vehicle: data.vehicle || "",
+    });
+
+    // Optional: set TTL for driver data (e.g., 24 hours)
+    await redis.expire(key, 24 * 60 * 60);
+
+  } catch (error) {
+    logger.error("addDriverData error:", error.message);
+  }
+}
+
+export async function getDriverData(driverId) {
+  try {
+    const redis = await getRedis();
+    const key = `driver:${driverId}`;
+    const data = await redis.hgetall(key);
+
+    if (!data || Object.keys(data).length === 0) {
+      logger.warn(`No data found for driver ${driverId}`);
+      return null;
+    }
+
+    return {
+      name: data.name || "",
+      vehicle: data.vehicle || "",
+    };
+
+  } catch (error) {
+    logger.error("getDriverData error:", error.message);
+    return null;
+  }
+}
+
+export async function removeDriverData(driverId) {
+  try {
+    const redis = await getRedis();
+    const key = `driver:${driverId}`;
+    await redis.del(key);
+  } catch (error) {
+    logger.error("removeDriverData error:", error.message);
+  }
+}   
+
+// ================================
+// GEO helpers for rides
+// ================================
+
+
 export async function findNearbyDrivers(
   longitude,
   latitude,

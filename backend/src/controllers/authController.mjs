@@ -9,7 +9,7 @@ import {PassThrough} from "stream"
 import {fileURLToPath} from "url"
 import path from 'path';
 import { ObjectId } from 'mongodb';
-import { removeDriverFromGeo, findNearbyDrivers,addDriverToGeo } from "../redis/redisClient.mjs";
+import { removeDriverFromGeo, findNearbyDrivers,addDriverToGeo, addDriverData } from "../redis/redisClient.mjs";
 
 /*
 This file contains the core logic for authentication-related operations. Below is an overview of how the functions in this file are utilized by the routes and interact with other parts of the backend:
