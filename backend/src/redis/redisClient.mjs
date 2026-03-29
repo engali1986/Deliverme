@@ -119,19 +119,22 @@ export async function removeDriverFromGeo(driverId) {
 export async function addDriverData(driverId, data) {
   try {
     const redis = await getRedis();
-    const key = `driver:${driverId}`;
-    console.log(`Adding data for driver ${driverId}:`, data);
+     const pipeline = redis.pipeline();
 
-    await redis.hset(key, {
-      name: data.name || "",
-      vehicle: data.vehicle || "",
-    });
+  pipeline.hset(`driver:${driverId}`, {
+    name: data.name,
+    vehicle: data.vehicle,
+  });
 
-    // Optional: set TTL for driver data (e.g., 24 hours)
-    await redis.expire(key, 24 * 60 * 60);
+  // TTL (optional but recommended)
+  pipeline.expire(`driver:${driverId}`, 24*3600); // 24 hours 
+
+  await pipeline.exec();
+  return { ok: true, reason: "Driver data added" };
 
   } catch (error) {
     logger.error("addDriverData error:", error.message);
+    return { ok: false, reason: error.message || "SERVER_ERROR" };
   }
 }
 
@@ -157,13 +160,21 @@ export async function getDriverData(driverId) {
   }
 }
 
+/**
+ * ❌ Remove driver from cache (offline)
+ */
+
 export async function removeDriverData(driverId) {
   try {
     const redis = await getRedis();
-    const key = `driver:${driverId}`;
-    await redis.del(key);
+    
+
+  await redis.del(`driver:${driverId}`);
+  await redis.zrem("drivers:geo", driverId.toString()); // remove from GEO if used
+  return { ok: true, reason: "Driver data removed" };
   } catch (error) {
     logger.error("removeDriverData error:", error.message);
+    return { ok: false, reason: error.message || "SERVER_ERROR" };
   }
 }   
 

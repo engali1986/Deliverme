@@ -9,7 +9,8 @@ import {PassThrough} from "stream"
 import {fileURLToPath} from "url"
 import path from 'path';
 import { ObjectId } from 'mongodb';
-import { removeDriverFromGeo, findNearbyDrivers,addDriverToGeo, addDriverData } from "../redis/redisClient.mjs";
+import { removeDriverFromGeo, findNearbyDrivers,addDriverToGeo, addDriverData, removeDriverData } from "../redis/redisClient.mjs";
+// import { add } from 'winston';
 
 /*
 This file contains the core logic for authentication-related operations. Below is an overview of how the functions in this file are utilized by the routes and interact with other parts of the backend:
@@ -639,17 +640,22 @@ export async function verifyDriver(req, res, db) {
 export async function updateDriverAvailability(req, res, db) {
   logger.info('updateDriverAvailability called with body: %o', req.body);
   logger.info('updateDriverAvailability user: %o', req.user);
+
   try {
     const database = db || req.app?.locals?.db;
-    if (!database) return res.status(500).json({ message: 'Database not initialized' });
+    if (!database) {
+      return res.status(500).json({ message: 'Database not initialized' });
+    }
 
     const driverId = req.user?.id || req.user?._id;
-    if (!driverId) return res.status(401).json({ message: 'Unauthorized' });
+    if (!driverId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     const available = Boolean(req.body.available);
     const loc = req.body.location;
 
-    // Validate location if available = true
+    // ✅ Validate location if going online
     if (available) {
       if (
         !loc ||
@@ -669,7 +675,7 @@ export async function updateDriverAvailability(req, res, db) {
       },
     };
 
-    // Add location if valid
+    // ✅ Add location if valid
     if (
       loc &&
       typeof loc.latitude === 'number' &&
@@ -687,22 +693,70 @@ export async function updateDriverAvailability(req, res, db) {
 
     let filter;
     try {
-      filter = ObjectId.isValid(driverId) ? { _id: new ObjectId(driverId) } : { _id: driverId };
+      filter = ObjectId.isValid(driverId)
+        ? { _id: new ObjectId(driverId) }
+        : { _id: driverId };
     } catch {
       filter = { _id: driverId };
     }
 
-    const result = await driversColl.updateOne(filter, updateDoc)
-    console.log('updateDriverAvailability result:', result);
+    const result = await driversColl.updateOne(filter, updateDoc);
 
-    if (result.modifiedCount===0) {
+    if (result.modifiedCount === 0) {
       logger.warn('Driver not found for ID: %s', driverId);
       return res.status(404).json({ message: 'Driver not found' });
     }
 
+    // ================================
+    // 🚀 REDIS INTEGRATION STARTS HERE
+    // ================================
+    let RedisAdded = false;
+
+    if (available) {
+      // ✅ Fetch driver data ONLY ONCE
+      const driver = await driversColl.findOne(filter, {
+        projection: {
+          name: 1,
+          vehicle: 1,
+        },
+      });
+
+      if (driver) {
+        console.log("Adding driver data to Redis for driverId:", driverId, "with data:", driver);
+        const addDriverDataResult = await addDriverData(driverId, driver);
+        if(addDriverDataResult.ok && addDriverDataResult.reason === "Driver data added"){
+          logger.info('Driver data added to Redis for driverId: %s', driverId);
+          RedisAdded = true;
+        } else {
+          logger.error('Failed to add driver data to Redis for driverId: %s, reason: %s', driverId, addDriverDataResult.reason);
+          RedisAdded = false;
+        } 
+      }
+
+    } else {
+      // ❌ Remove from Redis when offline
+      console.log("Removing driver data from Redis for driverId:", driverId);
+      const removeDriverDataResult = await removeDriverData(driverId);
+      if (removeDriverDataResult.ok && removeDriverDataResult.reason === "Driver data removed") {
+        logger.info('Driver data removed from Redis for driverId: %s', driverId);
+        RedisAdded = true;
+      } else {
+        logger.error('Failed to remove driver data from Redis for driverId: %s, reason: %s', driverId, removeDriverDataResult.reason);
+        RedisAdded = false;
+      }
+    }
+
+    // ================================
+    if (RedisAdded) {
+      return res.status(200).json({
+      message: 'Availability updated successfully',
+    });
+    }else{
+      throw new Error('Failed to update driver availability in cache');
+    }
+
     
 
-    return res.status(200).json({ message: 'Availability updated successfully' });
   } catch (err) {
     console.error('updateDriverAvailability error', err);
     return res.status(500).json({ message: 'Internal server error' });
