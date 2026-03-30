@@ -47,6 +47,88 @@ router.get("/drivers", async (req, res) => {
 });
 
 /* =========================================================
+   GET ALL CACHED DRIVER DATA (HASH DEBUG)
+   =========================================================
+   What it does:
+   - Fetches all "driver:*" keys from Redis
+   - Returns full cached driver data (name + vehicle info)
+
+   How it works:
+   1. Uses KEYS to find all driver cache entries
+   2. Uses pipeline to fetch all HASH data efficiently
+
+   When to use:
+   - Verify driver cache is being populated correctly
+   - Debug missing driver info in ride requests
+   - Check consistency between GEO and HASH
+
+   ⚠️ Note:
+   - Uses KEYS → NOT suitable for production
+   - Only for development/debugging
+
+   Output:
+   - driverId
+   - name
+   - vehicleModel
+   - vehicleColor
+   - plateNumber
+========================================================= */
+router.get("/drivers/data", async (req, res) => {
+  try {
+    const redis = await getRedis();
+
+    // Get all cached driver keys
+    const keys = await redis.keys("driver:*");
+
+    if (!keys.length) {
+      return res.json({
+        count: 0,
+        drivers: [],
+      });
+    }
+
+    // Use pipeline for performance
+    const pipeline = redis.pipeline();
+
+    keys.forEach((key) => {
+      pipeline.hgetall(key);
+    });
+
+    const results = await pipeline.exec();
+
+    const drivers = results.map(([err, data], index) => {
+      if (err) return null;
+
+      const key = keys[index];
+      const driverId = key.split(":")[1];
+
+      let vehicle = null;
+
+  try {
+    vehicle = data.vehicle ? JSON.parse(data.vehicle) : null;
+  } catch {
+    vehicle = null;
+  }
+
+  return {
+    driverId,
+    name: data.name,
+    vehicle,
+  };
+}).filter(Boolean);
+
+    res.json({
+      count: drivers.length,
+      drivers,
+    });
+
+  } catch (error) {
+    console.error("Redis drivers/data error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/* =========================================================
    GET SINGLE DRIVER LOCATION
    =========================================================
    What it does:

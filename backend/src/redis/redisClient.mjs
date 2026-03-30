@@ -123,7 +123,7 @@ export async function addDriverData(driverId, data) {
 
   pipeline.hset(`driver:${driverId}`, {
     name: data.name,
-    vehicle: data.vehicle,
+    vehicle: JSON.stringify(data.vehicle),
   });
 
   // TTL (optional but recommended)
@@ -142,7 +142,7 @@ export async function getDriverData(driverId) {
   try {
     const redis = await getRedis();
     const key = `driver:${driverId}`;
-    const data = await redis.hgetall(key);
+    const data = JSON.parse(await redis.hgetall(key) );
 
     if (!data || Object.keys(data).length === 0) {
       logger.warn(`No data found for driver ${driverId}`);
