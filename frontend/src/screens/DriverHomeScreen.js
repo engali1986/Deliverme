@@ -261,16 +261,34 @@ const DriverHomeScreen = () => {
 
            /* Step 5: Only connect socket + tracking if saved availability is true */
            if (shouldBeOnline) {
-             const socket = await initSocket();
-             attachRideRequestListener(socket);
-             await startBackgroundLocationTracking();
-             if (socket && driverIdRef.current) {
-               socket.emit('driver:register', {
-                 driverId: driverIdRef.current,
-                 isAvailable: true,
-               });
-             }
-           }
+            console.log('DriverHomeScreen: Restoring online state, initializing socket and tracking');
+              const socket = await initSocket();
+              attachRideRequestListener(socket);
+
+              // ✅ Get fresh location
+              const pos = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Balanced,
+              });
+
+              const coords = {
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+              };
+
+              // ✅ Send driver online again
+              await emitDriverOnline(coords);
+
+              // ✅ Register driver
+              if (socket && driverIdRef.current) {
+                socket.emit('driver:register', {
+                  driverId: driverIdRef.current,
+                  isAvailable: true,
+                });
+              }
+
+              // ✅ Start tracking AFTER initial emit
+              await startBackgroundLocationTracking();
+            }
          } catch (e) {
            console.warn('DriverHomeScreen init error:', e);
          }
