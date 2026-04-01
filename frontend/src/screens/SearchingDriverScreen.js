@@ -48,7 +48,13 @@ const SearchingDriverScreen = () => {
         const data = await getNearbyDrivers(rideId, 5, 20);
         console.log("Nearby drivers data:", data);
         if (!active) return;
-        setDrivers(data.drivers || []);
+        if (data.drivers) {
+          addLog(`Found ${data.drivers.length} nearby drivers for rideId: ${rideId}`, "success");
+          setDrivers(data.drivers || []);
+        } else {
+          addLog(`No nearby drivers found for rideId: ${rideId}`, "warning");
+          setDrivers([]);
+        }
       } catch (err) {
         if (!active) return;
         setDriversError(err.message || "Failed to load drivers");
