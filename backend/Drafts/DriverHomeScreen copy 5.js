@@ -41,7 +41,7 @@ const DriverHomeScreen = () => {
 
   // Initialize Socket.IO
   useEffect(() => {
-    socketRef.current = io('http://10.97.209.200', {
+    socketRef.current = io('http://10.250.87.200', {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,

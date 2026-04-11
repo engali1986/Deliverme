@@ -262,12 +262,20 @@ const ClientHomeScreen = () => {
   };
 
   const handleRequestRide = async () => {
-    console.log('ClientHomeScreen.js: Requesting ride with', { pickupCoords, destinationCoords, fare });
+    console.log('ClientHomeScreen.js: Requesting ride with', { pickupCoords, destinationCoords, fare, routeDistance });
     if (!pickupCoords || !destinationCoords || !fare) {
       Toast.show({
         type: 'error',
         text1: 'Missing Fields',
         text2: 'Please fill all ride details.',
+      });
+      return;
+    }
+    if (routeDistance === null || !Number.isFinite(routeDistance) || routeDistance <= 0) {
+      Toast.show({
+        type: 'error',
+        text1: 'Route Not Ready',
+        text2: 'Please wait for the route to calculate.',
       });
       return;
     }
@@ -420,7 +428,17 @@ const ClientHomeScreen = () => {
               pointerEvents="none"
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.findDriverBtn} disabled={destination.length===0 || pickupLocation.length===0? true: false} onPress={handleRequestRide}>
+          <TouchableOpacity
+            style={styles.findDriverBtn}
+            disabled={
+              destination.length===0 ||
+              pickupLocation.length===0 ||
+              !fare ||
+              routeDistance === null ||
+              !Number.isFinite(routeDistance)
+            }
+            onPress={handleRequestRide}
+          >
             <Text style={styles.findDriverText}>Find a driver</Text>
           </TouchableOpacity>
         </View>
