@@ -383,6 +383,7 @@ export async function findNearbyRides(
     // STEP 1: Get Redis instance
     // ================================
     const redis = await getRedis();
+    console.log(`Finding nearby rides for location (${latitude}, ${longitude}) within ${radiusKm} km`);
 
     // ================================
     // STEP 2: Search for nearby rides using GEO

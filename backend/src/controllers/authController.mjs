@@ -9,7 +9,7 @@ import {PassThrough} from "stream"
 import {fileURLToPath} from "url"
 import path from 'path';
 import { ObjectId } from 'mongodb';
-import { removeDriverFromGeo, findNearbyDrivers,addDriverToGeo, addDriverData, removeDriverData } from "../redis/redisClient.mjs";
+import { removeDriverFromGeo, findNearbyDrivers,addDriverToGeo, addDriverData, removeDriverData, findNearbyRides } from "../redis/redisClient.mjs";
 // import { add } from 'winston';
 
 /*
@@ -722,38 +722,39 @@ export async function updateDriverAvailability(req, res, db) {
       });
 
       if (driver) {
-        console.log("Adding driver data to Redis for driverId:", driverId, "with data:", driver);
+        console.log("Driver available", available)
+           console.log("Adding driver data to Redis for driverId:", driverId, "with data:", driver);
         const addDriverDataResult = await addDriverData(driverId, driver);
         if(addDriverDataResult.ok && addDriverDataResult.reason === "Driver data added"){
           logger.info('Driver data added to Redis for driverId: %s', driverId);
-          RedisAdded = true;
+          const getNerbyRides= await findNearbyRides(loc.longitude,loc.latitude)
+            console.log("Nearby rides found:", getNerbyRides);
+            return res.status(200).json({
+              message:"Availability updated successfully",
+              getNerbyRides
+            })
         } else {
           logger.error('Failed to add driver data to Redis for driverId: %s, reason: %s', driverId, addDriverDataResult.reason);
-          RedisAdded = false;
-        } 
+          return  res.status(404).json({ message: 'Driver not found' });
+        }  
+      } else{
+         logger.error('Failed to add driver data to Redis for driverId: %s, reason: %s', driverId, addDriverDataResult.reason);
+          return  res.status(404).json({ message: 'Driver not found' });
       }
 
-    } else {
+    }else{
       // ❌ Remove from Redis when offline
       console.log("Removing driver data from Redis for driverId:", driverId);
       const removeDriverDataResult = await removeDriverData(driverId);
       if (removeDriverDataResult.ok && removeDriverDataResult.reason === "Driver data removed") {
         logger.info('Driver data removed from Redis for driverId: %s', driverId);
-        RedisAdded = true;
-      } else {
-        logger.error('Failed to remove driver data from Redis for driverId: %s, reason: %s', driverId, removeDriverDataResult.reason);
-        RedisAdded = false;
+        return res.status(200).json({
+              message:"Driver Data Removed Successfully",
+            })
       }
     }
 
-    // ================================
-    if (RedisAdded) {
-      return res.status(200).json({
-      message: 'Availability updated successfully',
-    });
-    }else{
-      throw new Error('Failed to update driver availability in cache');
-    }
+   
 
     
 
