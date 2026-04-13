@@ -334,6 +334,9 @@ const DriverHomeScreen = () => {
 
       navigation.replace('Home');
     } catch (e) {
+      closeSocket();
+      await AsyncStorage.clear();
+      navigation.replace('Home');
       Toast.show({
         type: 'error',
         text1: i18n.t('logout_error'),
