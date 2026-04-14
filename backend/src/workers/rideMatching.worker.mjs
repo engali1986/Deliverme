@@ -16,7 +16,9 @@ import { findNearbyDrivers } from "../redis/redisClient.mjs";
 import { Server } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
+import { addDriverData, removeDriverData } from "../redis/redisClient.mjs";
 import http from "http";
+
 
 dotenv.config();
 
@@ -163,6 +165,48 @@ const worker = new Worker(
   },
   { connection }
 );
+
+// 🔥 Driver Availability Worker
+const driverQueue = new Worker(
+  'driver-availability',
+  async (job) => {
+    const { driverId, location } = job.data;
+    console.log('Driver availability job:', job.name, job.data);
+
+    switch (job.name) {
+      case 'driver-online':
+        const result= await addDriverData(driverId, location);
+        console.log('addDriverData result:', result);
+
+        await connection.publish(
+          'driver:online',
+          JSON.stringify({ driverId, location })
+        );
+        break;
+
+      case 'driver-offline':
+        await removeDriverData(driverId);
+
+        await connection.publish(
+          'driver:offline',
+          JSON.stringify({ driverId })
+        );
+        break;
+    }
+  },
+  { connection }
+);
+
+driverQueue.on("completed", job => {
+  // Step 11: Completion logging.
+  console.log(`Job ${job.id} completed`);
+});
+
+driverQueue.on("failed", (job, err) => {
+  // Step 12: Failure logging.
+  console.error(`Job ${job.id} failed`, err);
+});
+
 
 
 worker.on("completed", job => {

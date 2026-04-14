@@ -56,7 +56,7 @@ export async function initSocket() {
   if (socket && socket.connected) return socket;
 
   const token = await AsyncStorage.getItem("userToken");
-  socket = io("http://10.250.87.200", {
+  socket = io("http://10.114.106.200", {
     transports: ["websocket"],
     auth: token ? { token } : undefined,
     reconnection: true,

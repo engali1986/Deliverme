@@ -10,7 +10,9 @@ import {fileURLToPath} from "url"
 import path from 'path';
 import { ObjectId } from 'mongodb';
 import { removeDriverFromGeo, findNearbyDrivers,addDriverToGeo, addDriverData, removeDriverData, findNearbyRides } from "../redis/redisClient.mjs";
+import {driverQueue} from "../queues/driverQueue.mjs"
 // import { add } from 'winston';
+
 
 /*
 This file contains the core logic for authentication-related operations. Below is an overview of how the functions in this file are utilized by the routes and interact with other parts of the backend:
@@ -707,57 +709,34 @@ export async function updateDriverAvailability(req, res, db) {
       return res.status(404).json({ message: 'Driver not found' });
     }
 
-    // ================================
-    // 🚀 REDIS INTEGRATION STARTS HERE
-    // ================================
-    let RedisAdded = false;
+     // ===============================
+    // 🚀 BullMQ Queue (ASYNC HANDLING)
+    // ===============================
 
-    if (available) {
-      // ✅ Fetch driver data ONLY ONCE
-      const driver = await driversColl.findOne(filter, {
-        projection: {
-          name: 1,
-          vehicle: 1,
-        },
-      });
+    const jobData = {
+      driverId,
+      available,
+      location: loc || null,
+      timestamp: Date.now(),
+    };
 
-      if (driver) {
-        console.log("Driver available", available)
-           console.log("Adding driver data to Redis for driverId:", driverId, "with data:", driver);
-        const addDriverDataResult = await addDriverData(driverId, driver);
-        if(addDriverDataResult.ok && addDriverDataResult.reason === "Driver data added"){
-          logger.info('Driver data added to Redis for driverId: %s', driverId);
-          const getNerbyRides= await findNearbyRides(loc.longitude,loc.latitude)
-            console.log("Nearby rides found:", getNerbyRides);
-            return res.status(200).json({
-              message:"Availability updated successfully",
-              getNerbyRides
-            })
-        } else {
-          logger.error('Failed to add driver data to Redis for driverId: %s, reason: %s', driverId, addDriverDataResult.reason);
-          return  res.status(404).json({ message: 'Driver not found' });
-        }  
-      } else{
-         logger.error('Failed to add driver data to Redis for driverId: %s, reason: %s', driverId, addDriverDataResult.reason);
-          return  res.status(404).json({ message: 'Driver not found' });
-      }
+   driverQueue.add(
+      available ? 'driver-online' : 'driver-offline',
+      jobData
+    ).then(()=>console.log("driver added to driverqueue")).catch(err=>{
+      console.log("Updatedriveravailability driverqueue error",err)
+    });
 
-    }else{
-      // ❌ Remove from Redis when offline
-      console.log("Removing driver data from Redis for driverId:", driverId);
-      const removeDriverDataResult = await removeDriverData(driverId);
-      if (removeDriverDataResult.ok && removeDriverDataResult.reason === "Driver data removed") {
-        logger.info('Driver data removed from Redis for driverId: %s', driverId);
-        return res.status(200).json({
-              message:"Driver Data Removed Successfully",
-            })
-      }
-    }
+    // ✅ FAST RESPONSE (no waiting for Redis / matching)
+    return res.status(200).json({
+      message: 'Availability updated successfully',
+    });
+
 
    
-
     
 
+    
   } catch (err) {
     console.error('updateDriverAvailability error', err);
     return res.status(500).json({ message: 'Internal server error' });
