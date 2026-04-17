@@ -11,7 +11,7 @@ import IORedis from "ioredis";
 import dotenv from "dotenv";
 import { ObjectId } from "mongodb";
 import { connectDB } from "../db/connect.mjs";
-import { findNearbyDrivers } from "../redis/redisClient.mjs";
+import { findNearbyDrivers, findNearbyRides } from "../redis/redisClient.mjs";
 
 import { Server } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
@@ -177,10 +177,16 @@ const driverQueue = new Worker(
       case 'driver-online':
         const result= await addDriverData(driverId, location);
         console.log('addDriverData result:', result);
+        // 🔥 Find nearby rides
+        const nearbyRides = await findNearbyRides(
+          location.longitude,
+          location.latitude
+        );
 
+        // 🔥 Publish to Redis channel
         await connection.publish(
           'driver:online',
-          JSON.stringify({ driverId, location })
+          JSON.stringify({ driverId, location,rides: nearbyRides })
         );
         break;
 

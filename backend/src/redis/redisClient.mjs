@@ -399,6 +399,7 @@ export async function findNearbyRides(
       limit,
       "ASC"
     );
+    console.log(`GEO search found ${rideIds.length} ride(s) nearby`);
 
     // ================================
     // STEP 3: If no rides found → return empty array

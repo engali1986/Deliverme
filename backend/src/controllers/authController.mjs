@@ -10,7 +10,7 @@ import {fileURLToPath} from "url"
 import path from 'path';
 import { ObjectId } from 'mongodb';
 import { removeDriverFromGeo, findNearbyDrivers,addDriverToGeo, addDriverData, removeDriverData, findNearbyRides } from "../redis/redisClient.mjs";
-import {driverQueue} from "../queues/driverQueue.mjs"
+import { driverQueue } from '../queues/DriverQueue.mjs';
 // import { add } from 'winston';
 
 
@@ -712,10 +712,15 @@ export async function updateDriverAvailability(req, res, db) {
      // ===============================
     // 🚀 BullMQ Queue (ASYNC HANDLING)
     // ===============================
+    const driver=await driversColl.findOne(filter)
+    console.log("updateDriverAvailability driver:",driver )
 
     const jobData = {
       driverId,
       available,
+      driverName: driver.name,
+      driverMobile:driver.mobile,
+      driverVehicle: driver.vehicle,
       location: loc || null,
       timestamp: Date.now(),
     };
