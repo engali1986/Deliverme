@@ -182,6 +182,7 @@ const driverQueue = new Worker(
           location.longitude,
           location.latitude
         );
+        console.log('Sending all available rides to Driver Id:', driverId, 'location:', location,  'Nearby rides:', nearbyRides);
 
         // 🔥 Publish to Redis channel
         await connection.publish(

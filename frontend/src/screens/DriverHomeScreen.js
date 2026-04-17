@@ -45,8 +45,8 @@
  *
  *   Note over W: Ride matching
  *   W->>R: findNearbyDrivers()
- *   W->>BE: emit "ride_request" to room driver:{id}
- *   BE->>D: ride_request event
+ *   W->>BE: emit "nearby-rides" to room driver:{id}
+ *   BE->>D: nearby-rides event
  *
  *   Note over D: Toggle OFFLINE / Logout
  *   D->>API: PATCH /api/auth/driver/availability {available:false}
@@ -61,7 +61,7 @@
  *   and session safety.
  *
  * MAIN HOOKS AND FUNCTIONS
- * - useEffect (ride requests): init socket and listen to `ride_request`,
+ * - useEffect (ride requests): init socket and listen to `nearby-rides`,
  *   push into `requests`, clean up on unmount.
  * - logAllAsyncStorage: debug helper to dump AsyncStorage keys and values.
  * - useEffect (initialization): request permissions, decode JWT to `driverId`,
@@ -83,7 +83,7 @@
  * - AsyncStorage: `userToken` for JWT, `driverAvailable` for persistence.
  * - REST API: `updateDriverAvailability` in `../services/api`.
  * - Socket.IO: `initSocket`, `getSocket`, `closeSocket`,
- *   `emitDriverOnline`, and `ride_request` listener.
+ *   `emitDriverOnline`, and `nearby-rides` listener.
  * - Background tracking: `startBackgroundLocationTracking`,
  *   `stopBackgroundLocationTracking`.
  * - Location permissions: `expo-location` foreground and background.
@@ -152,18 +152,22 @@ const DriverHomeScreen = () => {
   /* ------------------------------------------------------------------ */
   /* Ride Request Listener                                               */
   /* ------------------------------------------------------------------ */
-  const handleRideRequest = useCallback((data) => {
-    console.log('DriverHomeScreen.js: New ride request received:', data);
-    setRequests((prev) => [...prev, data]);
-  }, []);
+  
 
-  const attachRideRequestListener = (socket) => {
-    if (!socket) return;
-    // Ensure we don't attach the same listener multiple times
-    socket.off('ride_request', handleRideRequest);
-    socket.on('ride_request', handleRideRequest);
-  };
+  const handleNearbyRides = useCallback((rides) => {
+  console.log('Nearby rides received:', rides);
 
+  // Replace list (not append)
+  setRequests(rides || []);
+}, []);
+
+  const attachRideListeners = (socket) => {
+  if (!socket) return;
+
+  // ✅ Listen for nearby rides
+  socket.off('nearby-rides');
+  socket.on('nearby-rides', handleNearbyRides);
+};
   /* ------------------------------------------------------------------ */
   /* Initialization                                                     */
   /* ------------------------------------------------------------------ */
@@ -263,7 +267,7 @@ const DriverHomeScreen = () => {
            if (shouldBeOnline) {
             console.log('DriverHomeScreen: Restoring online state, initializing socket and tracking');
               const socket = await initSocket();
-              attachRideRequestListener(socket);
+              attachRideListeners(socket);
 
               // ✅ Get fresh location
               const pos = await Location.getCurrentPositionAsync({
@@ -296,10 +300,10 @@ const DriverHomeScreen = () => {
 
     return  () => {
       const socket = getSocket();
-      socket?.off('ride_request', handleRideRequest);
+      socket?.off('nearby-rides', handleNearbyRides);
       stopBackgroundLocationTracking().catch(() => {});
     };
-  }, [handleRideRequest]);
+  }, [handleNearbyRides]);
 
   /* ------------------------------------------------------------------ */
   /* Menu                                                               */
@@ -384,7 +388,7 @@ const DriverHomeScreen = () => {
           throw new Error('Backend did not confirm availability');
         }
         const socket = await initSocket();
-        attachRideRequestListener(socket);
+        attachRideListeners(socket);
         
 
 

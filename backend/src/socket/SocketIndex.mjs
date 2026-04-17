@@ -40,6 +40,33 @@ export async function initSocket(io) {
   logger.info("✅ Socket.IO Redis adapter connected");
 
   /* =========================
+     🔥 REDIS EVENT SUBSCRIBER
+     (Worker → Socket Bridge)
+  ========================= */
+
+  const eventSub = pubClient.duplicate();
+  await eventSub.connect();
+
+  // 🎯 Nearby rides for driver
+  await eventSub.subscribe("driver:rides", (message) => {
+    try {
+      const data = JSON.parse(message);
+      const { driverId, rides } = data;
+
+      if (!driverId) return;
+
+      io.to(`driver:${driverId}`).emit("nearby-rides", rides);
+
+      logger.info(
+        `📡 Sent ${rides?.length || 0} rides to driver ${driverId}`
+      );
+    } catch (err) {
+      logger.error("Redis subscriber error (driver:rides): %o", err);
+    }
+  });
+
+
+  /* =========================
      AUTH MIDDLEWARE (ON CONNECT)
   ========================= */
   io.use((socket, next) => {
