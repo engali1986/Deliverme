@@ -265,7 +265,7 @@ const ClientHomeScreen = () => {
   };
 
   const handleRequestRide = async () => {
-    console.log('ClientHomeScreen.js: Requesting ride with', { pickupCoords, destinationCoords, fare, routeDistance });
+    console.log('ClientHomeScreen.js: Requesting ride with', { pickupCoords, destinationCoords, fare, routeDistance, address, destination });
     if (!pickupCoords || !destinationCoords || !fare) {
       Toast.show({
         type: 'error',
@@ -285,7 +285,9 @@ const ClientHomeScreen = () => {
     try {
       const response = await requestRide({
         pickup: pickupCoords, 
-        destination: destinationCoords, 
+        destination: destinationCoords,
+        pickupAddress: address,
+        destinationAddress: destination, 
         fare: parseFloat(fare),
         routeDistance:routeDistance
       }); 

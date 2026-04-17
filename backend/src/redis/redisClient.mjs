@@ -260,6 +260,8 @@ export async function addRideToGeo(
   ClientId,
   pickup,
   destination,
+  pickupAddress,
+  destinationAddress,
   fare,
   status = "pending",
   expiresAt

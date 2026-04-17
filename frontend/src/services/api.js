@@ -233,10 +233,10 @@ export async function verifyDriver(data) {
  * @param {Object} param0 - The ride request details (pickup, destination, fare). 
  * Requires Authorization header with Bearer token.
  */
-export async function requestRide({ pickup, destination, fare, routeDistance }) {  
+export async function requestRide({ pickup, destination, pickupAddress, destinationAddress, fare, routeDistance }) {  
   try {
     const token = await AsyncStorage.getItem("userToken");
-    console.log("api.js requestRide pickup, destination, fare, routeDistance:", pickup, destination, fare, routeDistance)
+    console.log("api.js requestRide pickup, destination, fare, routeDistance:", pickup, destination, pickupAddress, destinationAddress, fare, routeDistance)
     console.log("api.js requestRide token:", token)
     const response = await fetchWithTimeout(`${BASE_URL}/client/request-ride`, {
       method: "POST",
@@ -244,7 +244,7 @@ export async function requestRide({ pickup, destination, fare, routeDistance }) 
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ pickup, destination, fare, routeDistance }),
+      body: JSON.stringify({ pickup, destination, pickupAddress, destinationAddress, fare, routeDistance }),
     }, 15000); // 15 seconds timeout
     console.log("api.js requestRide response:",response)
     console.log("api.js requestRide response.ok:",response.ok || "cannot read response.ok")
