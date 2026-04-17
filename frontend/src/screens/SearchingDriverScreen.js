@@ -22,6 +22,7 @@ import i18n from "../i18n/i18n";
 import LogViewer from "../components/LogViewer.js";
 import { addLog } from "../utils/Logger.js";
 import { getNearbyDrivers } from "../services/api.js";
+import { closeSocket } from "../services/SocketManager.js";
 
 
 const { height } = Dimensions.get("window");

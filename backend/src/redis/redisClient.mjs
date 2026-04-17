@@ -332,6 +332,8 @@ export async function addRideToGeo(
       destinationLon: String(destination.longitude),
 
       // Ride info
+      pickupAddress: String(pickupAddress), 
+      destinationAddress: String(destinationAddress),
       fare: String(fare),
       status: String(status),
 
