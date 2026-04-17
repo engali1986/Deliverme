@@ -400,6 +400,7 @@ export async function findNearbyRides(
       "ASC"
     );
     console.log(`GEO search found ${rideIds.length} ride(s) nearby`);
+    console.log('Nearby ride IDs:', rideIds);
 
     // ================================
     // STEP 3: If no rides found → return empty array
@@ -427,6 +428,7 @@ export async function findNearbyRides(
 
     rideIds.forEach((rideId, index) => {
       const [err, exists] = existsResults[index];
+      console.log('exists result ', err, exists)
 
       // If error OR ride hash does not exist → stale
       if (err || exists !== 1) {
@@ -435,6 +437,9 @@ export async function findNearbyRides(
         liveIds.push(rideId);
       }
     });
+    console.log(`Live rides: ${liveIds.length}, Stale rides: ${staleIds.length}`);
+    console.log('Live ride IDs:', liveIds);
+    console.log('Stale ride IDs:', staleIds);
 
     // ================================
     // STEP 6: Cleanup stale rides from GEO
@@ -451,6 +456,7 @@ export async function findNearbyRides(
     // ================================
     // STEP 7: If no valid rides remain → return empty
     // ================================
+    console.log(`After cleanup, ${liveIds.length} live ride(s) remain`);
     if (!liveIds.length) return [];
 
     // ================================
@@ -499,6 +505,7 @@ export async function findNearbyRides(
     // ================================
     // STEP 10: Return final rides list
     // ================================
+    console.log(`Returning ${rides.length} nearby ride(s) with details`);
     return rides;
 
   } catch (error) {

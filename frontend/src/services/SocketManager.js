@@ -24,7 +24,11 @@ let lastEmitTime = 0;
 ========================= */
 
 export async function initSocket() {
-  if (socket) return socket;
+  if (socket) {
+    console.warn("Socket already initialized");
+    return socket;
+  }
+    
 
   const token = await AsyncStorage.getItem("userToken");
   const userType = await AsyncStorage.getItem("userType");

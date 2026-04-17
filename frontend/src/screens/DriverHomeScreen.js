@@ -45,8 +45,8 @@
  *
  *   Note over W: Ride matching
  *   W->>R: findNearbyDrivers()
- *   W->>BE: emit "nearby-rides" to room driver:{id}
- *   BE->>D: nearby-rides event
+ *   W->>BE: emit "ride_request" to room driver:{id}
+ *   BE->>D: ride_request event
  *
  *   Note over D: Toggle OFFLINE / Logout
  *   D->>API: PATCH /api/auth/driver/availability {available:false}
@@ -61,7 +61,7 @@
  *   and session safety.
  *
  * MAIN HOOKS AND FUNCTIONS
- * - useEffect (ride requests): init socket and listen to `nearby-rides`,
+ * - useEffect (ride requests): init socket and listen to `ride_request`,
  *   push into `requests`, clean up on unmount.
  * - logAllAsyncStorage: debug helper to dump AsyncStorage keys and values.
  * - useEffect (initialization): request permissions, decode JWT to `driverId`,
@@ -83,7 +83,7 @@
  * - AsyncStorage: `userToken` for JWT, `driverAvailable` for persistence.
  * - REST API: `updateDriverAvailability` in `../services/api`.
  * - Socket.IO: `initSocket`, `getSocket`, `closeSocket`,
- *   `emitDriverOnline`, and `nearby-rides` listener.
+ *   `emitDriverOnline`, and `ride_request` listener.
  * - Background tracking: `startBackgroundLocationTracking`,
  *   `stopBackgroundLocationTracking`.
  * - Location permissions: `expo-location` foreground and background.
@@ -377,6 +377,8 @@ const DriverHomeScreen = () => {
           longitude: pos.coords.longitude,
         };
       }
+      const socket = await initSocket();
+        attachRideListeners(socket);
 
       /* Step 2: Update backend availability (MongoDB) */
       const updateResult = await updateDriverAvailability(newValue, coords);
@@ -387,8 +389,7 @@ const DriverHomeScreen = () => {
         if (updateResult.message !== 'Availability updated successfully') {
           throw new Error('Backend did not confirm availability');
         }
-        const socket = await initSocket();
-        attachRideListeners(socket);
+        
         
 
 

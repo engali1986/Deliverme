@@ -184,9 +184,9 @@ const driverQueue = new Worker(
         );
         console.log('Sending all available rides to Driver Id:', driverId, 'location:', location,  'Nearby rides:', nearbyRides);
 
-        // 🔥 Publish to Redis channel
+        // 🔥 Publish to Redis channel 
         await connection.publish(
-          'driver:online',
+          'driver:rides',
           JSON.stringify({ driverId, location,rides: nearbyRides })
         );
         break;

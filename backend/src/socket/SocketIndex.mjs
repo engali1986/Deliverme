@@ -101,6 +101,7 @@ export async function initSocket(io) {
       if(socket.user.id){
         logger.info(`🟢 Driver connected: ${socket.user.id}`);
         socket.join(`driver:${socket.user.id}`); // Role-scoped room
+        console.log(`Driver ${socket.user.id} joined room driver:${socket.user.id}`);
       }else{
         logger.warn(`Driver connected without ID: ${socket.id}`);
       }

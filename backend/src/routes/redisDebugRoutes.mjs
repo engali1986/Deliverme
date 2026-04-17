@@ -365,6 +365,7 @@ router.get("/rides/geo", async (req, res) => {
 router.get("/rides/data", async (req, res) => {
   try {
     const redis = await getRedis();
+    console.log('Fetching all ride data from Redis...');
 
     const keys = await redis.keys("ride:*");
 

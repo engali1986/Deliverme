@@ -119,7 +119,7 @@ import LanguageToggle from '../components/LanguageToggle.js';
 import MapViewDirections from 'react-native-maps-directions';
 import { API_KEY, KM_RATE } from '@env';
 import { requestRide } from '../services/api.js';
-import {initSocket} from '../services/SocketManager.js';
+import {initSocket, closeSocket} from '../services/SocketManager.js';
 import { getClientSocketID, confirmClientOnline } from '../services/ClientSocket.js';
 
 const { height } = Dimensions.get('window');
@@ -249,6 +249,7 @@ const ClientHomeScreen = () => {
 
   const handleLogout = async () => {
     try {
+      closeSocket();
       await AsyncStorage.clear();
       Toast.show({
         type: 'success',
@@ -257,7 +258,9 @@ const ClientHomeScreen = () => {
       });
       navigation.replace('Home');
     } catch (error) {
+      closeSocket();
       Toast.show({ type: 'error', text1: 'Logout Failed', text2: error.message });
+      navigation.replace('Home');
     }
   };
 
