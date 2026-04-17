@@ -51,7 +51,7 @@
  *   Note over D: Toggle OFFLINE / Logout
  *   D->>API: PATCH /api/auth/driver/availability {available:false}
  *   D->>BG: stopBackgroundLocationTracking()
- *   D->>SM: closeSocket()
+ *   D->>SM: await closeSocket()
  *   D->>BE: emit "driver:availability" {isAvailable:false} (if connected)
  *   BE->>R: remove from GEO + delete presence keys
  * --------------------------------------------------------------------------
@@ -328,7 +328,7 @@ const DriverHomeScreen = () => {
         await stopBackgroundLocationTracking();
       }
 
-      closeSocket();
+      await closeSocket();
       await AsyncStorage.clear();
 
       Toast.show({
@@ -338,7 +338,7 @@ const DriverHomeScreen = () => {
 
       navigation.replace('Home');
     } catch (e) {
-      closeSocket();
+      await closeSocket();
       await AsyncStorage.clear();
       navigation.replace('Home');
       Toast.show({
@@ -409,7 +409,7 @@ const DriverHomeScreen = () => {
         const socket = getSocket();
         socket?.emit('driver:availability', { isAvailable: false });
         await stopBackgroundLocationTracking();
-        closeSocket();
+        await closeSocket();
       }
       /* Step 4: Persist availability state locally */
           setIsAvailable(newValue);

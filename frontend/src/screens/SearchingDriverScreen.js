@@ -87,6 +87,7 @@ const SearchingDriverScreen = () => {
 
   const handleLogout = async () => {
     await AsyncStorage.clear();
+    await closeSocket();
 
     Toast.show({
       type: "success",

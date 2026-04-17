@@ -91,6 +91,7 @@ export function getSocket() {
 
 export async function closeSocket() {
   if (socket) {
+    console.log('Closing socket')
     socket.removeAllListeners();
     socket.disconnect();
     socket = null;

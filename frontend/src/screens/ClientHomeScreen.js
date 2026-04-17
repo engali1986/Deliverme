@@ -249,7 +249,7 @@ const ClientHomeScreen = () => {
 
   const handleLogout = async () => {
     try {
-      closeSocket();
+      await closeSocket();
       await AsyncStorage.clear();
       Toast.show({
         type: 'success',
@@ -258,7 +258,7 @@ const ClientHomeScreen = () => {
       });
       navigation.replace('Home');
     } catch (error) {
-      closeSocket();
+      await closeSocket();
       Toast.show({ type: 'error', text1: 'Logout Failed', text2: error.message });
       navigation.replace('Home');
     }
