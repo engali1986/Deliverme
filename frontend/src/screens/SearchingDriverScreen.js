@@ -86,6 +86,7 @@ const SearchingDriverScreen = () => {
   };
 
   const handleLogout = async () => {
+    console.log("Logging out user");
     await AsyncStorage.clear();
     await closeSocket();
 
