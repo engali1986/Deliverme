@@ -257,7 +257,7 @@ export async function findNearbyDrivers(
 
 export async function addRideToGeo(
   rideId,
-  ClientId,
+  clientId,
   pickup,
   destination,
   pickupAddress,
@@ -321,7 +321,7 @@ export async function addRideToGeo(
     // ================================
     pipeline.hset(key, {
       rideId: rideId.toString(),
-      ClientId: String(ClientId),
+      clientId: String(clientId),
 
       // Pickup location
       pickupLat: String(pickup.latitude),

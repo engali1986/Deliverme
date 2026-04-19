@@ -97,6 +97,9 @@ const worker = new Worker(
           status: cachedRide.status || "pending",
           fare: Number(cachedRide.fare),
           expiresAt: cachedRide.expiresAt,
+          clientId: cachedRide.clientId,
+          pickupAddress: cachedRide.pickupAddress,
+          destinationAddress: cachedRide.destinationAddress,
           pickup: {
             type: "Point",
             coordinates: [
@@ -144,16 +147,12 @@ const worker = new Worker(
       );
 
       console.log("Found drivers:", drivers);
+      console.log('Broadcasting ride request',ride, 'to', drivers.length, 'drivers');
 
       // Step 9: Broadcast ride request to each nearby driver.
       for (const [driverId] of drivers) {
 
-        io.to(`driver:${driverId.toString()}`).emit("ride_request", {
-          rideId,
-          pickup: ride.pickup,
-          destination: ride.destination,
-          fare: ride.fare,
-        });
+        io.to(`driver:${driverId.toString()}`).emit("ride_request", ride);
 
       }
 

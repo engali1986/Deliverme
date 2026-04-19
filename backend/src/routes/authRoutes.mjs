@@ -79,11 +79,11 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
   try{
     const db = req.app.locals.db;  // Access the db instance from app.locals
     const io= req.app.locals.io; // Access the Socket.io instance from app.locals
-    const ClientId= req.user.id
+    const clientId= req.user.id
     const { pickup, destination, pickupAddress, destinationAddress, fare, routeDistance } = req.body;
-    console.log("Request ride by client:", ClientId, "with data:", req.body);
+    console.log("Request ride by client:", clientId, "with data:", req.body);
     console.log("Ride Request type of data:", typeof pickup, typeof destination, typeof fare, typeof routeDistance);
-    if(!pickup || !destination || !fare || !ClientId || fare<=0 || typeof fare!=="number" || typeof pickup!=="object" || typeof destination!=="object" ){
+    if(!pickup || !destination || !fare || !clientId || fare<=0 || typeof fare!=="number" || typeof pickup!=="object" || typeof destination!=="object" ){
       return res.status(400).json({ message: "Missing required fields" });
     }
      // 1️⃣ Create ride record
@@ -92,7 +92,7 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
      console.log('expiresAt type:', typeof expiresAt, 'expiresAt value:', expiresAt);
      console.log('new Date() type:', typeof new Date(), 'new Date() value:', new Date()); 
     const ride = {
-      clientId: new ObjectId(ClientId),
+      clientId: new ObjectId(clientId),
       pickup: {
         type: 'Point',
         coordinates: [pickup.longitude, pickup.latitude],
@@ -146,9 +146,10 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
         rideId = result.insertedId.toString();
         console.log("New ride created with ID:", rideId);
         // Add ride to Redis geo index for quick nearby lookup
+        console.log('Adding ride to redis', ride)
         const redisResult = await addRideToGeo(
           rideId,
-          ClientId,
+          clientId,
           pickup,
           destination,
           pickupAddress,
