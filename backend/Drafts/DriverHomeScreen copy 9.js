@@ -134,60 +134,6 @@ import { emitDriverOnline } from '../services/DriverSocket';
 
 const COOLDOWN_MS = 10000;
 
-const getRideRequestKey = (request) => {
-  if (!request) return null;
-  console.log('Generating key for ride request:', request);
-
-  const explicitId =
-    request.rideId ??
-    request.id ??
-    request._id ??
-    request.ride?._id ??
-    request.ride?.id;
-
-  if (explicitId !== undefined && explicitId !== null && explicitId !== '') {
-    return `id:${String(explicitId)}`;
-  }
-
-  const pickupLat =
-    request.pickup?.latitude ?? request.pickup?.coordinates?.[1] ?? '';
-  const pickupLng =
-    request.pickup?.longitude ?? request.pickup?.coordinates?.[0] ?? '';
-  const destinationLat =
-    request.destination?.latitude ??
-    request.destination?.coordinates?.[1] ??
-    '';
-  const destinationLng =
-    request.destination?.longitude ??
-    request.destination?.coordinates?.[0] ??
-    '';
-
-  return [
-    'fallback',
-    request.pickupAddress ?? '',
-    request.destinationAddress ?? '',
-    request.fare ?? '',
-    pickupLat,
-    pickupLng,
-    destinationLat,
-    destinationLng,
-    request.expiresAt ?? '',
-  ].join('|');
-};
-
-const dedupeRideRequests = (rides = []) => {
-  const map = new Map();
-
-  rides.forEach((ride) => {
-    if (!ride) return;
-    const key = getRideRequestKey(ride);
-    if (!key) return;
-    if (!map.has(key)) map.set(key, ride);
-  });
-
-  return Array.from(map.values());
-};
-
 const DriverHomeScreen = () => {
   const { language } = useContext(LanguageContext);
   const navigation = useNavigation();
@@ -202,11 +148,6 @@ const DriverHomeScreen = () => {
 
   const driverIdRef = useRef(null);
   const locationPermissionGranted = useRef(false);
-  const isAvailableRef = useRef(false);
-
-  useEffect(() => {
-    isAvailableRef.current = isAvailable;
-  }, [isAvailable]);
 
   /* ------------------------------------------------------------------ */
   /* Ride Request Listener                                               */
@@ -214,30 +155,19 @@ const DriverHomeScreen = () => {
   
 
   const handleNearbyRides = useCallback((rides) => {
-    if (!isAvailableRef.current) return;
+  console.log('Nearby rides received:', rides);
 
-    console.log('Nearby rides received:', rides);
-
-    const next = Array.isArray(rides) ? rides : [];
-    setRequests(dedupeRideRequests(next));
-  }, []);
-
-  const handleRideRequest = useCallback((ride) => {
-    if (!isAvailableRef.current || !ride) return;
-
-    console.log('New ride request received:', ride);
-    setRequests((prev) => dedupeRideRequests([...prev, ride]));
-  }, []);
+  // Replace list (not append)
+  setRequests(rides || []);
+}, []);
 
   const attachRideListeners = (socket) => {
-    if (!socket) return;
+  if (!socket) return;
 
-    socket.off('nearby-rides', handleNearbyRides);
-    socket.off('ride_request', handleRideRequest);
-
-    socket.on('nearby-rides', handleNearbyRides);
-    socket.on('ride_request', handleRideRequest);
-  };
+  // ✅ Listen for nearby rides
+  socket.off('nearby-rides');
+  socket.on('nearby-rides', handleNearbyRides);
+};
   /* ------------------------------------------------------------------ */
   /* Initialization                                                     */
   /* ------------------------------------------------------------------ */
@@ -371,10 +301,9 @@ const DriverHomeScreen = () => {
     return  () => {
       const socket = getSocket();
       socket?.off('nearby-rides', handleNearbyRides);
-      socket?.off('ride_request', handleRideRequest);
       stopBackgroundLocationTracking().catch(() => {});
     };
-  }, [handleNearbyRides, handleRideRequest]);
+  }, [handleNearbyRides]);
 
   /* ------------------------------------------------------------------ */
   /* Menu                                                               */
@@ -548,7 +477,7 @@ const DriverHomeScreen = () => {
         ) : (
           <FlatList
             data={requests}
-            keyExtractor={(item, i) => getRideRequestKey(item) ?? String(i)}
+            keyExtractor={(item, i) => item.id ?? String(i)}
             renderItem={renderRequestItem}
           />
         )}
