@@ -204,6 +204,7 @@ export async function findNearbyDrivers(
       limit,
       "ASC"
     );
+    console.log('Drivers found', drivers)
 
     if (!drivers.length) return [];
 

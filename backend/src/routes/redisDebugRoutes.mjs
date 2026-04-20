@@ -250,6 +250,7 @@ router.get("/drivers/full", async (req, res) => {
         longitude: Number(pos[0][0]),
       };
     }).filter(Boolean);
+    console.log('redisDebugRoutes - drivers/full:', drivers);
 
     res.json({
       count: drivers.length,
