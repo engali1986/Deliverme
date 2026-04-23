@@ -135,6 +135,7 @@ import { emitDriverOnline } from '../services/DriverSocket';
 const COOLDOWN_MS = 10000;
 
 const getRideRequestKey = (request) => {
+  console.log('Generating key for ride request:', request);
   if (!request) return null;
   console.log('Generating key for ride request:', request);
 
@@ -223,6 +224,8 @@ const DriverHomeScreen = () => {
   }, []);
 
   const handleRideRequest = useCallback((ride) => {
+    console.log('Handling ride request:', ride);
+    console.log('current requests:', requests);
     if (!isAvailableRef.current || !ride) return;
 
     console.log('New ride request received:', ride);
