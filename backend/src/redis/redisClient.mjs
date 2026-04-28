@@ -423,6 +423,7 @@ export async function findNearbyRides(
     });
 
     const existsResults = await existsPipeline.exec();
+  
 
     // ================================
     // STEP 5: Separate valid rides from stale rides
@@ -475,6 +476,7 @@ export async function findNearbyRides(
     });
 
     const dataResults = await dataPipeline.exec();
+    console.log('Data results for live rides:', dataResults);
 
     // ================================
     // STEP 9: Build final rides array
@@ -487,30 +489,53 @@ export async function findNearbyRides(
 
       // Skip if error or empty data
       if (err || !hash || Object.keys(hash).length === 0) return;
-
       rides.push({
-        rideId: hash.rideId || rideId.toString(),
+        _id: dataResults[index][1].rideId || rideId.toString(),
+        status: dataResults[index][1].status || "pending",
+          fare: Number(dataResults[index][1] .fare),
+          expiresAt: dataResults[index][1] .expiresAt,
+          clientId: dataResults[index][1].clientId,
+          pickupAddress: dataResults[index][1] .pickupAddress,
+          destinationAddress: dataResults[index][1].destinationAddress,
+          pickup: {
+            type: "Point",
+            coordinates: [
+              Number(dataResults[index][1] .pickupLon),
+              Number(dataResults[index][1] .pickupLat),
+            ],
+          },
+          destination: {
+            type: "Point",
+            coordinates: [
+              Number(dataResults[index][1] .destinationLon),
+              Number(dataResults[index][1] .destinationLat),
+            ],
+          },
+      })
 
-        pickup: {
-          latitude: Number(hash.pickupLat),
-          longitude: Number(hash.pickupLon),
-        },
+      // rides.push({
+      //   rideId: hash.rideId || rideId.toString(),
 
-        destination: {
-          latitude: Number(hash.destinationLat),
-          longitude: Number(hash.destinationLon),
-        },
+      //   pickup: {
+      //     latitude: Number(hash.pickupLat),
+      //     longitude: Number(hash.pickupLon),
+      //   },
 
-        fare: Number(hash.fare),
-        status: hash.status,
-        expiresAt: hash.expiresAt,
-      });
+      //   destination: {
+      //     latitude: Number(hash.destinationLat),
+      //     longitude: Number(hash.destinationLon),
+      //   },
+
+      //   fare: Number(hash.fare),
+      //   status: hash.status,
+      //   expiresAt: hash.expiresAt,
+      // });
     });
 
     // ================================
     // STEP 10: Return final rides list
     // ================================
-    console.log(`Returning ${rides.length} nearby ride(s) with details`);
+    console.log(`Returning ${rides.length} nearby ride(s) with details ${JSON.stringify(rides)}`);
     return rides;
 
   } catch (error) {
