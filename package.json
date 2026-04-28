@@ -8,7 +8,16 @@
     "frontend": "npm --prefix frontend run start",
     "backend": "npm --prefix backend run dev",
     "worker": "npm --prefix backend run ride-matching-worker",
-    "dev": "concurrently \"npm run backend\" \"npm run worker\""
+    "dev": "concurrently \"npm run backend\" \"npm run worker\"",
+
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:dev": "pm2 start ecosystem.config.js",
+    "pm2:prod": "pm2 start ecosystem.config.js --env production",
+
+    "pm2:stop": "pm2 stop all",
+    "pm2:restart": "pm2 restart all",
+    "pm2:logs": "pm2 logs",
+    "pm2:delete": "pm2 delete all"
   },
   "author": "",
   "license": "ISC",

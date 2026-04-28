@@ -35,7 +35,7 @@ async function start() {
 
     // Start listening
     server.listen(PORT, HOST, () => {
-      console.log(`🚀 Express + Socket.IO running on ${HOST}:${PORT}`);
+      console.log(`🚀 Express + Socket.IO running on ${HOST}:${PORT} with environment ${process.env.NODE_ENV} `);
     });
 
     // Graceful shutdown
