@@ -1,11 +1,13 @@
 // src/redis/redisClient.mjs
 import Redis from "ioredis";
 import logger from "../utils/logger.mjs";
+import { ObjectId } from "mongodb";
 
 let redisClient;
 
 /*
 redisClient.mjs
+===============
 ===============
 Purpose:
 - Centralized Redis client initialization (singleton).
@@ -490,7 +492,7 @@ export async function findNearbyRides(
       // Skip if error or empty data
       if (err || !hash || Object.keys(hash).length === 0) return;
       rides.push({
-        _id: dataResults[index][1].rideId || rideId.toString(),
+        _id: new ObjectId(dataResults[index][1].rideId || rideId.toString()),
         status: dataResults[index][1].status || "pending",
           fare: Number(dataResults[index][1] .fare),
           expiresAt: dataResults[index][1] .expiresAt,
