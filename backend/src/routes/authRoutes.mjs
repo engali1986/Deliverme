@@ -80,6 +80,8 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
     const db = req.app.locals.db;  // Access the db instance from app.locals
     const io= req.app.locals.io; // Access the Socket.io instance from app.locals
     const clientId= req.user.id
+    const clientName = req.user.name;
+    const clientMobile = req.user.mobile;
     const { pickup, destination, pickupAddress, destinationAddress, fare, routeDistance } = req.body;
     console.log("Request ride by client:", clientId, "with data:", req.body);
     console.log("Ride Request type of data:", typeof pickup, typeof destination, typeof fare, typeof routeDistance);
@@ -103,6 +105,8 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
       },
       pickupAddress,
       destinationAddress, 
+      clientName,
+      clientMobile,
       fare,
       status: 'pending',
       assignedDriverId: null,
@@ -154,6 +158,8 @@ router.post('/client/request-ride', authenticateToken, async (req, res) => {
           destination,
           pickupAddress,
           destinationAddress,
+          clientName,
+          clientMobile,
           fare,
           "pending",
           routeDistance,

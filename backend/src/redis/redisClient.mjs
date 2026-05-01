@@ -265,6 +265,8 @@ export async function addRideToGeo(
   destination,
   pickupAddress,
   destinationAddress,
+  clientName,
+  clientMobile,
   fare,
   status = "pending",
   routeDistance,
@@ -338,6 +340,8 @@ export async function addRideToGeo(
 
             pickupAddress,
             destinationAddress,
+            clientName,
+            clientMobile,
             fare,
             status,
             routeDistance,

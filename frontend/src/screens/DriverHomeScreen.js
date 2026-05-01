@@ -512,6 +512,7 @@ const DriverHomeScreen = () => {
   const renderRequestItem = ({ item }) => (
     <View style={styles.requestItem}>
       <Text style={styles.requestTitle}>Ride Request</Text>
+      <Text style={styles.requestText}>{item.clientName || 'Client'}</Text>
       <Text style={styles.requestText}>{item._id}</Text>
       <Text style={styles.requestText}>{item.pickupAddress}</Text>
       <Text style={styles.requestText}>{item.fare}</Text>
