@@ -163,12 +163,21 @@ Example `driver:availability` payload:
 | `ride_request` | Backend worker -> Driver frontend | `backend/src/workers/rideMatching.worker.mjs:141` | `frontend/src/screens/DriverHomeScreen.js:242` | Single ride object | Sent to room `driver:{driverId}` for every nearby alive driver. |
 | `nearby-rides` | Backend -> Driver frontend | Redis publish at `backend/src/workers/rideMatching.worker.mjs:173`; Redis subscribe and socket emit at `backend/src/socket/SocketIndex.mjs:51` and `backend/src/socket/SocketIndex.mjs:58` | `frontend/src/screens/DriverHomeScreen.js:241` | Array of ride objects | Sent when driver availability worker finds pending rides near a newly online driver. |
 
+Ride client identity fields:
+
+- `clientName` and `clientMobile` are added by the REST ride request backend from the verified client JWT.
+- They are stored in MongoDB and Redis with the ride.
+- `ride_request` and `nearby-rides` include those fields because both events send the stored ride object.
+- `DriverHomeScreen` displays `clientName` only. It does not display `clientMobile`.
+
 Example `ride_request` payload:
 
 ```json
 {
   "_id": "65f1b123e4b0a12345678902",
   "clientId": "65f1a7c8e4b0a12345678901",
+  "clientName": "Client User",
+  "clientMobile": "01012345678",
   "pickup": {
     "type": "Point",
     "coordinates": [31.2357, 30.0444]
@@ -195,6 +204,8 @@ Example `nearby-rides` payload:
   {
     "_id": "65f1b123e4b0a12345678902",
     "clientId": "65f1a7c8e4b0a12345678901",
+    "clientName": "Client User",
+    "clientMobile": "01012345678",
     "pickup": {
       "type": "Point",
       "coordinates": [31.2357, 30.0444]
@@ -221,6 +232,8 @@ type Ride = {
   rideId?: string;
   id?: string;
   clientId?: string | object;
+  clientName?: string;
+  clientMobile?: string;
   pickup?: {
     type?: "Point";
     coordinates?: [number, number]; // [longitude, latitude]

@@ -676,6 +676,7 @@ Backend validation:
 
 - Requires valid JWT.
 - Requires `pickup`, `destination`, `fare`, and `clientId`.
+- Reads `clientName` and `clientMobile` from the verified JWT (`req.user.name` and `req.user.mobile`), not from the request body.
 - `fare` must be a number greater than 0.
 - `pickup` and `destination` must be objects.
 - Backend calculates haversine distance in meters.
@@ -696,6 +697,8 @@ Backend ride document:
   },
   "pickupAddress": "Tahrir Square Cairo",
   "destinationAddress": "Nasr City Cairo",
+  "clientName": "Client User",
+  "clientMobile": "01012345678",
   "fare": 120,
   "status": "pending",
   "assignedDriverId": null,
@@ -708,7 +711,7 @@ Backend ride document:
 Backend side effects:
 
 1. Inserts ride into MongoDB `rides`.
-2. Adds ride to Redis geo/cache through `addRideToGeo()`.
+2. Adds ride to Redis geo/cache through `addRideToGeo()`, including `clientName` and `clientMobile`.
 3. Adds BullMQ job:
 
 ```js
@@ -954,7 +957,8 @@ Frontend logic:
 1. Driver screen attaches listeners for both events.
 2. `nearby-rides` replaces the current request list with a deduped array.
 3. `ride_request` appends one ride to the current list, then dedupes.
-4. UI displays each request with `_id`, `pickupAddress`, and `fare`.
+4. UI displays each request with `clientName`, `_id`, `pickupAddress`, and `fare`.
+5. `clientMobile` is present in the ride payload/cache for backend use, but `DriverHomeScreen` does not display it.
 
 Ride payload example:
 
@@ -962,6 +966,8 @@ Ride payload example:
 {
   "_id": "65f1b123e4b0a12345678902",
   "clientId": "65f1a7c8e4b0a12345678901",
+  "clientName": "Client User",
+  "clientMobile": "01012345678",
   "pickupAddress": "Tahrir Square Cairo",
   "destinationAddress": "Nasr City Cairo",
   "fare": 120,
@@ -1259,6 +1265,12 @@ type RequestRideBody = {
   destinationAddress: string;
   fare: number;
   routeDistance: number; // kilometers from frontend route calculation
+};
+
+// Added by backend from the verified client JWT, not accepted from the request body.
+type RideClientIdentity = {
+  clientName?: string;
+  clientMobile?: string;
 };
 
 type RequestRideResponse = {
