@@ -377,7 +377,7 @@ router.get("/rides/data", async (req, res) => {
     const pipeline = redis.pipeline();
 
     keys.forEach((key) => {
-      pipeline.hgetall(key);
+      pipeline.get(key);
     });
 
     const results = await pipeline.exec();
@@ -427,7 +427,7 @@ router.get("/rides/full", async (req, res) => {
 
     rideIds.forEach((rideId) => {
       pipeline.geopos("rides:geo", rideId);
-      pipeline.hgetall(`ride:${rideId}`);
+      pipeline.get(`ride:${rideId}`);
       pipeline.exists(`ride:${rideId}`);
     });
 

@@ -267,6 +267,7 @@ export async function addRideToGeo(
   destinationAddress,
   fare,
   status = "pending",
+  routeDistance,
   expiresAt
 ) {
   try {
@@ -318,31 +319,33 @@ export async function addRideToGeo(
     );
 
     // ================================
-    // STEP 6: Store ride details as HASH
-    // HSET = store structured data (like object)
+    // STEP 6: Store full ride object as JSON (same as MongoDB)
     // Key: "ride:{rideId}"
     // ================================
-    pipeline.hset(key, {
-      rideId: rideId.toString(),
-      clientId: String(clientId),
+          const rideObject = {
+            _id: rideId,
+            clientId: String(clientId),
 
-      // Pickup location
-      pickupLat: String(pickup.latitude),
-      pickupLon: String(pickup.longitude),
+            pickup: {
+              type: "Point",
+              coordinates: [pickup.longitude, pickup.latitude],
+            },
 
-      // Destination location
-      destinationLat: String(destination.latitude),
-      destinationLon: String(destination.longitude),
+            destination: {
+              type: "Point",
+              coordinates: [destination.longitude, destination.latitude],
+            },
 
-      // Ride info
-      pickupAddress: String(pickupAddress), 
-      destinationAddress: String(destinationAddress),
-      fare: String(fare),
-      status: String(status),
-
-      // Expiration timestamp
-      expiresAt: new Date(expiresAt).toISOString(),
-    });
+            pickupAddress,
+            destinationAddress,
+            fare,
+            status,
+            routeDistance,
+            expiresAt: new Date(expiresAt),
+            
+      };
+      // Store as JSON string
+    pipeline.set(key, JSON.stringify(rideObject));
 
     // ================================
     // STEP 7: Set expiration (TTL)
@@ -474,7 +477,7 @@ export async function findNearbyRides(
     const dataPipeline = redis.pipeline();
 
     liveIds.forEach((rideId) => {
-      dataPipeline.hgetall(`ride:${rideId}`);
+      dataPipeline.get(`ride:${rideId}`);
     });
 
     const dataResults = await dataPipeline.exec();
@@ -486,52 +489,18 @@ export async function findNearbyRides(
     // ================================
     const rides = [];
 
-    liveIds.forEach((rideId, index) => {
-      const [err, hash] = dataResults[index];
+    dataResults.forEach(([err, data], index) => {
+      console.log(`Processing ride ${dataResults[index]}:`, { err, data });
+      const rideId = liveIds[index];
+      if (err || !data) return;
+      try {
+        const ride = JSON.parse(data);
 
-      // Skip if error or empty data
-      if (err || !hash || Object.keys(hash).length === 0) return;
-      rides.push({
-        _id: new ObjectId(dataResults[index][1].rideId || rideId.toString()),
-        status: dataResults[index][1].status || "pending",
-          fare: Number(dataResults[index][1] .fare),
-          expiresAt: dataResults[index][1] .expiresAt,
-          clientId: dataResults[index][1].clientId,
-          pickupAddress: dataResults[index][1] .pickupAddress,
-          destinationAddress: dataResults[index][1].destinationAddress,
-          pickup: {
-            type: "Point",
-            coordinates: [
-              Number(dataResults[index][1] .pickupLon),
-              Number(dataResults[index][1] .pickupLat),
-            ],
-          },
-          destination: {
-            type: "Point",
-            coordinates: [
-              Number(dataResults[index][1] .destinationLon),
-              Number(dataResults[index][1] .destinationLat),
-            ],
-          },
-      })
+        rides.push(ride);
+      } catch (parseErr) {
+        console.error("JSON parse error for ride:", liveIds[index]);
+      }
 
-      // rides.push({
-      //   rideId: hash.rideId || rideId.toString(),
-
-      //   pickup: {
-      //     latitude: Number(hash.pickupLat),
-      //     longitude: Number(hash.pickupLon),
-      //   },
-
-      //   destination: {
-      //     latitude: Number(hash.destinationLat),
-      //     longitude: Number(hash.destinationLon),
-      //   },
-
-      //   fare: Number(hash.fare),
-      //   status: hash.status,
-      //   expiresAt: hash.expiresAt,
-      // });
     });
 
     // ================================

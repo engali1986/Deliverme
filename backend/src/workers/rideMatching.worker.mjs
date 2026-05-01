@@ -89,34 +89,20 @@ const worker = new Worker(
       // Step 6: Load ride data (Redis cache first, then MongoDB fallback).
       // Redis cache is stored as a HASH (see addRideToGeo in redisClient.mjs).
       let ride = null;
-      const cachedRide = await connection.hgetall(`ride:${rideId}`);
+      const cachedRide = await connection.get(`ride:${rideId}`);
       console.log("Cached ride data from Redis:", cachedRide);
-      if (cachedRide && Object.keys(cachedRide).length > 0) {
-        ride = {
-          _id: rideObjectId,
-          status: cachedRide.status || "pending",
-          fare: Number(cachedRide.fare),
-          expiresAt: cachedRide.expiresAt,
-          clientId: cachedRide.clientId,
-          pickupAddress: cachedRide.pickupAddress,
-          destinationAddress: cachedRide.destinationAddress,
-          pickup: {
-            type: "Point",
-            coordinates: [
-              Number(cachedRide.pickupLon),
-              Number(cachedRide.pickupLat),
-            ],
-          },
-          destination: {
-            type: "Point",
-            coordinates: [
-              Number(cachedRide.destinationLon),
-              Number(cachedRide.destinationLat),
-            ],
-          },
-        };
-        console.log("Ride loaded from Redis cache:", rideId);
-      }
+      if (cachedRide) {
+  try {
+    ride = JSON.parse(cachedRide);
+
+    // Normalize _id if needed
+    ride._id = rideObjectId;
+
+    console.log("Ride loaded from Redis cache:", ride);
+  } catch (err) {
+    console.error("Failed to parse cached ride JSON:", err);
+  }
+}
 
       if (!ride) {
         ride = await db.collection("rides").findOne({
