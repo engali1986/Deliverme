@@ -763,7 +763,7 @@ Backend logic:
 4. If requester is a client, checks that `ride.clientId` matches `req.user.id`.
 5. Reads pickup GeoJSON coordinates from ride.
 6. Calls `findNearbyDrivers(longitude, latitude, radiusKm, limit)`.
-7. Returns nearby alive drivers from Redis.
+7. Returns nearby alive drivers from Redis, enriched with cached `driverName`, `driverMobile`, and `vehicle`.
 
 Success response:
 
@@ -773,11 +773,25 @@ Success response:
   "drivers": [
     {
       "driverId": "65f1a7c8e4b0a12345678901",
-      "distanceKm": 1.32
+      "distanceKm": 1.32,
+      "driverName": "Driver User",
+      "driverMobile": "01099998888",
+      "vehicle": {
+        "model": "Toyota Corolla",
+        "color": "White",
+        "plateNumber": "ABC-123"
+      }
     },
     {
       "driverId": "65f1a7c8e4b0a12345678903",
-      "distanceKm": 3.08
+      "distanceKm": 3.08,
+      "driverName": "Second Driver",
+      "driverMobile": "01088887777",
+      "vehicle": {
+        "model": "Hyundai Elantra",
+        "color": "Black",
+        "plateNumber": "XYZ-789"
+      }
     }
   ]
 }
@@ -785,7 +799,7 @@ Success response:
 
 Frontend after response:
 
-- Shows drivers in `SearchingDriverScreen`.
+- Shows driver name, mobile, vehicle, and distance in `SearchingDriverScreen`.
 - If none are returned, shows "No available drivers yet."
 
 Important: this screen polls once on mount. Live driver ride notifications are handled by sockets on the driver side, documented in `socket.md`.
@@ -1300,6 +1314,13 @@ type NearbyDriversResponse = {
   drivers: Array<{
     driverId: string;
     distanceKm: number;
+    driverName: string;
+    driverMobile: string;
+    vehicle: {
+      model?: string;
+      color?: string;
+      plateNumber?: string;
+    } | null;
   }>;
 };
 ```

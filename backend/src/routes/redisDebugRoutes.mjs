@@ -112,7 +112,8 @@ router.get("/drivers/data", async (req, res) => {
 
   return {
     driverId,
-    name: data.name,
+    driverName: data.driverName || data.name || "",
+    driverMobile: data.driverMobile || data.mobile || "",
     vehicle,
   };
 }).filter(Boolean);
@@ -236,18 +237,30 @@ router.get("/drivers/full", async (req, res) => {
     const pipeline = redis.pipeline();
     driverIds.forEach((driverId) => {
       pipeline.geopos("drivers:geo", driverId);
+      pipeline.hgetall(`driver:${driverId}`);
     });
 
     const pipelineResults = await pipeline.exec();
 
     const drivers = driverIds.map((driverId, index) => {
-      const [err, pos] = pipelineResults[index];
+      const [err, pos] = pipelineResults[index * 2];
+      const [dataErr, data] = pipelineResults[index * 2 + 1];
       if (err || !pos || !pos[0]) return null;
+
+      let vehicle = null;
+      try {
+        vehicle = data?.vehicle ? JSON.parse(data.vehicle) : null;
+      } catch {
+        vehicle = null;
+      }
 
       return {
         driverId,
         latitude: Number(pos[0][1]),
         longitude: Number(pos[0][0]),
+        driverName: dataErr ? "" : data?.driverName || data?.name || "",
+        driverMobile: dataErr ? "" : data?.driverMobile || data?.mobile || "",
+        vehicle,
       };
     }).filter(Boolean);
     console.log('redisDebugRoutes - drivers/full:', drivers);

@@ -141,7 +141,18 @@ const SearchingDriverScreen = () => {
           {!driversLoading && Array.isArray(drivers) && drivers.length > 0 ?(
                 drivers.map((item) => (
                   <View key={item.driverId} style={styles.driverRow}>
-                    <Text style={styles.driverId}>{item.driverId}</Text>
+                    <View style={styles.driverInfo}>
+                      <Text style={styles.driverName}>{item.driverName || "Driver"}</Text>
+                      <Text style={styles.driverId}>{item.driverMobile || item.driverId}</Text>
+                      {item.vehicle &&
+                        [item.vehicle.model, item.vehicle.color, item.vehicle.plateNumber].filter(Boolean).length > 0 && (
+                        <Text style={styles.driverVehicle}>
+                          {[item.vehicle.model, item.vehicle.color, item.vehicle.plateNumber]
+                            .filter(Boolean)
+                            .join(" - ")}
+                        </Text>
+                      )}
+                    </View>
                     <Text style={styles.driverDistance}>
                       {Number(item.distanceKm).toFixed(2)} km
                     </Text>
@@ -279,15 +290,35 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   driverRow: {
+    width: "88%",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "flex-start",
+    backgroundColor: "#ffffff",
+    paddingHorizontal: 12,
     paddingVertical: 6,
+    marginTop: 8,
+    borderRadius: 8,
     borderBottomWidth: 1,
     borderBottomColor: "#e6eef8",
+  },
+  driverInfo: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  driverName: {
+    color: "#003366",
+    fontSize: 14,
+    fontWeight: "600",
   },
   driverId: {
     color: "#003366",
     fontSize: 13,
+  },
+  driverVehicle: {
+    color: "#004080",
+    fontSize: 12,
+    marginTop: 2,
   },
   driverDistance: {
     color: "#1565C0",

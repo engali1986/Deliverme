@@ -136,7 +136,9 @@ const worker = new Worker(
       console.log('Broadcasting ride request',ride, 'to', drivers.length, 'drivers');
 
       // Step 9: Broadcast ride request to each nearby driver.
-      for (const [driverId] of drivers) {
+      for (const driver of drivers) {
+        const driverId = driver.driverId;
+        if (!driverId) continue;
 
         io.to(`driver:${driverId.toString()}`).emit("ride_request", ride);
 
@@ -160,7 +162,7 @@ const driverQueue = new Worker(
 
     switch (job.name) {
       case 'driver-online':
-        const result= await addDriverData(driverId, location);
+        const result= await addDriverData(driverId, job.data);
         console.log('addDriverData result:', result);
         // 🔥 Find nearby rides
         const nearbyRides = await findNearbyRides(

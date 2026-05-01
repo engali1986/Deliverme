@@ -121,18 +121,20 @@ export async function removeDriverFromGeo(driverId) {
 export async function addDriverData(driverId, data) {
   try {
     const redis = await getRedis();
-     const pipeline = redis.pipeline();
+    const pipeline = redis.pipeline();
+    const vehicle = data?.driverVehicle ?? data?.vehicle ?? null;
 
-  pipeline.hset(`driver:${driverId}`, {
-    name: data.name,
-    vehicle: JSON.stringify(data.vehicle),
-  });
+    pipeline.hset(`driver:${driverId}`, {
+      driverName: data?.driverName ?? data?.name ?? "",
+      driverMobile: data?.driverMobile ?? data?.mobile ?? "",
+      vehicle: JSON.stringify(vehicle ?? {}),
+    });
 
-  // TTL (optional but recommended)
-  pipeline.expire(`driver:${driverId}`, 24*3600); // 24 hours 
+    // TTL (optional but recommended)
+    pipeline.expire(`driver:${driverId}`, 24*3600); // 24 hours 
 
-  await pipeline.exec();
-  return { ok: true, reason: "Driver data added" };
+    await pipeline.exec();
+    return { ok: true, reason: "Driver data added" };
 
   } catch (error) {
     logger.error("addDriverData error:", error.message);
@@ -144,16 +146,24 @@ export async function getDriverData(driverId) {
   try {
     const redis = await getRedis();
     const key = `driver:${driverId}`;
-    const data = JSON.parse(await redis.hgetall(key) );
+    const data = await redis.hgetall(key);
 
     if (!data || Object.keys(data).length === 0) {
       logger.warn(`No data found for driver ${driverId}`);
       return null;
     }
 
+    let vehicle = null;
+    try {
+      vehicle = data.vehicle ? JSON.parse(data.vehicle) : null;
+    } catch {
+      vehicle = null;
+    }
+
     return {
-      name: data.name || "",
-      vehicle: data.vehicle || "",
+      driverName: data.driverName || data.name || "",
+      driverMobile: data.driverMobile || data.mobile || "",
+      vehicle,
     };
 
   } catch (error) {
@@ -246,7 +256,34 @@ export async function findNearbyDrivers(
     }
     console.log(`Found ${aliveDrivers.length} alive drivers, removed ${staleDrivers.length} stale drivers`);
 
-    return aliveDrivers;
+    const dataPipeline = redis.pipeline();
+    aliveDrivers.forEach(([driverId]) => {
+      dataPipeline.hgetall(`driver:${driverId}`);
+    });
+
+    const dataResults = await dataPipeline.exec();
+
+    return aliveDrivers.map(([driverId, distance], index) => {
+      const [err, data] = dataResults[index] || [];
+      if (err) {
+        logger.warn(`Driver data lookup error for ${driverId}:`, err.message);
+      }
+
+      let vehicle = null;
+      try {
+        vehicle = data?.vehicle ? JSON.parse(data.vehicle) : null;
+      } catch {
+        vehicle = null;
+      }
+
+      return {
+        driverId: driverId?.toString?.() ?? String(driverId),
+        distanceKm: Number(distance),
+        driverName: data?.driverName || data?.name || "",
+        driverMobile: data?.driverMobile || data?.mobile || "",
+        vehicle,
+      };
+    });
 
   } catch (error) {
     logger.error("Error finding nearby drivers:", error.message);

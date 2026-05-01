@@ -37,9 +37,12 @@ router.get('/:rideId/nearby-drivers', authenticateToken, async (req, res) => {
     }
 
     const drivers = await findNearbyDrivers(longitude, latitude, radiusKm, limit);
-    const payload = drivers.map(([driverId, distance]) => ({
-      driverId: driverId?.toString?.() ?? String(driverId),
-      distanceKm: Number(distance),
+    const payload = drivers.map((driver) => ({
+      driverId: driver.driverId?.toString?.() ?? String(driver.driverId),
+      distanceKm: Number(driver.distanceKm),
+      driverName: driver.driverName || "",
+      driverMobile: driver.driverMobile || "",
+      vehicle: driver.vehicle || null,
     }));
     console.log(`Nearby drivers for ride ${rideId}:`, payload);
 
